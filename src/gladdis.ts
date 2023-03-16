@@ -1,9 +1,10 @@
 import merge from 'deepmerge'
 import { promises as fs } from 'fs'
-import { transcribe } from './whisper.js'
 import { OpenAIChat } from 'langchain/llms'
-import type { Context } from './types.js'
+import { transcribe } from './whisper.js'
+
 import type { ChatCompletionRequestMessage } from 'openai'
+import type { Context } from './types.js'
 
 const gladdisMemory: ChatCompletionRequestMessage[] = []
 
