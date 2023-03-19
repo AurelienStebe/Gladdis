@@ -3,20 +3,31 @@ import merge from 'deepmerge'
 import { promises as fs } from 'fs'
 
 import type { Context } from './types.js'
+import type { ChatCompletionRequestMessage, ChatCompletionRequestMessageRoleEnum } from 'openai'
 
-export async function loadContext({ filePath }: { filePath: string }): Promise<Context> {
+interface RequestInputParams {
+    body: { filePath: string }
+}
+
+export async function loadContext({ body: { filePath } }: RequestInputParams): Promise<Context> {
     const content = (await fs.readFile(filePath, 'utf-8')).trim()
     const fileContext = { file: { path: filePath, text: content } }
 
     let userContext = {
+        file: {
+            data: process.env.GLADDIS_DATA_PATH ?? './DATA',
+            date: new Date(),
+        },
         user: {
             label: process.env.GLADDIS_DEFAULT_USER ?? 'User',
+            prompt: '',
+            history: [],
         },
     }
 
     if (content.startsWith('---\n')) {
-        const [frontMatter, ...fileContent] = content.slice(4).split('---')
-        fileContext.file.text = fileContent.join('---').trim()
+        const [frontMatter, ...fileContent] = content.slice(4).split('\n---')
+        fileContext.file.text = fileContent.join('\n---').trim()
         userContext = merge(userContext, yaml.parse(frontMatter))
     }
 
@@ -31,6 +42,7 @@ export async function loadContext({ filePath }: { filePath: string }): Promise<C
             freq_penalty: Number(process.env.GLADDIS_FREQ_PENALTY ?? 0),
             pres_penalty: Number(process.env.GLADDIS_PRES_PENALTY ?? 0),
         },
+
         whisper: {
             label: process.env.GLADDIS_WHISPER_LABEL ?? 'Transcript',
             prompt: process.env.GLADDIS_WHISPER_PROMPT ?? 'Transcribe',
@@ -45,26 +57,96 @@ export async function loadContext({ filePath }: { filePath: string }): Promise<C
     return merge.all([coreContext, userContext, fileContext]) as Context
 }
 
-export function parsePrompt(context: Context): Context {
-    let prompt = context.file.text
+export function loadContent(context: Context): Context {
+    let prompt = ''
+    let quotes = ''
 
-    const border = (prompt + '\n').lastIndexOf('\n---\n')
-    if (border > 0) prompt = prompt.slice(border + 4).trim()
+    let codeBlock = false
+    let textBlock = false
 
-    const userNameMatch = prompt.match(/^\*\*(.+):\*\*/)
+    context.file.text.split('\n').forEach((line) => {
+        if (codeBlock || textBlock) {
+            if (line.trimEnd().endsWith('```')) codeBlock = false
+            if (line.trimEnd().endsWith('"""')) textBlock = false
+            prompt += line
+            return
+        }
 
-    if (userNameMatch !== null) {
-        context.user.label = userNameMatch[1]
-        prompt = prompt.slice(userNameMatch[0].length)
+        if (line.trimStart().startsWith('```')) {
+            if (!line.trimEnd().endsWith('```')) codeBlock = true
+            prompt += line
+            return
+        }
+
+        if (line.trimStart().startsWith('"""')) {
+            if (!line.trimEnd().endsWith('"""')) textBlock = true
+            prompt += line
+            return
+        }
+
+        if (line.trim() === '---') {
+            context = parsePrompt(prompt.trim(), quotes.trim(), context)
+            prompt = quotes = ''
+            return
+        }
+
+        if (line.startsWith('>')) quotes += line.slice(1).trimStart()
+        else {
+            if (!quotes.endsWith('\n\n')) quotes += '\n\n'
+            prompt += line
+        }
+    })
+
+    const past = context.user.history.length
+    context = parsePrompt(prompt.trim(), quotes.trim(), context)
+
+    if (context.user.history.slice(past).at(-1)?.role === 'user') {
+        const last = context.user.history.pop()
+        context.user.prompt = last?.content ?? ''
     }
-
-    context.user.prompt = prompt.trim()
 
     return context
 }
 
-export function parseHistory(context: Context): Context {
-    // TODO
+function parsePrompt(prompt: string, quotes: string, context: Context): Context {
+    let role: ChatCompletionRequestMessageRoleEnum = 'user'
+    let labelMatch = prompt.match(/^\*\*([^*]+):\*\*/)
+    let content = prompt
 
-    return context
+    if (labelMatch !== null) {
+        if (labelMatch[1] === context.gladdis.label) role = 'assistant'
+        else {
+            if (labelMatch[1].toLowerCase() === 'system') role = 'system'
+            else context.user.label = labelMatch[1]
+        }
+        content = content.slice(labelMatch[0].length).trimStart()
+    }
+
+    labelMatch = content.match(/\*\*([^*]+):\*\*/)
+    if (labelMatch !== null) {
+        prompt = content.slice(labelMatch.index).trim()
+        content = content.slice(0, labelMatch.index).trim()
+    }
+
+    content = parseTranscript(content, quotes, context)
+
+    const message: ChatCompletionRequestMessage = { role, content }
+    if (role === 'user') message.name = context.user.label
+    context.user.history.push(message)
+
+    return labelMatch !== null ? parsePrompt(prompt, quotes, context) : context
+}
+
+function parseTranscript(prompt: string, quotes: string, context: Context): string {
+    const transcriptRegex = new RegExp(`\\[!${context.whisper.label} of "(.+)"\\]`, 'g')
+
+    for (const transcriptMatch of quotes.matchAll(transcriptRegex)) {
+        const start = (transcriptMatch.index ?? 0) + transcriptMatch[0].length
+        const stop = quotes.indexOf('\n\n', start) + 1
+
+        const transcript = quotes.slice(start, stop === 0 ? undefined : stop).trim()
+        prompt = prompt.replace(`![[${transcriptMatch[1]}]]`, transcript)
+    }
+
+    return prompt
 }

@@ -2,19 +2,15 @@ import 'dotenv/config'
 import express from 'express'
 import { askGladdis } from './gladdis.js'
 import { transcribe } from './whisper.js'
-import { loadContext, parsePrompt, parseHistory } from './utils.js'
+import { loadContext, loadContent } from './utils.js'
 
 const app = express()
 app.use(express.json())
 
 app.post('/askGladdis', (req, res) => {
     void (async () => {
-        let context = await loadContext(req.body)
-
-        context = parsePrompt(context)
-        context = parseHistory(context)
-
-        void askGladdis(context)
+        const context = await loadContext(req)
+        void askGladdis(loadContent(context))
     })()
 
     res.status(200).end()
@@ -22,12 +18,9 @@ app.post('/askGladdis', (req, res) => {
 
 app.post('/transcribe', (req, res) => {
     void (async () => {
-        const context = await loadContext(req.body)
-
+        const context = await loadContext(req)
         context.whisper.echoScript = true
-        context.whisper.deleteFile = false
-
-        void transcribe(parsePrompt(context))
+        void transcribe(loadContent(context))
     })()
 
     res.status(200).end()

@@ -4,6 +4,8 @@ export interface Context {
     file: {
         path: string
         text: string
+        data: string
+        date: Date
     }
     user: {
         label: string

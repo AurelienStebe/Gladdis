@@ -6,16 +6,13 @@ import type { Context } from './types.js'
 
 const openai = new OpenAIApi(new Configuration({ apiKey: process.env.OPENAI_API_KEY }))
 
-const audioFileRegex = /!\[\[(.+\.(mp3|mp4|mpeg|mpga|m4a|wav|webm))\]\]/g
-
 export async function transcribe(context: Context): Promise<Context> {
-    let match, transcript
+    const audioFileRegex = /!\[\[(.+\.(mp3|mp4|mpeg|mpga|m4a|wav|webm))\]\]/g
 
-    while ((match = audioFileRegex.exec(context.user.prompt)) !== null) {
-        const [fullMatch, audioFileName] = match
-
+    for (const [fullMatch, audioFileName] of context.user.prompt.matchAll(audioFileRegex)) {
         const audioFilePath = path.resolve(path.dirname(context.file.path), audioFileName)
 
+        let transcript
         if (context.whisper.language !== undefined) {
             transcript = await transcription(audioFilePath, context)
         } else {
@@ -23,9 +20,11 @@ export async function transcribe(context: Context): Promise<Context> {
         }
 
         if (context.whisper.deleteFile) void fs.promises.rm(audioFilePath)
+
         if (context.whisper.echoScript) {
-            const transcriptLabel = `*${context.whisper.label} of "${audioFileName}":* `
-            await fs.promises.appendFile(context.file.path, transcriptLabel + transcript + '\n\n')
+            const transcriptLabel = `\n\n> [!${context.whisper.label} of "${audioFileName}"]\n> `
+            const transcriptQuote = transcriptLabel + transcript.split('\n').join('\n> ') + '\n'
+            await fs.promises.appendFile(context.file.path, transcriptQuote)
         }
 
         context.user.prompt = context.user.prompt.replace(fullMatch, transcript)
