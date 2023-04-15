@@ -1,8 +1,9 @@
 import merge from 'deepmerge'
 import { promises as fs } from 'fs'
-import { transcribe } from './whisper.js'
 import { OpenAIClient } from '@fern-api/openai'
-import { getTokenModal } from './tools/history.js'
+
+import { transcribe } from './whisper.js'
+import { getTokenModal } from './utils/history.js'
 import { logGladdisCall, logGladdisChat } from './utils/logging.js'
 
 import type { Context, ChatMessage } from './types/context.js'

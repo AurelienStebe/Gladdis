@@ -1,13 +1,14 @@
 import yaml from 'yaml'
 import merge from 'deepmerge'
 import { promises as fs } from 'fs'
-import { loadHistory } from '../tools/history.js'
+
+import { loadHistory } from './history.js'
 
 import type { Context } from '../types/context.js'
 
-export async function loadContext({ body }: { body: Context }): Promise<Context> {
-    const content = (await fs.readFile(body.file.path, 'utf-8')).trim()
-    const bodyContext = merge(body, { file: { text: content } })
+export async function loadContext(bodyContext: Context): Promise<Context> {
+    const content = (await fs.readFile(bodyContext.file.path, 'utf-8')).trim()
+    bodyContext = merge(bodyContext, { file: { text: content } })
 
     let fileContext = {
         file: {

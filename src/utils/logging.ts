@@ -2,14 +2,14 @@ import path from 'path'
 import yaml from 'yaml'
 import merge from 'deepmerge'
 import { promises as fs } from 'fs'
-import { writeHistory } from '../tools/history.js'
+
+import { writeHistory } from './history.js'
 
 import type { Context } from '../types/context.js'
 
 export async function logGladdisCall(context: Context): Promise<void> {
     const dateDir = context.file.date.toISOString().split('T')[0]
-    const logPath = await getDataPath(context, 'calls', dateDir)
-
+    const logPath = await createDataPath(context.file.data, 'history', 'calls', dateDir)
     const logFile = path.resolve(logPath, `${context.file.date.getTime()}.md`)
 
     const logContext = merge({}, context) as any
@@ -22,8 +22,7 @@ export async function logGladdisCall(context: Context): Promise<void> {
 
 export async function logGladdisChat(context: Context): Promise<void> {
     const dateDir = context.file.date.toISOString().split('T')[0]
-    const logPath = await getDataPath(context, 'chats', dateDir)
-
+    const logPath = await createDataPath(context.file.data, 'history', 'chats', dateDir)
     const logFile = path.resolve(logPath, path.basename(context.file.path))
 
     const history = context.user.history.slice(-2)
@@ -34,15 +33,9 @@ export async function logGladdisChat(context: Context): Promise<void> {
     await fs.appendFile(logFile, writeHistory(context) + '\n')
 }
 
-async function getDataPath(context: Context, ...subPaths: string[]): Promise<string> {
-    try {
-        await fs.access(context.file.data)
-    } catch (e) {
-        await fs.mkdir(context.file.data)
-    }
-
+async function createDataPath(...subPaths: string[]): Promise<string> {
     for (const [i] of subPaths.entries()) {
-        const dataPath = path.resolve(context.file.data, ...subPaths.slice(0, i + 1))
+        const dataPath = path.resolve(...subPaths.slice(0, i + 1))
 
         try {
             await fs.access(dataPath)
@@ -51,5 +44,5 @@ async function getDataPath(context: Context, ...subPaths: string[]): Promise<str
         }
     }
 
-    return path.resolve(context.file.data, ...subPaths)
+    return path.resolve(...subPaths)
 }

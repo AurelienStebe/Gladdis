@@ -1,5 +1,7 @@
 import 'dotenv/config'
+
 import express from 'express'
+
 import { askGladdis } from './gladdis.js'
 import { transcribe } from './whisper.js'
 import { loadContext, loadContent } from './utils/loaders.js'
@@ -9,7 +11,7 @@ app.use(express.json())
 
 app.post('/askGladdis', (req, res) => {
     void (async () => {
-        const context = await loadContext(req)
+        const context = await loadContext(req.body)
         void askGladdis(loadContent(context))
     })()
 
@@ -18,8 +20,11 @@ app.post('/askGladdis', (req, res) => {
 
 app.post('/transcribe', (req, res) => {
     void (async () => {
-        const context = await loadContext(req)
+        const context = await loadContext(req.body)
+
         context.whisper.echoScript = true
+        context.whisper.deleteFile = false
+
         void transcribe(loadContent(context))
     })()
 
