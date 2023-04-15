@@ -5,15 +5,11 @@ import { promises as fs } from 'fs'
 import type { Context } from './types.js'
 import type { ChatCompletionRequestMessage, ChatCompletionRequestMessageRoleEnum } from 'openai'
 
-interface RequestInputParams {
-    body: { filePath: string }
-}
+export async function loadContext({ body }: { body: Context }): Promise<Context> {
+    const content = (await fs.readFile(body.file.path, 'utf-8')).trim()
+    const bodyContext = merge(body, { file: { text: content } })
 
-export async function loadContext({ body: { filePath } }: RequestInputParams): Promise<Context> {
-    const content = (await fs.readFile(filePath, 'utf-8')).trim()
-    const fileContext = { file: { path: filePath, text: content } }
-
-    let userContext = {
+    let fileContext = {
         file: {
             data: process.env.GLADDIS_DATA_PATH ?? './DATA',
             date: new Date(),
@@ -26,9 +22,9 @@ export async function loadContext({ body: { filePath } }: RequestInputParams): P
     }
 
     if (content.startsWith('---\n')) {
-        const [frontMatter, ...fileContent] = content.slice(4).split('\n---')
-        fileContext.file.text = fileContent.join('\n---').trim()
-        userContext = merge(userContext, yaml.parse(frontMatter))
+        const [frontMatter, ...bodyContent] = content.slice(4).split('\n---')
+        bodyContext.file.text = bodyContent.join('\n---').trim()
+        fileContext = merge(fileContext, yaml.parse(frontMatter))
     }
 
     const coreContext = {
@@ -50,16 +46,16 @@ export async function loadContext({ body: { filePath } }: RequestInputParams): P
             echoScript: Boolean(process.env.GLADDIS_WHISPER_ECHO_SCRIPT ?? false),
             deleteFile: Boolean(process.env.GLADDIS_WHISPER_DELETE_FILE ?? false),
             temperature: Number(process.env.GLADDIS_WHISPER_TEMPERATURE ?? 0),
-            language: process.env.GLADDIS_WHISPER_LANGUAGE,
+            language: process.env.GLADDIS_WHISPER_LANGUAGE_ID,
         },
     }
 
-    return merge.all([coreContext, userContext, fileContext]) as Context
+    return merge.all([coreContext, fileContext, bodyContext]) as Context
 }
 
 export function loadContent(context: Context): Context {
-    let prompt = ''
-    let quotes = ''
+    let prompt: string[] = []
+    let quotes: string[] = []
 
     let codeBlock = false
     let textBlock = false
@@ -68,41 +64,40 @@ export function loadContent(context: Context): Context {
         if (codeBlock || textBlock) {
             if (line.trimEnd().endsWith('```')) codeBlock = false
             if (line.trimEnd().endsWith('"""')) textBlock = false
-            prompt += line
+            prompt.push(line)
             return
         }
 
         if (line.trimStart().startsWith('```')) {
             if (!line.trimEnd().endsWith('```')) codeBlock = true
-            prompt += line
+            prompt.push(line)
             return
         }
 
         if (line.trimStart().startsWith('"""')) {
             if (!line.trimEnd().endsWith('"""')) textBlock = true
-            prompt += line
+            prompt.push(line)
             return
         }
 
         if (line.trim() === '---') {
-            context = parsePrompt(prompt.trim(), quotes.trim(), context)
-            prompt = quotes = ''
+            context = parsePrompt(prompt.join('\n').trim(), quotes.join('\n').trim(), context)
+            prompt = []
+            quotes = []
             return
         }
 
-        if (line.startsWith('>')) quotes += line.slice(1).trimStart()
-        else {
-            if (!quotes.endsWith('\n\n')) quotes += '\n\n'
-            prompt += line
-        }
+        if (!line.startsWith('>')) {
+            if (quotes.at(-1) !== '\n\n') quotes.push('\n\n')
+            prompt.push(line)
+        } else quotes.push(line.slice(1).trimStart())
     })
 
-    const past = context.user.history.length
-    context = parsePrompt(prompt.trim(), quotes.trim(), context)
+    context = parsePrompt(prompt.join('\n').trim(), quotes.join('\n').trim(), context)
 
-    if (context.user.history.slice(past).at(-1)?.role === 'user') {
-        const last = context.user.history.pop()
-        context.user.prompt = last?.content ?? ''
+    if (context.user.history.at(-1)?.role === 'user') {
+        const content = context.user.history.pop()?.content ?? ''
+        context.user.prompt = content.replace(/(?<!!)(\[\[.+?\]\])/g, '!$1')
     }
 
     return context
@@ -110,7 +105,8 @@ export function loadContent(context: Context): Context {
 
 function parsePrompt(prompt: string, quotes: string, context: Context): Context {
     let role: ChatCompletionRequestMessageRoleEnum = 'user'
-    let labelMatch = prompt.match(/^\*\*([^*]+):\*\*/)
+    let labelMatch = prompt.match(/^\*\*(.+?):\*\*/)
+
     let content = prompt
 
     if (labelMatch !== null) {
@@ -122,7 +118,8 @@ function parsePrompt(prompt: string, quotes: string, context: Context): Context 
         content = content.slice(labelMatch[0].length).trimStart()
     }
 
-    labelMatch = content.match(/\*\*([^*]+):\*\*/)
+    labelMatch = content.match(/^\*\*(.+?):\*\*/m)
+
     if (labelMatch !== null) {
         prompt = content.slice(labelMatch.index).trim()
         content = content.slice(0, labelMatch.index).trim()
@@ -138,7 +135,7 @@ function parsePrompt(prompt: string, quotes: string, context: Context): Context 
 }
 
 function parseTranscript(prompt: string, quotes: string, context: Context): string {
-    const transcriptRegex = new RegExp(`\\[!${context.whisper.label} of "(.+)"\\]`, 'g')
+    const transcriptRegex = new RegExp(`\\[!${context.whisper.label} of "(.+?)"\\]`, 'gi')
 
     for (const transcriptMatch of quotes.matchAll(transcriptRegex)) {
         const start = (transcriptMatch.index ?? 0) + transcriptMatch[0].length

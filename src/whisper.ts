@@ -7,7 +7,7 @@ import type { Context } from './types.js'
 const openai = new OpenAIApi(new Configuration({ apiKey: process.env.OPENAI_API_KEY }))
 
 export async function transcribe(context: Context): Promise<Context> {
-    const audioFileRegex = /!\[\[(.+\.(mp3|mp4|mpeg|mpga|m4a|wav|webm))\]\]/g
+    const audioFileRegex = /!\[\[(.+?\.(mp3|mp4|mpeg|mpga|m4a|wav|webm))\]\]/gi
 
     for (const [fullMatch, audioFileName] of context.user.prompt.matchAll(audioFileRegex)) {
         const audioFilePath = path.resolve(path.dirname(context.file.path), audioFileName)
