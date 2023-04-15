@@ -1,9 +1,9 @@
 import yaml from 'yaml'
 import merge from 'deepmerge'
 import { promises as fs } from 'fs'
-import { parseTranscript } from './whisper.js'
+import { loadHistory } from '../tools/history.js'
 
-import type { Context, ChatMessage, ChatRoleEnum } from '../types/context.js'
+import type { Context } from '../types/context.js'
 
 export async function loadContext({ body }: { body: Context }): Promise<Context> {
     const content = (await fs.readFile(body.file.path, 'utf-8')).trim()
@@ -54,46 +54,7 @@ export async function loadContext({ body }: { body: Context }): Promise<Context>
 }
 
 export function loadContent(context: Context): Context {
-    let prompt: string[] = []
-    let quotes: string[] = []
-
-    let codeBlock = false
-    let textBlock = false
-
-    context.file.text.split('\n').forEach((line) => {
-        if (codeBlock || textBlock) {
-            if (line.trimEnd().endsWith('```')) codeBlock = false
-            if (line.trimEnd().endsWith('"""')) textBlock = false
-            prompt.push(line)
-            return
-        }
-
-        if (line.trimStart().startsWith('```')) {
-            if (!line.trimEnd().endsWith('```')) codeBlock = true
-            prompt.push(line)
-            return
-        }
-
-        if (line.trimStart().startsWith('"""')) {
-            if (!line.trimEnd().endsWith('"""')) textBlock = true
-            prompt.push(line)
-            return
-        }
-
-        if (line.trim() === '---') {
-            context = parsePrompt(prompt.join('\n').trim(), quotes.join('\n').trim(), context)
-            prompt = []
-            quotes = []
-            return
-        }
-
-        if (!line.startsWith('>')) {
-            if (quotes.at(-1) !== '\n\n') quotes.push('\n\n')
-            prompt.push(line)
-        } else quotes.push(line.slice(1).trimStart())
-    })
-
-    context = parsePrompt(prompt.join('\n').trim(), quotes.join('\n').trim(), context)
+    context = loadHistory(context)
 
     if (context.user.history.at(-1)?.role === 'user') {
         const content = context.user.history.pop()?.content ?? ''
@@ -101,35 +62,4 @@ export function loadContent(context: Context): Context {
     }
 
     return context
-}
-
-function parsePrompt(prompt: string, quotes: string, context: Context): Context {
-    let role: ChatRoleEnum = 'user'
-    let labelMatch = prompt.match(/^\*\*(.+?):\*\*/)
-
-    let content = prompt
-
-    if (labelMatch !== null) {
-        if (labelMatch[1] === context.gladdis.label) role = 'assistant'
-        else {
-            if (labelMatch[1].toLowerCase() === 'system') role = 'system'
-            else context.user.label = labelMatch[1]
-        }
-        content = content.slice(labelMatch[0].length).trimStart()
-    }
-
-    labelMatch = content.match(/^\*\*(.+?):\*\*/m)
-
-    if (labelMatch !== null) {
-        prompt = content.slice(labelMatch.index).trim()
-        content = content.slice(0, labelMatch.index).trim()
-    }
-
-    content = parseTranscript(content, quotes, context)
-
-    const message: ChatMessage = { role, content }
-    if (role === 'user') message.name = context.user.label
-    context.user.history.push(message)
-
-    return labelMatch !== null ? parsePrompt(prompt, quotes, context) : context
 }
