@@ -1,4 +1,9 @@
-import type { ChatCompletionRequestMessage } from 'openai'
+import type {
+    ChatCompletionRequestMessage as ChatMessage,
+    ChatCompletionRequestMessageRoleEnum as ChatRoleEnum,
+} from 'openai'
+
+export type { ChatMessage, ChatRoleEnum }
 
 export interface Context {
     file: {
@@ -10,7 +15,7 @@ export interface Context {
     user: {
         label: string
         prompt: string
-        history: ChatCompletionRequestMessage[]
+        history: ChatMessage[]
     }
     gladdis: {
         label: string

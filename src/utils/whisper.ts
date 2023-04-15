@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { OpenAIApi, Configuration } from 'openai'
 
-import type { Context } from './types.js'
+import type { Context } from '../types/context.js'
 
 const openai = new OpenAIApi(new Configuration({ apiKey: process.env.OPENAI_API_KEY }))
 
@@ -13,10 +13,10 @@ export async function transcribe(context: Context): Promise<Context> {
         const audioFilePath = path.resolve(path.dirname(context.file.path), audioFileName)
 
         let transcript
-        if (context.whisper.language !== undefined) {
-            transcript = await transcription(audioFilePath, context)
-        } else {
+        if (context.whisper.language === undefined) {
             transcript = await translation(audioFilePath, context)
+        } else {
+            transcript = await transcription(audioFilePath, context)
         }
 
         if (context.whisper.deleteFile) void fs.promises.rm(audioFilePath)
@@ -62,4 +62,18 @@ export async function transcription(filePath: string, context: Context): Promise
 
     fileReadStream.destroy()
     return transcription.data.text
+}
+
+export function parseTranscript(prompt: string, quotes: string, context: Context): string {
+    const transcriptRegex = new RegExp(`\\[!${context.whisper.label} of "(.+?)"\\]`, 'gi')
+
+    for (const transcriptMatch of quotes.matchAll(transcriptRegex)) {
+        const start = (transcriptMatch.index ?? 0) + transcriptMatch[0].length
+        const stop = quotes.indexOf('\n\n', start) + 1
+
+        const transcript = quotes.slice(start, stop === 0 ? undefined : stop).trim()
+        prompt = prompt.replace(`![[${transcriptMatch[1]}]]`, transcript)
+    }
+
+    return prompt
 }

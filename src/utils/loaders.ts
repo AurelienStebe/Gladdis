@@ -1,9 +1,9 @@
 import yaml from 'yaml'
 import merge from 'deepmerge'
 import { promises as fs } from 'fs'
+import { parseTranscript } from './whisper.js'
 
-import type { Context } from './types.js'
-import type { ChatCompletionRequestMessage, ChatCompletionRequestMessageRoleEnum } from 'openai'
+import type { Context, ChatMessage, ChatRoleEnum } from '../types/context.js'
 
 export async function loadContext({ body }: { body: Context }): Promise<Context> {
     const content = (await fs.readFile(body.file.path, 'utf-8')).trim()
@@ -104,7 +104,7 @@ export function loadContent(context: Context): Context {
 }
 
 function parsePrompt(prompt: string, quotes: string, context: Context): Context {
-    let role: ChatCompletionRequestMessageRoleEnum = 'user'
+    let role: ChatRoleEnum = 'user'
     let labelMatch = prompt.match(/^\*\*(.+?):\*\*/)
 
     let content = prompt
@@ -127,23 +127,9 @@ function parsePrompt(prompt: string, quotes: string, context: Context): Context 
 
     content = parseTranscript(content, quotes, context)
 
-    const message: ChatCompletionRequestMessage = { role, content }
+    const message: ChatMessage = { role, content }
     if (role === 'user') message.name = context.user.label
     context.user.history.push(message)
 
     return labelMatch !== null ? parsePrompt(prompt, quotes, context) : context
-}
-
-function parseTranscript(prompt: string, quotes: string, context: Context): string {
-    const transcriptRegex = new RegExp(`\\[!${context.whisper.label} of "(.+?)"\\]`, 'gi')
-
-    for (const transcriptMatch of quotes.matchAll(transcriptRegex)) {
-        const start = (transcriptMatch.index ?? 0) + transcriptMatch[0].length
-        const stop = quotes.indexOf('\n\n', start) + 1
-
-        const transcript = quotes.slice(start, stop === 0 ? undefined : stop).trim()
-        prompt = prompt.replace(`![[${transcriptMatch[1]}]]`, transcript)
-    }
-
-    return prompt
 }

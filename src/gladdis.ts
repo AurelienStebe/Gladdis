@@ -4,10 +4,9 @@ import merge from 'deepmerge'
 import { promises as fs } from 'fs'
 import { Tiktoken } from '@dqbd/tiktoken/lite'
 import { OpenAIClient } from '@fern-api/openai'
-import { transcribe } from './whisper.js'
+import { transcribe } from './utils/whisper.js'
 
-import type { ChatCompletionRequestMessage } from 'openai'
-import type { Context } from './types.js'
+import type { Context, ChatMessage } from './types/context.js'
 
 import cl100k_base from '@dqbd/tiktoken/encoders/cl100k_base.json' assert { type: 'json' }
 
@@ -23,13 +22,13 @@ export async function askGladdis(context: Context): Promise<void> {
     delete chatContext.gladdis
     delete chatContext.whisper
 
-    const promptMessage: ChatCompletionRequestMessage = {
+    const promptMessage: ChatMessage = {
         role: 'user',
         content: context.user.prompt,
         name: context.user.label,
     }
 
-    const prefixMessages: ChatCompletionRequestMessage[] = [
+    const prefixMessages: ChatMessage[] = [
         { role: 'system', content: context.gladdis.corePrompt },
         { role: 'system', content: context.gladdis.metaPrompt + JSON.stringify(chatContext) },
     ]
@@ -44,7 +43,7 @@ export async function askGladdis(context: Context): Promise<void> {
 }
 
 export async function chatWithGladdis(context: Context): Promise<Context> {
-    const gladdisResponse: ChatCompletionRequestMessage = {
+    const gladdisResponse: ChatMessage = {
         role: 'assistant',
         content: '',
     }
@@ -164,7 +163,7 @@ function getTokenModal(context: Context): string {
     return `\n\n> [!INFO]\n> Using ${tokenCount} max tokens.\n>\n> ${tokenGraph}`
 }
 
-function getTokenLength(messages: ChatCompletionRequestMessage[]): number {
+function getTokenLength(messages: ChatMessage[]): number {
     const tiktoken = new Tiktoken(cl100k_base.bpe_ranks, cl100k_base.special_tokens, cl100k_base.pat_str)
 
     const fullHistory = messages.map((message) => `${message.name ?? message.role}\n${message.content}`)

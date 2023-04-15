@@ -12,14 +12,14 @@
     },
     "license": "MIT",
     "type": "module",
-    "main": "./dist/index.js",
-    "exports": "./dist/index.js",
+    "main": "./dist/service.js",
+    "exports": "./dist/service.js",
     "scripts": {
         "lint": "prettier -c . && eslint .",
         "clean": "rimraf dist",
         "build": "npm run clean && tsc",
-        "start": "node --no-warnings ./dist/index.js",
-        "live": "nodemon --exec ts-node-esm ./src/index.ts"
+        "start": "node --no-warnings ./dist/service.js",
+        "live": "nodemon --exec ts-node-esm ./src/service.ts"
     },
     "prettier": {
         "semi": false,
