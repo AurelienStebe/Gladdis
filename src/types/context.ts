@@ -19,8 +19,6 @@ export interface Context {
     }
     gladdis: {
         label: string
-        corePrompt: string
-        metaPrompt: string
         model: string
         temperature: number
         top_p_param: number

@@ -31,8 +31,6 @@ export async function loadContext(context: Context): Promise<Context> {
     const coreContext = {
         gladdis: {
             label: process.env.GLADDIS_NAME_LABEL ?? 'Gladdis',
-            corePrompt: process.env.GLADDIS_CORE_PROMPT ?? 'You are Gladdis, trained by OpenAI.',
-            metaPrompt: process.env.GLADDIS_META_PROMPT ?? 'Metadata Context (in JSON format): ',
             model: process.env.GLADDIS_DEFAULT_MODEL ?? 'gpt-3.5-turbo',
             temperature: Number(process.env.GLADDIS_TEMPERATURE ?? 0),
             top_p_param: Number(process.env.GLADDIS_TOP_P_PARAM ?? 1),
