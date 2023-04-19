@@ -2,82 +2,67 @@ import { parseTranscript } from './whisper.js'
 
 import type { Context, ChatMessage, ChatRoleEnum } from '../types/context.js'
 
-import cl100k_base from '@dqbd/tiktoken/encoders/cl100k_base.json' assert { type: 'json' }
+export function parseHistory(context: Context): ChatMessage[] {
+    const lines = (context.file.text + '\n---\n').split('\n')
+    const history: ChatMessage[] = []
 
-export function loadHistory(context: Context): ChatMessage[] {
+    let label = context.user.label
+
     let prompt: string[] = []
     let quotes: string[] = []
 
     let codeBlock = false
     let textBlock = false
 
-    context.file.text.split('\n').forEach((line) => {
+    lines.forEach((line) => {
         if (codeBlock || textBlock) {
             if (line.trimEnd().endsWith('```')) codeBlock = false
             if (line.trimEnd().endsWith('"""')) textBlock = false
-            prompt.push(line)
-            return
-        }
 
-        if (line.trimStart().startsWith('```')) {
+            prompt.push(line)
+        } else if (line.trimStart().startsWith('```')) {
             if (!line.trimEnd().endsWith('```')) codeBlock = true
-            prompt.push(line)
-            return
-        }
 
-        if (line.trimStart().startsWith('"""')) {
+            prompt.push(line)
+        } else if (line.trimStart().startsWith('"""')) {
             if (!line.trimEnd().endsWith('"""')) textBlock = true
-            prompt.push(line)
-            return
-        }
 
-        if (line.trim() === '---') {
-            context = parsePrompt(prompt.join('\n').trim(), quotes.join('\n').trim(), context)
+            prompt.push(line)
+        } else if (line.trim() === '---') {
+            history.push(parsePrompt(label, prompt, quotes, context))
+            label = context.user.label
             prompt = []
             quotes = []
-            return
-        }
-
-        if (!line.startsWith('>')) {
+        } else if (line.startsWith('>')) quotes.push(line.slice(1))
+        else {
             if (quotes.at(-1) !== '\n\n') quotes.push('\n\n')
-            prompt.push(line)
-        } else quotes.push(line.slice(1).trimStart())
+
+            const labelMatch = line.match(/^\*\*(.+?):\*\*/)
+            if (labelMatch !== null) {
+                history.push(parsePrompt(label, prompt, quotes, context))
+
+                prompt = [line.slice(labelMatch[0].length).trimStart()]
+                label = labelMatch[1]
+            } else {
+                prompt.push(line)
+            }
+        }
     })
 
-    context = parsePrompt(prompt.join('\n').trim(), quotes.join('\n').trim(), context)
-
-    return context.user.history
+    return history.filter((message) => message.content !== '')
 }
 
-function parsePrompt(prompt: string, quotes: string, context: Context): Context {
+export function parsePrompt(label: string, prompt: string[], quotes: string[], context: Context): ChatMessage {
+    const content = parseTranscript(prompt.join('\n').trim(), quotes.join('\n').trim(), context)
+
     let role: ChatRoleEnum = 'user'
-    let labelMatch = prompt.match(/^\*\*(.+?):\*\*/)
-
-    let content = prompt
-
-    if (labelMatch !== null) {
-        if (labelMatch[1] === context.gladdis.label) role = 'assistant'
-        else {
-            if (labelMatch[1].toLowerCase() === 'system') role = 'system'
-            else context.user.label = labelMatch[1]
-        }
-        content = content.slice(labelMatch[0].length).trimStart()
-    }
-
-    labelMatch = content.match(/^\*\*(.+?):\*\*/m)
-
-    if (labelMatch !== null) {
-        prompt = content.slice(labelMatch.index).trim()
-        content = content.slice(0, labelMatch.index).trim()
-    }
-
-    content = parseTranscript(content, quotes, context)
+    if (label.toLowerCase() in ['system', 'assistant']) role = label.toLowerCase() as ChatRoleEnum
+    if (label.toLowerCase() === context.gladdis.label.toLowerCase()) role = 'assistant'
 
     const message: ChatMessage = { role, content }
-    if (role === 'user') message.name = context.user.label
-    context.user.history.push(message)
+    if (role === 'user' && label.toLowerCase() !== 'user') message.name = label
 
-    return labelMatch !== null ? parsePrompt(prompt, quotes, context) : context
+    return message
 }
 
 export function writeHistory(context: Context): string {
