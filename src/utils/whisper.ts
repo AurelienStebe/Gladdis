@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { OpenAIApi, Configuration } from 'openai'
 
-import type { Context } from './types/context.js'
+import type { Context } from '../types/context.js'
 
 const openai = new OpenAIApi(new Configuration({ apiKey: process.env.OPENAI_API_KEY }))
 
@@ -71,8 +71,8 @@ export function parseTranscript(prompt: string, quotes: string, context: Context
         const start = (transcriptMatch.index ?? 0) + transcriptMatch[0].length
         const stop = quotes.indexOf('\n\n', start) + 1
 
-        const transcript = quotes.slice(start, stop === 0 ? undefined : stop).trim()
-        prompt = prompt.replace(`![[${transcriptMatch[1]}]]`, transcript)
+        const transcript = quotes.slice(start, stop === 0 ? undefined : stop)
+        prompt = prompt.replace(`![[${transcriptMatch[1]}]]`, transcript.trim())
     }
 
     return prompt

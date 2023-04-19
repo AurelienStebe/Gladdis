@@ -2,9 +2,8 @@ import merge from 'deepmerge'
 import { promises as fs } from 'fs'
 import { OpenAIClient } from '@fern-api/openai'
 
-import { transcribe } from './whisper.js'
-import { getTokenModal } from './utils/history.js'
-import { logGladdisCall, logGladdisChat } from './utils/logging.js'
+import { transcribe } from './utils/whisper.js'
+import { logGladdisCall, logGladdisChat, getTokenModal } from './utils/loggers.js'
 
 import type { Context, ChatMessage } from './types/context.js'
 
@@ -36,8 +35,8 @@ export async function askGladdis(context: Context): Promise<void> {
 
     context = await chatWithGladdis(context)
 
-    void logGladdisCall(context)
-    void logGladdisChat(context)
+    await logGladdisCall(context)
+    await logGladdisChat(context)
 }
 
 export async function chatWithGladdis(context: Context): Promise<Context> {

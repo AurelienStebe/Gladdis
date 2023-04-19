@@ -3,7 +3,7 @@ import 'dotenv/config'
 import express from 'express'
 
 import { askGladdis } from './gladdis.js'
-import { transcribe } from './whisper.js'
+import { transcribe } from './utils/whisper.js'
 import { loadContext, loadContent } from './utils/loaders.js'
 
 const app = express()

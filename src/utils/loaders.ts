@@ -2,13 +2,13 @@ import yaml from 'yaml'
 import merge from 'deepmerge'
 import { promises as fs } from 'fs'
 
-import { loadHistory } from './history.js'
+import { parseHistory } from './history.js'
 
 import type { Context } from '../types/context.js'
 
-export async function loadContext(bodyContext: Context): Promise<Context> {
-    const content = (await fs.readFile(bodyContext.file.path, 'utf-8')).trim()
-    bodyContext = merge(bodyContext, { file: { text: content } })
+export async function loadContext(context: Context): Promise<Context> {
+    const content = (await fs.readFile(context.file.path, 'utf-8')).trim()
+    const bodyContext = merge(context, { file: { text: content } })
 
     let fileContext = {
         file: {
@@ -39,7 +39,6 @@ export async function loadContext(bodyContext: Context): Promise<Context> {
             freq_penalty: Number(process.env.GLADDIS_FREQ_PENALTY ?? 0),
             pres_penalty: Number(process.env.GLADDIS_PRES_PENALTY ?? 0),
         },
-
         whisper: {
             label: process.env.GLADDIS_WHISPER_LABEL ?? 'Transcript',
             prompt: process.env.GLADDIS_WHISPER_PROMPT ?? 'Transcribe',
@@ -55,9 +54,13 @@ export async function loadContext(bodyContext: Context): Promise<Context> {
 }
 
 export function loadContent(context: Context): Context {
-    context = loadHistory(context)
+    context.user.history = parseHistory(context)
 
     if (context.user.history.at(-1)?.role === 'user') {
+        if (context.user.history.at(-1)?.name !== undefined) {
+            context.user.label = context.user.history.at(-1)?.name ?? 'User'
+        }
+
         const content = context.user.history.pop()?.content ?? ''
         context.user.prompt = content.replace(/(?<!!)(\[\[.+?\]\])/g, '!$1')
     }

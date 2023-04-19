@@ -1,12 +1,10 @@
-import { Tiktoken } from '@dqbd/tiktoken/lite'
-
-import { parseTranscript } from '../whisper.js'
+import { parseTranscript } from './whisper.js'
 
 import type { Context, ChatMessage, ChatRoleEnum } from '../types/context.js'
 
 import cl100k_base from '@dqbd/tiktoken/encoders/cl100k_base.json' assert { type: 'json' }
 
-export function loadHistory(context: Context): Context {
+export function loadHistory(context: Context): ChatMessage[] {
     let prompt: string[] = []
     let quotes: string[] = []
 
@@ -48,7 +46,7 @@ export function loadHistory(context: Context): Context {
 
     context = parsePrompt(prompt.join('\n').trim(), quotes.join('\n').trim(), context)
 
-    return context
+    return context.user.history
 }
 
 function parsePrompt(prompt: string, quotes: string, context: Context): Context {
@@ -93,28 +91,4 @@ export function writeHistory(context: Context): string {
     })
 
     return history.join('\n\n') + '\n'
-}
-
-export function getTokenModal(context: Context): string {
-    const tokenLength = getTokenLength(context.user.history)
-
-    let tokenLimit = context.gladdis.model.startsWith('gpt-4') ? 8192 : 4096
-    if (context.gladdis.model.startsWith('gpt-4-32k')) tokenLimit = 32768
-
-    const tokenRatio = Math.ceil((tokenLength / tokenLimit) * 33)
-    const tokenGraph = `[**${'#'.repeat(tokenRatio)}**${'-'.repeat(33 - tokenRatio)}]`
-    const tokenCount = `**${tokenLength.toLocaleString()}** tokens out of ${tokenLimit.toLocaleString()}`
-
-    return `\n\n> [!INFO]\n> Using ${tokenCount} max tokens.\n>\n> ${tokenGraph}`
-}
-
-export function getTokenLength(messages: ChatMessage[]): number {
-    const tiktoken = new Tiktoken(cl100k_base.bpe_ranks, cl100k_base.special_tokens, cl100k_base.pat_str)
-
-    const fullHistory = messages.map((message) => `${message.name ?? message.role}\n${message.content}`)
-    const tokenLength = tiktoken.encode(fullHistory.join('\n')).length + messages.length * 3
-
-    tiktoken.free()
-
-    return tokenLength
 }
