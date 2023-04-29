@@ -7,18 +7,20 @@ export type { ChatMessage, ChatRoleEnum }
 
 export interface Context {
     file: {
+        date: Date
+        name: string
         path: string
         text: string
-        data: string
-        date: Date
     }
     user: {
+        data: string
         label: string
         prompt: string
         history: ChatMessage[]
     }
     gladdis: {
         label: string
+        config: string
         model: string
         temperature: number
         top_p_param: number

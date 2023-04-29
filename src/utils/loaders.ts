@@ -1,36 +1,27 @@
+import path from 'path'
 import yaml from 'yaml'
+import fs from 'fs-extra'
 import merge from 'deepmerge'
-import { promises as fs } from 'fs'
 
 import { parseHistory } from './history.js'
 
 import type { Context } from '../types/context.js'
 
 export async function loadContext(context: Context): Promise<Context> {
-    const content = (await fs.readFile(context.file.path, 'utf-8')).trim()
-    const bodyContext = merge(context, { file: { text: content } })
-
-    let fileContext = {
-        file: {
-            data: process.env.GLADDIS_DATA_PATH ?? './DATA',
-            date: new Date(),
-        },
-        user: {
-            label: process.env.GLADDIS_DEFAULT_USER ?? 'User',
-            prompt: '',
-            history: [],
-        },
-    }
-
-    if (content.startsWith('---\n')) {
-        const [frontMatter, ...bodyContent] = content.slice(4).split('\n---')
-        bodyContext.file.text = bodyContent.join('\n---').trim()
-        fileContext = merge(fileContext, yaml.parse(frontMatter))
-    }
+    const callContext = merge(context, { file: { date: new Date() } })
+    const fileContext = merge(await loadMarkdown(context), callContext)
 
     const coreContext = {
+        file: {
+            name: path.basename(fileContext.file.path),
+        },
+        user: {
+            data: process.env.GLADDIS_DATA_PATH ?? './DATA',
+            label: process.env.GLADDIS_DEFAULT_USER ?? 'User',
+        },
         gladdis: {
             label: process.env.GLADDIS_NAME_LABEL ?? 'Gladdis',
+            config: process.env.GLADDIS_CONFIG_FILE ?? 'Gladdis.md',
             model: process.env.GLADDIS_DEFAULT_MODEL ?? 'gpt-3.5-turbo',
             temperature: Number(process.env.GLADDIS_TEMPERATURE ?? 0),
             top_p_param: Number(process.env.GLADDIS_TOP_P_PARAM ?? 1),
@@ -48,11 +39,51 @@ export async function loadContext(context: Context): Promise<Context> {
         },
     }
 
-    return merge.all([coreContext, fileContext, bodyContext]) as Context
+    const fullContext = merge(coreContext, fileContext)
+
+    return merge(await loadAIConfig(fullContext), fileContext)
+}
+
+export async function loadAIConfig(context: Context): Promise<Context> {
+    const confPath = path.resolve(context.user.data, 'configs', context.gladdis.config)
+
+    if (await fs.pathExists(confPath)) {
+        let confContext: any = {
+            file: { path: confPath },
+            user: { label: 'System' },
+        }
+
+        confContext = merge(context, await loadMarkdown(confContext))
+        context.user.history = parseHistory(confContext)
+
+        delete confContext.file
+        delete confContext.user
+
+        context = merge(context, confContext)
+    } else {
+        const warning = `\n\n> [!WARNING]\n> **Config File Not Found:** ${confPath}`
+        await fs.appendFile(context.file.path, warning)
+        context.user.history = []
+    }
+
+    return context
+}
+
+export async function loadMarkdown(context: Context): Promise<Context> {
+    const content = (await fs.readFile(context.file.path, 'utf-8')).trim()
+
+    if (content.startsWith('---\n')) {
+        const [frontMatter, ...bodyContent] = content.slice(4).split('\n---')
+
+        context = merge(yaml.parse(frontMatter), context)
+        context.file.text = bodyContent.join('\n---').trim()
+    } else context.file.text = content
+
+    return context
 }
 
 export function loadContent(context: Context): Context {
-    context.user.history = parseHistory(context)
+    context.user.history.push(...parseHistory(context))
 
     if (context.user.history.at(-1)?.role === 'user') {
         if (context.user.history.at(-1)?.name !== undefined) {
@@ -61,7 +92,7 @@ export function loadContent(context: Context): Context {
 
         const content = context.user.history.pop()?.content ?? ''
         context.user.prompt = content.replace(/(?<!!)(\[\[.+?\]\])/g, '!$1')
-    }
+    } else context.user.prompt = ''
 
     return context
 }

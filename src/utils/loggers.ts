@@ -1,7 +1,7 @@
 import path from 'path'
 import yaml from 'yaml'
+import fs from 'fs-extra'
 import merge from 'deepmerge'
-import { promises as fs } from 'fs'
 import { Tiktoken } from '@dqbd/tiktoken/lite'
 
 import { writeHistory } from './history.js'
@@ -12,8 +12,10 @@ import cl100k_base from '@dqbd/tiktoken/encoders/cl100k_base.json' assert { type
 
 export async function logGladdisCall(context: Context): Promise<void> {
     const dateDir = context.file.date.toISOString().split('T')[0]
-    const logPath = await createDataPath(context.file.data, 'history', 'calls', dateDir)
+    const logPath = path.resolve(context.user.data, 'history', 'calls', dateDir)
     const logFile = path.resolve(logPath, `${context.file.date.getTime()}.md`)
+
+    await fs.ensureDir(logPath)
 
     const logContext = merge({}, context) as any
     delete logContext.file
@@ -25,8 +27,10 @@ export async function logGladdisCall(context: Context): Promise<void> {
 
 export async function logGladdisChat(context: Context): Promise<void> {
     const dateDir = context.file.date.toISOString().split('T')[0]
-    const logPath = await createDataPath(context.file.data, 'history', 'chats', dateDir)
-    const logFile = path.resolve(logPath, path.basename(context.file.path))
+    const logPath = path.resolve(context.user.data, 'history', 'chats', dateDir)
+    const logFile = path.resolve(logPath, context.file.name)
+
+    await fs.ensureDir(logPath)
 
     const history = merge({}, context.user.history.slice(-2))
     history[0].content = `[${context.file.date.toISOString().split('T')[1]}] ${history[0].content}`
@@ -38,22 +42,8 @@ export async function logGladdisChat(context: Context): Promise<void> {
     await fs.appendFile(logFile, '\n' + writeHistory(logContext))
 }
 
-async function createDataPath(...subPaths: string[]): Promise<string> {
-    for (const [i] of subPaths.entries()) {
-        const dataPath = path.resolve(...subPaths.slice(0, i + 1))
-
-        try {
-            await fs.access(dataPath)
-        } catch (e) {
-            await fs.mkdir(dataPath)
-        }
-    }
-
-    return path.resolve(...subPaths)
-}
-
 export function getTokenModal(context: Context): string {
-    const tokenLength = getTokenLength(context.user.history)
+    const tokenLength = getTokenCount(context.user.history)
 
     let tokenLimit = context.gladdis.model.startsWith('gpt-4') ? 8192 : 4096
     if (context.gladdis.model.startsWith('gpt-4-32k')) tokenLimit = 32768
@@ -65,12 +55,13 @@ export function getTokenModal(context: Context): string {
     return `\n\n> [!INFO]\n> Using ${tokenCount} max tokens.\n>\n> ${tokenGraph}`
 }
 
-export function getTokenLength(messages: ChatMessage[]): number {
+export function getTokenCount(messages: ChatMessage[]): number {
     const tiktoken = new Tiktoken(cl100k_base.bpe_ranks, cl100k_base.special_tokens, cl100k_base.pat_str)
 
     const fullHistory = messages.map((message) => `${message.name ?? message.role}\n${message.content}`)
     const tokenLength = tiktoken.encode(fullHistory.join('\n')).length + messages.length * 3
 
     tiktoken.free()
+
     return tokenLength
 }

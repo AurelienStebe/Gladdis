@@ -1,5 +1,5 @@
-import fs from 'fs'
 import path from 'path'
+import fs from 'fs-extra'
 import { OpenAIApi, Configuration } from 'openai'
 
 import type { Context } from '../types/context.js'
@@ -19,12 +19,13 @@ export async function transcribe(context: Context): Promise<Context> {
             transcript = await transcription(audioFilePath, context)
         }
 
-        if (context.whisper.deleteFile) void fs.promises.rm(audioFilePath)
+        if (context.whisper.deleteFile) void fs.remove(audioFilePath)
 
         if (context.whisper.echoScript) {
             const transcriptLabel = `\n\n> [!${context.whisper.label} of "${audioFileName}"]\n> `
             const transcriptQuote = transcriptLabel + transcript.split('\n').join('\n> ') + '\n'
-            await fs.promises.appendFile(context.file.path, transcriptQuote)
+
+            await fs.appendFile(context.file.path, transcriptQuote)
         }
 
         context.user.prompt = context.user.prompt.replace(fullMatch, transcript)

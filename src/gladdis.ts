@@ -1,5 +1,5 @@
+import fs from 'fs-extra'
 import merge from 'deepmerge'
-import { promises as fs } from 'fs'
 import { OpenAIClient } from '@fern-api/openai'
 
 import { transcribe } from './utils/whisper.js'
@@ -35,7 +35,6 @@ export async function askGladdis(context: Context): Promise<void> {
     if (Object.entries(chatContext).length > 0) {
         context.user.history.unshift({ role: 'system', content: metaPrompt + JSON.stringify(chatContext) })
     }
-
     context.user.history.unshift({ role: 'system', content: corePrompt })
 
     const promptMessage: ChatMessage = {
@@ -74,11 +73,11 @@ export async function chatWithGladdis(context: Context): Promise<Context> {
         },
         (data) => {
             if (data.choices[0].delta.role === 'assistant') {
-                void fs.appendFile(context.file.path, `\n\n**${context.gladdis.label}:** `)
+                fs.appendFileSync(context.file.path, `\n\n**${context.gladdis.label}:** `)
             }
             if (data.choices[0].delta.content !== undefined) {
                 gladdisResponse.content += data.choices[0].delta.content
-                void fs.appendFile(context.file.path, data.choices[0].delta.content)
+                fs.appendFileSync(context.file.path, data.choices[0].delta.content)
             }
         },
         {
