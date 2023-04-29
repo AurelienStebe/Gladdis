@@ -24,7 +24,7 @@ export async function loadContext(context: Context): Promise<Context> {
             config: process.env.GLADDIS_CONFIG_FILE ?? 'Gladdis.md',
             model: process.env.GLADDIS_DEFAULT_MODEL ?? 'gpt-3.5-turbo',
             temperature: Number(process.env.GLADDIS_TEMPERATURE ?? 0),
-            top_p_param: Number(process.env.GLADDIS_TOP_P_PARAM ?? 1),
+            top_p_param: Number(process.env.GLADDIS_TOP_P_PARAM ?? 100),
             freq_penalty: Number(process.env.GLADDIS_FREQ_PENALTY ?? 0),
             pres_penalty: Number(process.env.GLADDIS_PRES_PENALTY ?? 0),
         },
@@ -32,7 +32,7 @@ export async function loadContext(context: Context): Promise<Context> {
             label: process.env.GLADDIS_WHISPER_LABEL ?? 'Transcript',
             prompt: process.env.GLADDIS_WHISPER_PROMPT ?? 'Transcribe',
             model: process.env.GLADDIS_WHISPER_MODEL ?? 'whisper-1',
-            echoScript: Boolean(process.env.GLADDIS_WHISPER_ECHO_SCRIPT ?? false),
+            echoScript: Boolean(process.env.GLADDIS_WHISPER_ECHO_SCRIPT ?? true),
             deleteFile: Boolean(process.env.GLADDIS_WHISPER_DELETE_FILE ?? false),
             temperature: Number(process.env.GLADDIS_WHISPER_TEMPERATURE ?? 0),
             language: process.env.GLADDIS_WHISPER_LANGUAGE_ID,
@@ -61,7 +61,7 @@ export async function loadAIConfig(context: Context): Promise<Context> {
 
         context = merge(context, confContext)
     } else {
-        const warning = `\n\n> [!WARNING]\n> **Config File Not Found:** ${confPath}`
+        const warning = `\n\n> [!WARNING]\n> **Config File Not Found:**\n>\n> ${confPath}`
         await fs.appendFile(context.file.path, warning)
         context.user.history = []
     }

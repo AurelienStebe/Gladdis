@@ -11,8 +11,8 @@ import type { Context, ChatMessage } from '../types/context.js'
 import cl100k_base from '@dqbd/tiktoken/encoders/cl100k_base.json' assert { type: 'json' }
 
 export async function logGladdisCall(context: Context): Promise<void> {
-    const dateDir = context.file.date.toISOString().split('T')[0]
-    const logPath = path.resolve(context.user.data, 'history', 'calls', dateDir)
+    const dateDir = context.file.date.toISOString().split('T')[0].split('-')
+    const logPath = path.resolve(context.user.data, 'history', 'calls', ...dateDir)
     const logFile = path.resolve(logPath, `${context.file.date.getTime()}.md`)
 
     await fs.ensureDir(logPath)
@@ -26,8 +26,8 @@ export async function logGladdisCall(context: Context): Promise<void> {
 }
 
 export async function logGladdisChat(context: Context): Promise<void> {
-    const dateDir = context.file.date.toISOString().split('T')[0]
-    const logPath = path.resolve(context.user.data, 'history', 'chats', dateDir)
+    const dateDir = context.file.date.toISOString().split('T')[0].split('-')
+    const logPath = path.resolve(context.user.data, 'history', 'chats', ...dateDir)
     const logFile = path.resolve(logPath, context.file.name)
 
     await fs.ensureDir(logPath)
@@ -48,9 +48,9 @@ export function getTokenModal(context: Context): string {
     let tokenLimit = context.gladdis.model.startsWith('gpt-4') ? 8192 : 4096
     if (context.gladdis.model.startsWith('gpt-4-32k')) tokenLimit = 32768
 
-    const tokenRatio = Math.ceil((tokenLength / tokenLimit) * 33)
-    const tokenGraph = `[**${'#'.repeat(tokenRatio)}**${'-'.repeat(33 - tokenRatio)}]`
-    const tokenCount = `**${tokenLength.toLocaleString()}** tokens out of ${tokenLimit.toLocaleString()}`
+    const tokenRatio = Math.ceil((tokenLength / tokenLimit) * 42)
+    const tokenGraph = `[**${'#'.repeat(tokenRatio)}**${'-'.repeat(42 - tokenRatio)}]`
+    const tokenCount = `**${tokenLength.toLocaleString()}** tokens out of **${tokenLimit.toLocaleString()}**`
 
     return `\n\n> [!INFO]\n> Using ${tokenCount} max tokens.\n>\n> ${tokenGraph}`
 }

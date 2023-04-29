@@ -13,9 +13,9 @@ const defaultCorePrompt =
     '**Core Prompt**\n' +
     'You are Gladdis, trained by OpenAI.\n\n' +
     'Your 3 key Heuristic Imperatives are:\n' +
-    '\t- Reduce suffering in the universe.\n' +
-    '\t- Increase prosperity in the universe.\n' +
-    '\t- Increase understanding in the universe.'
+    '  - Reduce suffering in the universe.\n' +
+    '  - Increase prosperity in the universe.\n' +
+    '  - Increase understanding in the universe.'
 
 const defaultMetaPrompt = '**Metadata Context** (in JSON format)\n'
 
@@ -66,10 +66,10 @@ export async function chatWithGladdis(context: Context): Promise<Context> {
             stream: true,
             model: context.gladdis.model,
             messages: context.user.history,
-            temperature: context.gladdis.temperature,
-            topP: context.gladdis.top_p_param,
-            frequencyPenalty: context.gladdis.freq_penalty,
-            presencePenalty: context.gladdis.pres_penalty,
+            temperature: context.gladdis.temperature / 100,
+            topP: context.gladdis.top_p_param / 100,
+            frequencyPenalty: context.gladdis.freq_penalty / 100,
+            presencePenalty: context.gladdis.pres_penalty / 100,
         },
         (data) => {
             if (data.choices[0].delta.role === 'assistant') {

@@ -22,10 +22,12 @@ export function parseHistory(context: Context): ChatMessage[] {
             prompt.push(line)
         } else if (line.trimStart().startsWith('```')) {
             if (!line.trimEnd().endsWith('```')) codeBlock = true
+            if (line.trim() === '```') codeBlock = true
 
             prompt.push(line)
         } else if (line.trimStart().startsWith('"""')) {
             if (!line.trimEnd().endsWith('"""')) textBlock = true
+            if (line.trim() === '"""') textBlock = true
 
             prompt.push(line)
         } else if (line.trim() === '---') {
@@ -56,7 +58,7 @@ export function parsePrompt(label: string, prompt: string[], quotes: string[], c
     const content = parseTranscript(prompt.join('\n').trim(), quotes.join('\n').trim(), context)
 
     let role: ChatRoleEnum = 'user'
-    if (label.toLowerCase() in ['system', 'assistant']) role = label.toLowerCase() as ChatRoleEnum
+    if (['system', 'assistant'].includes(label.toLowerCase())) role = label.toLowerCase() as ChatRoleEnum
     if (label.toLowerCase() === context.gladdis.label.toLowerCase()) role = 'assistant'
 
     const message: ChatMessage = { role, content }

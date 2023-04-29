@@ -12,23 +12,28 @@ export async function transcribe(context: Context): Promise<Context> {
     for (const [fullMatch, audioFileName] of context.user.prompt.matchAll(audioFileRegex)) {
         const audioFilePath = path.resolve(path.dirname(context.file.path), audioFileName)
 
-        let transcript
-        if (context.whisper.language === undefined) {
-            transcript = await translation(audioFilePath, context)
+        if (await fs.pathExists(audioFilePath)) {
+            let transcript
+            if (context.whisper.language === undefined) {
+                transcript = await translation(audioFilePath, context)
+            } else {
+                transcript = await transcription(audioFilePath, context)
+            }
+
+            if (context.whisper.deleteFile) void fs.remove(audioFilePath)
+
+            if (context.whisper.echoScript) {
+                const transcriptLabel = `\n\n> [!${context.whisper.label} of "${audioFileName}"]\n> `
+                const transcriptQuote = transcriptLabel + transcript.split('\n').join('\n> ') + '\n'
+
+                await fs.appendFile(context.file.path, transcriptQuote)
+            }
+
+            context.user.prompt = context.user.prompt.replace(fullMatch, `"${transcript}" (dictated, but not read)`)
         } else {
-            transcript = await transcription(audioFilePath, context)
+            const warning = `\n\n> [!WARNING]\n> **Audio File Not Found:**\n>\n> ${audioFilePath}`
+            await fs.appendFile(context.file.path, warning)
         }
-
-        if (context.whisper.deleteFile) void fs.remove(audioFilePath)
-
-        if (context.whisper.echoScript) {
-            const transcriptLabel = `\n\n> [!${context.whisper.label} of "${audioFileName}"]\n> `
-            const transcriptQuote = transcriptLabel + transcript.split('\n').join('\n> ') + '\n'
-
-            await fs.appendFile(context.file.path, transcriptQuote)
-        }
-
-        context.user.prompt = context.user.prompt.replace(fullMatch, transcript)
     }
 
     return context
@@ -42,7 +47,7 @@ export async function translation(filePath: string, context: Context): Promise<s
         context.whisper.model,
         context.whisper.prompt,
         'json',
-        context.whisper.temperature
+        context.whisper.temperature / 100
     )
 
     fileReadStream.destroy()
@@ -57,7 +62,7 @@ export async function transcription(filePath: string, context: Context): Promise
         context.whisper.model,
         context.whisper.prompt,
         'json',
-        context.whisper.temperature,
+        context.whisper.temperature / 100,
         context.whisper.language
     )
 
@@ -72,8 +77,8 @@ export function parseTranscript(prompt: string, quotes: string, context: Context
         const start = (transcriptMatch.index ?? 0) + transcriptMatch[0].length
         const stop = quotes.indexOf('\n\n', start) + 1
 
-        const transcript = quotes.slice(start, stop === 0 ? undefined : stop)
-        prompt = prompt.replace(`![[${transcriptMatch[1]}]]`, transcript.trim())
+        const transcript = quotes.slice(start, stop === 0 ? undefined : stop).trim()
+        prompt = prompt.replace(`![[${transcriptMatch[1]}]]`, `"${transcript}" (transcribed and read)`)
     }
 
     return prompt
