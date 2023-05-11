@@ -1,6 +1,7 @@
-/.env
-/DATA/
-/dist/
-.DS_Store
+/__DATA__/
+/coverage/
+/lib/
 /node_modules/
+/.env
+.DS_Store
 /pnpm-lock.yaml

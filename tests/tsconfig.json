@@ -1,0 +1,8 @@
+{
+    "exclude": [""],
+    "extends": "..",
+    "compilerOptions": {
+        "noEmit": true,
+        "rootDir": ".."
+    }
+}

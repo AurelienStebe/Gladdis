@@ -1,2 +1,4 @@
-/dist/
+/__DATA__/
+/coverage/
+/lib/
 /node_modules/

@@ -1,4 +1,5 @@
-/DATA/
-/dist/
+/__DATA__/
+/coverage/
+/lib/
 /CHANGELOG.md
 /pnpm-lock.yaml
