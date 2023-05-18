@@ -20,7 +20,7 @@ export interface Context {
     }
     gladdis: {
         label: string
-        config: string
+        config?: string
         model: string
         temperature: number
         top_p_param: number
@@ -28,12 +28,14 @@ export interface Context {
         pres_penalty: number
     }
     whisper: {
-        label: string
-        prompt: string
+        input: string
+        config?: string
         model: string
-        echoScript: boolean
-        deleteFile: boolean
+        liveSuffix: string
+        readSuffix: string
         temperature: number
         language?: string
+        echoScript: boolean
+        deleteFile: boolean
     }
 }

@@ -28,7 +28,7 @@ export async function logGladdisCall(context: Context): Promise<void> {
 export async function logGladdisChat(context: Context): Promise<void> {
     const dateDir = context.file.date.toISOString().split('T')[0].split('-')
     const logPath = path.resolve(context.user.data, 'history', 'chats', ...dateDir)
-    const logFile = path.resolve(logPath, context.file.name)
+    const logFile = path.resolve(logPath, context.file.name + '.md')
 
     await fs.ensureDir(logPath)
 
@@ -48,11 +48,12 @@ export function getTokenModal(context: Context): string {
     let tokenLimit = context.gladdis.model.startsWith('gpt-4') ? 8192 : 4096
     if (context.gladdis.model.startsWith('gpt-4-32k')) tokenLimit = 32768
 
-    const tokenRatio = Math.ceil((tokenLength / tokenLimit) * 42)
-    const tokenGraph = `[**${'#'.repeat(tokenRatio)}**${'-'.repeat(42 - tokenRatio)}]`
+    const tokenRatio = Math.ceil((tokenLength / tokenLimit) * 36)
+    const tokenGraph = `[**${'#'.repeat(tokenRatio)}**${'-'.repeat(36 - tokenRatio)}]`
     const tokenCount = `**${tokenLength.toLocaleString()}** tokens out of **${tokenLimit.toLocaleString()}**`
 
-    return `\n\n> [!INFO]\n> Using ${tokenCount} max tokens.\n>\n> ${tokenGraph}`
+    const label = tokenRatio > 33 ? 'DANGER' : tokenRatio > 22 ? 'WARNING' : 'NOTE'
+    return `\n\n> [!${label}]- ${tokenGraph}\n> Using ${tokenCount} max tokens.`
 }
 
 export function getTokenCount(messages: ChatMessage[]): number {

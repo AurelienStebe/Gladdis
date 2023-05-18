@@ -6,37 +6,38 @@ import type { Context } from '../types/context.js'
 
 const openai = new OpenAIApi(new Configuration({ apiKey: process.env.OPENAI_API_KEY }))
 
-export async function transcribe(context: Context): Promise<Context> {
-    const audioFileRegex = /!\[\[(.+?\.(mp3|mp4|mpeg|mpga|m4a|wav|webm))\]\]/gi
+export async function transcribe(content: string, context: Context): Promise<string> {
+    const audioRegex = /!\[\[(.+?\.(mp3|mp4|mpeg|mpga|m4a|wav|webm))\]\]/gi
 
-    for (const [fullMatch, audioFileName] of context.user.prompt.matchAll(audioFileRegex)) {
-        const audioFilePath = path.resolve(path.dirname(context.file.path), audioFileName)
+    for (const [fullMatch, audioFile] of content.matchAll(audioRegex)) {
+        const audioPath = path.resolve(path.dirname(context.file.path), audioFile)
 
-        if (await fs.pathExists(audioFilePath)) {
+        if (await fs.pathExists(audioPath)) {
             let transcript
+
             if (context.whisper.language === undefined) {
-                transcript = await translation(audioFilePath, context)
+                transcript = await translation(audioPath, context)
             } else {
-                transcript = await transcription(audioFilePath, context)
+                transcript = await transcription(audioPath, context)
             }
 
-            if (context.whisper.deleteFile) void fs.remove(audioFilePath)
+            if (context.whisper.deleteFile) void fs.remove(audioPath)
 
             if (context.whisper.echoScript) {
-                const transcriptLabel = `\n\n> [!${context.whisper.label} of "${audioFileName}"]\n> `
-                const transcriptQuote = transcriptLabel + transcript.split('\n').join('\n> ') + '\n'
+                const transcriptLabel = `\n\n> [!QUOTE]+ Transcript from "${audioFile}"`
+                const transcriptQuote = '\n> ' + transcript.split('\n').join('\n>\n> ')
 
-                await fs.appendFile(context.file.path, transcriptQuote)
+                await fs.appendFile(context.file.path, transcriptLabel + transcriptQuote)
             }
 
-            context.user.prompt = context.user.prompt.replace(fullMatch, `"${transcript}" (dictated, but not read)`)
+            content = content.replace(fullMatch, `"${transcript}" (${context.whisper.liveSuffix})`)
         } else {
-            const warning = `\n\n> [!WARNING]\n> **Audio File Not Found:**\n>\n> ${audioFilePath}`
-            await fs.appendFile(context.file.path, warning)
+            const missing = `\n\n> [!MISSING]+ **Audio File Not Found**\n> `
+            await fs.appendFile(context.file.path, missing + audioFile)
         }
     }
 
-    return context
+    return content
 }
 
 export async function translation(filePath: string, context: Context): Promise<string> {
@@ -45,12 +46,13 @@ export async function translation(filePath: string, context: Context): Promise<s
     const translation = await openai.createTranslation(
         fileReadStream as unknown as File,
         context.whisper.model,
-        context.whisper.prompt,
+        context.whisper.input,
         'json',
         context.whisper.temperature / 100
     )
 
     fileReadStream.destroy()
+
     return translation.data.text
 }
 
@@ -60,26 +62,13 @@ export async function transcription(filePath: string, context: Context): Promise
     const transcription = await openai.createTranscription(
         fileReadStream as unknown as File,
         context.whisper.model,
-        context.whisper.prompt,
+        context.whisper.input,
         'json',
         context.whisper.temperature / 100,
         context.whisper.language
     )
 
     fileReadStream.destroy()
+
     return transcription.data.text
-}
-
-export function parseTranscript(prompt: string, quotes: string, context: Context): string {
-    const transcriptRegex = new RegExp(`\\[!${context.whisper.label} of "(.+?)"\\]`, 'gi')
-
-    for (const transcriptMatch of quotes.matchAll(transcriptRegex)) {
-        const start = (transcriptMatch.index ?? 0) + transcriptMatch[0].length
-        const stop = quotes.indexOf('\n\n', start) + 1
-
-        const transcript = quotes.slice(start, stop === 0 ? undefined : stop).trim()
-        prompt = prompt.replace(`![[${transcriptMatch[1]}]]`, `"${transcript}" (transcribed and read)`)
-    }
-
-    return prompt
 }

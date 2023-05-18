@@ -3,6 +3,7 @@ import merge from 'deepmerge'
 import { OpenAIClient } from '@fern-api/openai'
 
 import { transcribe } from './utils/whisper.js'
+import { processText } from './utils/history.js'
 import { logGladdisCall, logGladdisChat, getTokenModal } from './utils/loggers.js'
 
 import type { Context, ChatMessage } from './types/context.js'
@@ -20,7 +21,7 @@ const defaultCorePrompt =
 const defaultMetaPrompt = '**Metadata Context** (in JSON format)\n'
 
 export async function askGladdis(context: Context): Promise<void> {
-    context = await transcribe(context)
+    context.user.prompt = await processText(context.user.prompt, context, transcribe)
 
     const corePrompt = process.env.GLADDIS_CORE_PROMPT ?? defaultCorePrompt
     const metaPrompt = process.env.GLADDIS_META_PROMPT ?? defaultMetaPrompt
@@ -35,6 +36,7 @@ export async function askGladdis(context: Context): Promise<void> {
     if (Object.entries(chatContext).length > 0) {
         context.user.history.unshift({ role: 'system', content: metaPrompt + JSON.stringify(chatContext) })
     }
+
     context.user.history.unshift({ role: 'system', content: corePrompt })
 
     const promptMessage: ChatMessage = {
@@ -51,6 +53,8 @@ export async function askGladdis(context: Context): Promise<void> {
 }
 
 export async function chatWithGladdis(context: Context): Promise<Context> {
+    const newPromptInvite = `\n\n---\n\n__${context.user.label}:__ `
+
     const gladdisResponse: ChatMessage = {
         role: 'assistant',
         content: '',
@@ -58,7 +62,9 @@ export async function chatWithGladdis(context: Context): Promise<Context> {
 
     let deferredPromise: (value: string) => void
     const finishMessage = new Promise<string>((resolve) => {
-        deferredPromise = resolve
+        deferredPromise = (value) => {
+            resolve(value + newPromptInvite)
+        }
     })
 
     await openai.chat.createCompletion(
@@ -73,7 +79,7 @@ export async function chatWithGladdis(context: Context): Promise<Context> {
         },
         (data) => {
             if (data.choices[0].delta.role === 'assistant') {
-                fs.appendFileSync(context.file.path, `\n\n**${context.gladdis.label}:** `)
+                fs.appendFileSync(context.file.path, `\n\n__${context.gladdis.label}:__ `)
             }
             if (data.choices[0].delta.content !== undefined) {
                 gladdisResponse.content += data.choices[0].delta.content
@@ -82,17 +88,20 @@ export async function chatWithGladdis(context: Context): Promise<Context> {
         },
         {
             onFinish: () => {
-                context.user.history.push(gladdisResponse)
-                deferredPromise(`${getTokenModal(context)}\n\n---\n\n**${context.user.label}:** `)
+                deferredPromise(getTokenModal(context))
             },
             onError: (error) => {
-                context.user.history.push(gladdisResponse)
-                deferredPromise(`${error?.toString() ?? '**Error**'}\n\n---\n\n**${context.user.label}:** `)
+                const errorName = error?.toString() ?? 'OpenAI API Streaming Error'
+                const errorJSON = '```json\n> ' + JSON.stringify(error) + '\n> ```'
+
+                deferredPromise(`\n\n> [!BUG]+ **${errorName}**\n> ${errorJSON}`)
             },
         }
     )
 
     await fs.appendFile(context.file.path, await finishMessage)
+
+    context.user.history.push(gladdisResponse)
 
     return context
 }

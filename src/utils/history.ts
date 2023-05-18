@@ -1,5 +1,3 @@
-import { parseTranscript } from './whisper.js'
-
 import type { Context, ChatMessage, ChatRoleEnum } from '../types/context.js'
 
 export function parseHistory(context: Context): ChatMessage[] {
@@ -9,23 +7,27 @@ export function parseHistory(context: Context): ChatMessage[] {
     let label = context.user.label
 
     let prompt: string[] = []
-    let quotes: string[] = []
+    let quotes: string[][] = [[]]
 
     let codeBlock = false
     let textBlock = false
 
-    lines.forEach((line) => {
+    for (const line of lines) {
         if (codeBlock || textBlock) {
             if (line.trimEnd().endsWith('```')) codeBlock = false
             if (line.trimEnd().endsWith('"""')) textBlock = false
 
             prompt.push(line)
         } else if (line.trimStart().startsWith('```')) {
+            if (quotes[0].length !== 0) quotes.unshift([])
+
             if (!line.trimEnd().endsWith('```')) codeBlock = true
             if (line.trim() === '```') codeBlock = true
 
             prompt.push(line)
         } else if (line.trimStart().startsWith('"""')) {
+            if (quotes[0].length !== 0) quotes.unshift([])
+
             if (!line.trimEnd().endsWith('"""')) textBlock = true
             if (line.trim() === '"""') textBlock = true
 
@@ -33,31 +35,46 @@ export function parseHistory(context: Context): ChatMessage[] {
         } else if (line.trim() === '---') {
             history.push(parsePrompt(label, prompt, quotes, context))
             label = context.user.label
-            prompt = []
-            quotes = []
-        } else if (line.startsWith('>')) quotes.push(line.slice(1))
-        else {
-            if (quotes.at(-1) !== '\n\n') quotes.push('\n\n')
 
-            const labelMatch = line.match(/^\*\*(.+?):\*\*/)
+            prompt = []
+            quotes = [[]]
+        } else if (line.startsWith('>')) {
+            quotes[0].push(line.startsWith('> ') ? line.slice(2) : line.slice(1))
+        } else {
+            if (quotes[0].length !== 0) quotes.unshift([])
+
+            const labelMatch = line.match(/^__(.+?):__ ?/)
             if (labelMatch !== null) {
                 history.push(parsePrompt(label, prompt, quotes, context))
 
-                prompt = [line.slice(labelMatch[0].length).trimStart()]
+                prompt = [line.slice(labelMatch[0].length)]
                 label = labelMatch[1]
             } else {
                 prompt.push(line)
             }
         }
-    })
+    }
 
-    return history.filter((message) => message.content !== '')
+    return history.filter((message) => message.content.trim() !== '')
 }
 
-export function parsePrompt(label: string, prompt: string[], quotes: string[], context: Context): ChatMessage {
-    const content = parseTranscript(prompt.join('\n').trim(), quotes.join('\n').trim(), context)
+export function parsePrompt(label: string, prompt: string[], quotes: string[][], context: Context): ChatMessage {
+    let content = prompt.join('\n').trim()
+
+    for (const lines of quotes) {
+        if (lines[0] === undefined) continue
+
+        const transcriptRegex = /^\[!QUOTE\][+-]? Transcript from "(.+?)"$/i
+        const transcriptMatch = transcriptRegex.exec(lines[0])
+
+        if (transcriptMatch !== null) {
+            const transcript = lines.slice(1).join('\n').trim()
+            content = content.replace(`![[${transcriptMatch[1]}]]`, `"${transcript}" (${context.whisper.readSuffix})`)
+        }
+    }
 
     let role: ChatRoleEnum = 'user'
+
     if (['system', 'assistant'].includes(label.toLowerCase())) role = label.toLowerCase() as ChatRoleEnum
     if (label.toLowerCase() === context.gladdis.label.toLowerCase()) role = 'assistant'
 
@@ -74,8 +91,53 @@ export function writeHistory(context: Context): string {
         if (message.role === 'system') label = 'System'
         if (message.role === 'assistant') label = context.gladdis.label
 
-        return `**${label}:** ${message.content}`
+        return `__${label}:__ ${message.content}`
     })
 
     return history.join('\n\n') + '\n'
+}
+
+type Processor = (content: string, context: Context) => Promise<string>
+
+export async function processText(content: string, context: Context, process: Processor): Promise<string> {
+    const result: string[] = []
+    let liveText: string[] = []
+
+    let codeBlock = false
+    let textBlock = false
+
+    for (const line of content.split('\n')) {
+        if (codeBlock || textBlock) {
+            if (line.trimEnd().endsWith('```')) codeBlock = false
+            if (line.trimEnd().endsWith('"""')) textBlock = false
+
+            result.push(line)
+        } else if (line.trimStart().startsWith('```')) {
+            if (liveText.length > 0) {
+                result.push(await process(liveText.join('\n'), context))
+                liveText = []
+            }
+
+            if (!line.trimEnd().endsWith('```')) codeBlock = true
+            if (line.trim() === '```') codeBlock = true
+
+            result.push(line)
+        } else if (line.trimStart().startsWith('"""')) {
+            if (liveText.length > 0) {
+                result.push(await process(liveText.join('\n'), context))
+                liveText = []
+            }
+
+            if (!line.trimEnd().endsWith('"""')) textBlock = true
+            if (line.trim() === '"""') textBlock = true
+
+            result.push(line)
+        } else {
+            liveText.push(line)
+        }
+    }
+
+    result.push(await process(liveText.join('\n'), context))
+
+    return result.join('\n').trim()
 }
