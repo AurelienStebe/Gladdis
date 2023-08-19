@@ -23,7 +23,7 @@ app.post('/transcribe', (req, res) => {
     void (async () => {
         let context = await loadContext(req.body)
 
-        context.whisper.echoScript = true
+        context.whisper.echoOutput = true
         context.whisper.deleteFile = false
 
         context = loadContent(context)
@@ -33,8 +33,8 @@ app.post('/transcribe', (req, res) => {
     res.status(200).end()
 })
 
+const name = process.env.GLADDIS_NAME_LABEL ?? 'Gladdis'
 const port = process.env.GLADDIS_SERVER_PORT ?? 3000
-const name = process.env.GLADDIS_NAME_LABEL ?? 'Gladdis AI'
 
 app.listen(port, () => {
     console.log(`${name} is listening on port ${port} ...`)

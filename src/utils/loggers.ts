@@ -12,8 +12,8 @@ import cl100k_base from '@dqbd/tiktoken/encoders/cl100k_base.json' assert { type
 
 export async function logGladdisCall(context: Context): Promise<void> {
     const dateDir = context.file.date.toISOString().split('T')[0].split('-')
-    const logPath = path.resolve(context.user.data, 'history', 'calls', ...dateDir)
-    const logFile = path.resolve(logPath, `${context.file.date.getTime()}.md`)
+    const logPath = path.join(context.user.data, 'history', 'calls', ...dateDir)
+    const logFile = path.join(logPath, `${context.file.date.getTime()}.md`)
 
     await fs.ensureDir(logPath)
 
@@ -27,8 +27,8 @@ export async function logGladdisCall(context: Context): Promise<void> {
 
 export async function logGladdisChat(context: Context): Promise<void> {
     const dateDir = context.file.date.toISOString().split('T')[0].split('-')
-    const logPath = path.resolve(context.user.data, 'history', 'chats', ...dateDir)
-    const logFile = path.resolve(logPath, context.file.name + '.md')
+    const logPath = path.join(context.user.data, 'history', 'chats', ...dateDir)
+    const logFile = path.join(logPath, context.file.name + '.md')
 
     await fs.ensureDir(logPath)
 
@@ -46,9 +46,10 @@ export function getTokenModal(context: Context): string {
     const tokenLength = getTokenCount(context.user.history)
 
     let tokenLimit = context.gladdis.model.startsWith('gpt-4') ? 8192 : 4096
-    if (context.gladdis.model.startsWith('gpt-4-32k')) tokenLimit = 32768
+    if (context.gladdis.model === 'gpt-4-32k') tokenLimit = 32768
+    if (context.gladdis.model === 'gpt-3.5-turbo-16k') tokenLimit = 16384
 
-    const tokenRatio = Math.ceil((tokenLength / tokenLimit) * 36)
+    const tokenRatio = Math.min(Math.ceil((tokenLength / tokenLimit) * 36), 36)
     const tokenGraph = `[**${'#'.repeat(tokenRatio)}**${'-'.repeat(36 - tokenRatio)}]`
     const tokenCount = `**${tokenLength.toLocaleString()}** tokens out of **${tokenLimit.toLocaleString()}**`
 

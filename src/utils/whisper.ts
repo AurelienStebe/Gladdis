@@ -41,34 +41,26 @@ export async function transcribe(content: string, context: Context): Promise<str
 }
 
 export async function translation(filePath: string, context: Context): Promise<string> {
-    const fileReadStream = fs.createReadStream(filePath)
+    const translation = await openai.audio.translations.create({
+        response_format: 'json',
+        model: context.whisper.model,
+        prompt: context.whisper.input,
+        file: fs.createReadStream(filePath),
+        temperature: context.whisper.temperature / 100,
+    })
 
-    const translation = await openai.createTranslation(
-        fileReadStream as unknown as File,
-        context.whisper.model,
-        context.whisper.input,
-        'json',
-        context.whisper.temperature / 100
-    )
-
-    fileReadStream.destroy()
-
-    return translation.data.text
+    return translation.text
 }
 
 export async function transcription(filePath: string, context: Context): Promise<string> {
-    const fileReadStream = fs.createReadStream(filePath)
+    const transcription = await openai.audio.transcriptions.create({
+        response_format: 'json',
+        model: context.whisper.model,
+        prompt: context.whisper.input,
+        file: fs.createReadStream(filePath),
+        temperature: context.whisper.temperature / 100,
+        language: context.whisper.language,
+    })
 
-    const transcription = await openai.createTranscription(
-        fileReadStream as unknown as File,
-        context.whisper.model,
-        context.whisper.input,
-        'json',
-        context.whisper.temperature / 100,
-        context.whisper.language
-    )
-
-    fileReadStream.destroy()
-
-    return transcription.data.text
+    return transcription.text
 }

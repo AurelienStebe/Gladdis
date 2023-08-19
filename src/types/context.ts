@@ -1,9 +1,10 @@
-import type {
-    ChatCompletionRequestMessage as ChatMessage,
-    ChatCompletionRequestMessageRoleEnum as ChatRoleEnum,
-} from 'openai'
+export type ChatRoleEnum = 'user' | 'system' | 'assistant'
 
-export type { ChatMessage, ChatRoleEnum }
+export interface ChatMessage {
+    role: ChatRoleEnum
+    content: string
+    name?: string
+}
 
 export interface Context {
     file: {
@@ -34,8 +35,8 @@ export interface Context {
         liveSuffix: string
         readSuffix: string
         temperature: number
-        language?: string
-        echoScript: boolean
+        echoOutput: boolean
         deleteFile: boolean
+        language?: string
     }
 }

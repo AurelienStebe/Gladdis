@@ -53,55 +53,40 @@ export async function askGladdis(context: Context): Promise<void> {
 }
 
 export async function chatWithGladdis(context: Context): Promise<Context> {
-    const newPromptInvite = `\n\n---\n\n__${context.user.label}:__ `
+    const response: string[] = []
 
-    const gladdisResponse: ChatMessage = {
-        role: 'assistant',
-        content: '',
-    }
-
-    let deferredPromise: (value: string) => void
-    const finishMessage = new Promise<string>((resolve) => {
-        deferredPromise = (value) => {
-            resolve(value + newPromptInvite)
-        }
-    })
-
-    await openai.chat.createCompletion(
-        {
+    try {
+        const stream = await openai.chat.completions.create({
             stream: true,
             model: context.gladdis.model,
             messages: context.user.history,
             temperature: context.gladdis.temperature / 100,
-            topP: context.gladdis.top_p_param / 100,
-            frequencyPenalty: context.gladdis.freq_penalty / 100,
-            presencePenalty: context.gladdis.pres_penalty / 100,
-        },
-        (data) => {
-            if (data.choices[0].delta.role === 'assistant') {
-                fs.appendFileSync(context.file.path, `\n\n__${context.gladdis.label}:__ `)
-            }
-            if (data.choices[0].delta.content !== undefined) {
-                gladdisResponse.content += data.choices[0].delta.content
-                fs.appendFileSync(context.file.path, data.choices[0].delta.content)
-            }
-        },
-        {
-            onFinish: () => {
-                deferredPromise(getTokenModal(context))
-            },
-            onError: (error) => {
-                const errorName = error?.toString() ?? 'OpenAI API Streaming Error'
-                const errorJSON = '```json\n> ' + JSON.stringify(error) + '\n> ```'
+            top_p: context.gladdis.top_p_param / 100,
+            frequency_penalty: context.gladdis.freq_penalty / 100,
+            presence_penalty: context.gladdis.pres_penalty / 100,
+        })
 
-                deferredPromise(`\n\n> [!BUG]+ **${errorName}**\n> ${errorJSON}`)
-            },
+        for await (const data of stream) {
+            if (data.choices[0].delta?.role === 'assistant') {
+                await fs.appendFile(context.file.path, `\n\n__${context.gladdis.label}:__ `)
+            }
+
+            if ((data.choices[0].delta?.content ?? '') !== '') {
+                response.push(data.choices[0].delta?.content ?? '')
+                await fs.appendFile(context.file.path, data.choices[0].delta?.content ?? '')
+            }
         }
-    )
+    } catch (error: any) {
+        const errorName: string = error?.message ?? 'OpenAI API Streaming Error'
+        const errorJSON: string = '```json\n> ' + JSON.stringify(error) + '\n> ```'
 
-    await fs.appendFile(context.file.path, await finishMessage)
+        await fs.appendFile(context.file.path, `\n\n> [!BUG]+ **${errorName}**\n> ${errorJSON}`)
+    }
 
-    context.user.history.push(gladdisResponse)
+    context.user.history.push({ role: 'assistant', content: response.join('') })
+
+    await fs.appendFile(context.file.path, getTokenModal(context))
+    await fs.appendFile(context.file.path, `\n\n---\n\n__${context.user.label}:__ `)
 
     return context
 }
