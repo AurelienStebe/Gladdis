@@ -1,43 +1,52 @@
 import fs from 'fs-extra'
+import OpenAI from 'openai'
 import merge from 'deepmerge'
-import { OpenAIClient } from '@fern-api/openai'
 
+import { parseLinks } from './utils/scanner.js'
 import { transcribe } from './utils/whisper.js'
-import { processText } from './utils/history.js'
 import { logGladdisCall, logGladdisChat, getTokenModal } from './utils/loggers.js'
 
 import type { Context, ChatMessage } from './types/context.js'
 
-const openai = new OpenAIClient({ token: process.env.OPENAI_API_KEY ?? '' })
-
 const defaultCorePrompt =
-    '**Core Prompt**\n' +
-    'You are Gladdis, trained by OpenAI.\n\n' +
-    'Your 3 key Heuristic Imperatives are:\n' +
-    '  - Reduce suffering in the universe.\n' +
-    '  - Increase prosperity in the universe.\n' +
-    '  - Increase understanding in the universe.'
+    '_Heuristics_\n' +
+    'Your 3 key Heuristic Imperatives are to:\n' +
+    '  - reduce suffering in the universe.\n' +
+    '  - increase prosperity in the universe.\n' +
+    '  - increase understanding in the universe.'
 
-const defaultMetaPrompt = '**Metadata Context** (in JSON format)\n'
+const defaultMetaPrompt = '_Metadata_ (as JSON):'
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 export async function askGladdis(context: Context): Promise<void> {
-    context.user.prompt = await processText(context.user.prompt, context, transcribe)
-
-    const corePrompt = process.env.GLADDIS_CORE_PROMPT ?? defaultCorePrompt
-    const metaPrompt = process.env.GLADDIS_META_PROMPT ?? defaultMetaPrompt
-
     const chatContext = merge({}, context) as any
+
+    chatContext.whisper.echoOutput = false
+    chatContext.whisper.deleteFile = false
+
+    for (const message of context.user.history) {
+        message.content = await transcribe(message.content, chatContext)
+        message.content = await parseLinks(message.content, chatContext)
+    }
 
     delete chatContext.file
     delete chatContext.user
     delete chatContext.gladdis
     delete chatContext.whisper
 
+    const corePrompt = process.env.GLADDIS_CORE_PROMPT ?? defaultCorePrompt
+    const metaPrompt = process.env.GLADDIS_META_PROMPT ?? defaultMetaPrompt
+
     if (Object.entries(chatContext).length > 0) {
-        context.user.history.unshift({ role: 'system', content: metaPrompt + JSON.stringify(chatContext) })
+        const metadata = `${metaPrompt} \`${JSON.stringify(chatContext)}\``
+        context.user.history.unshift({ role: 'system', content: metadata })
     }
 
     context.user.history.unshift({ role: 'system', content: corePrompt })
+
+    context.user.prompt = await transcribe(context.user.prompt, context)
+    context.user.prompt = await parseLinks(context.user.prompt, context)
 
     const promptMessage: ChatMessage = {
         role: 'user',
