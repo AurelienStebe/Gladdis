@@ -1,43 +1,42 @@
-import path from 'path'
 import fs from 'fs-extra'
-import { OpenAIApi, Configuration } from 'openai'
+import OpenAI from 'openai'
+
+import { processText } from './history.js'
+import { resolveFile } from './scanner.js'
 
 import type { Context } from '../types/context.js'
 
-const openai = new OpenAIApi(new Configuration({ apiKey: process.env.OPENAI_API_KEY }))
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+
+const linkRegex = /(?<!<%.*)!\[\[(.+?\.(flac|mp3|mp4|mpeg|mpga|m4a|ogg|wav|webm))\]\](?!.*%>)/gis
 
 export async function transcribe(content: string, context: Context): Promise<string> {
-    const audioRegex = /!\[\[(.+?\.(mp3|mp4|mpeg|mpga|m4a|wav|webm))\]\]/gi
+    return await processText(content, context, async (content, context) => {
+        for (const [fullMatch, filePath] of content.matchAll(linkRegex)) {
+            const fullPath = await resolveFile(filePath, context)
+            if (fullPath === undefined) continue
 
-    for (const [fullMatch, audioFile] of content.matchAll(audioRegex)) {
-        const audioPath = path.resolve(path.dirname(context.file.path), audioFile)
-
-        if (await fs.pathExists(audioPath)) {
             let transcript
-
             if (context.whisper.language === undefined) {
-                transcript = await translation(audioPath, context)
+                transcript = await translation(fullPath, context)
             } else {
-                transcript = await transcription(audioPath, context)
+                transcript = await transcription(fullPath, context)
             }
 
-            if (context.whisper.deleteFile) void fs.remove(audioPath)
+            if (context.whisper.deleteFile) void fs.remove(fullPath)
 
-            if (context.whisper.echoScript) {
-                const transcriptLabel = `\n\n> [!QUOTE]+ Transcript from "${audioFile}"`
+            if (context.whisper.echoOutput) {
+                const transcriptLabel = `\n\n> [!QUOTE]+ Transcript from "${filePath}"`
                 const transcriptQuote = '\n> ' + transcript.split('\n').join('\n>\n> ')
 
                 await fs.appendFile(context.file.path, transcriptLabel + transcriptQuote)
             }
 
             content = content.replace(fullMatch, `"${transcript}" (${context.whisper.liveSuffix})`)
-        } else {
-            const missing = `\n\n> [!MISSING]+ **Audio File Not Found**\n> `
-            await fs.appendFile(context.file.path, missing + audioFile)
         }
-    }
 
-    return content
+        return content
+    })
 }
 
 export async function translation(filePath: string, context: Context): Promise<string> {

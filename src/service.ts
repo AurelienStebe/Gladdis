@@ -4,7 +4,6 @@ import express from 'express'
 
 import { askGladdis } from './gladdis.js'
 import { transcribe } from './utils/whisper.js'
-import { processText } from './utils/history.js'
 import { loadContext, loadContent } from './utils/loaders.js'
 
 const app = express()
@@ -27,7 +26,7 @@ app.post('/transcribe', (req, res) => {
         context.whisper.deleteFile = false
 
         context = loadContent(context)
-        void processText(context.user.prompt, context, transcribe)
+        void transcribe(context.user.prompt, context)
     })()
 
     res.status(200).end()

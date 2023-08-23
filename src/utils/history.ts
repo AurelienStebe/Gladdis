@@ -1,5 +1,7 @@
 import type { Context, ChatMessage, ChatRoleEnum } from '../types/context.js'
 
+export type Processor = (content: string, context: Context) => Promise<string>
+
 export function parseHistory(context: Context): ChatMessage[] {
     const lines = (context.file.text + '\n---\n').split('\n')
     const history: ChatMessage[] = []
@@ -96,8 +98,6 @@ export function writeHistory(context: Context): string {
 
     return history.join('\n\n') + '\n'
 }
-
-type Processor = (content: string, context: Context) => Promise<string>
 
 export async function processText(content: string, context: Context, process: Processor): Promise<string> {
     const result: string[] = []
