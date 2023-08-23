@@ -1,0 +1,38 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`loadContext() function > loads the default values 1`] = `
+{
+  "file": {
+    "date": Any<Date>,
+    "name": "input",
+    "path": Any<String>,
+    "text": "",
+  },
+  "gladdis": {
+    "config": undefined,
+    "freq_penalty": 0,
+    "label": "Gladdis",
+    "model": "gpt-3.5-turbo",
+    "pres_penalty": 0,
+    "temperature": 0,
+    "top_p_param": 100,
+  },
+  "user": {
+    "data": Any<String>,
+    "history": [],
+    "label": "User",
+    "prompt": "",
+  },
+  "whisper": {
+    "config": undefined,
+    "deleteFile": false,
+    "echoOutput": true,
+    "input": "Gladdis",
+    "language": undefined,
+    "liveSuffix": "dictated, but not read",
+    "model": "whisper-1",
+    "readSuffix": "transcribed and read",
+    "temperature": 0,
+  },
+}
+`;
