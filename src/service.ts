@@ -7,6 +7,7 @@ import { transcribe } from './utils/whisper.js'
 import { loadContext, loadContent } from './utils/loaders.js'
 
 const app = express()
+
 app.use(express.json())
 
 app.post('/askGladdis', (req, res) => {
@@ -33,7 +34,7 @@ app.post('/transcribe', (req, res) => {
 })
 
 const name = process.env.GLADDIS_NAME_LABEL ?? 'Gladdis'
-const port = process.env.GLADDIS_SERVER_PORT ?? 3000
+const port = Number(process.env.GLADDIS_SERVER_PORT) ?? 3000
 
 app.listen(port, () => {
     console.log(`${name} is listening on port ${port} ...`)

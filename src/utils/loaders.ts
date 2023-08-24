@@ -73,7 +73,7 @@ export async function loadAIConfig(context: Context): Promise<Context> {
             context = merge(context, configContext)
             context.user.history.unshift(...configHistory)
         } else {
-            const missing = `\n\n> [!MISSING]+ **Config File Not Found**\n> `
+            const missing = '\n\n> [!MISSING]+ **Config File Not Found**\n> '
             await fs.appendFile(context.file.path, missing + configPath)
         }
     }
@@ -93,7 +93,7 @@ export async function loadAIConfig(context: Context): Promise<Context> {
             whisperContext = merge(whisperContext, configContext)
             context.whisper = merge(context.whisper, whisperContext.whisper)
         } else {
-            const missing = `\n\n> [!MISSING]+ **Whisper File Not Found**\n> `
+            const missing = '\n\n> [!MISSING]+ **Whisper File Not Found**\n> '
             await fs.appendFile(context.file.path, missing + whisperPath)
         }
     }

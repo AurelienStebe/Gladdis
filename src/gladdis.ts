@@ -57,8 +57,7 @@ export async function askGladdis(context: Context): Promise<void> {
     context.user.history.push(promptMessage)
     context = await chatWithGladdis(context)
 
-    await logGladdisCall(context)
-    await logGladdisChat(context)
+    await Promise.all([logGladdisCall(context), logGladdisChat(context)])
 }
 
 export async function chatWithGladdis(context: Context): Promise<Context> {

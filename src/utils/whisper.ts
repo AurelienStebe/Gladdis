@@ -15,14 +15,22 @@ export async function transcribe(content: string, context: Context): Promise<str
         for (const [fullMatch, filePath] of content.matchAll(linkRegex)) {
             const fullPath = await resolveFile(filePath, context)
             if (fullPath === undefined) continue
-
             let transcript
-            if (context.whisper.language === undefined) {
-                transcript = await translation(fullPath, context)
-            } else {
-                transcript = await transcription(fullPath, context)
+
+            try {
+                if (context.whisper.language === undefined) {
+                    transcript = await translation(fullPath, context)
+                } else {
+                    transcript = await transcription(fullPath, context)
+                }
+            } catch (error: any) {
+                const errorName: string = error?.message ?? 'OpenAI Whisper API Error'
+                const errorJSON: string = '```json\n> ' + JSON.stringify(error) + '\n> ```'
+
+                await fs.appendFile(context.file.path, `\n\n> [!BUG]+ **${errorName}**\n> ${errorJSON}`)
             }
 
+            if (transcript === undefined) continue
             if (context.whisper.deleteFile) void fs.remove(fullPath)
 
             if (context.whisper.echoOutput) {

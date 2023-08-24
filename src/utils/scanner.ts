@@ -10,19 +10,29 @@ const linkRegex = /(?<!<%.*)!\[\[(.+?)(\|.*?)?\]\](?!.*%>)/gs
 const audioFiles = ['flac', 'mp3', 'mp4', 'mpeg', 'mpga', 'm4a', 'ogg', 'wav', 'webm']
 const imageFiles = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'ico', 'webp']
 const videoFiles = ['avi', 'mpg', 'mov', 'mkv', 'm4v', 'wmv', '3gp']
-const otherFiles = ['pdf', 'bin', 'exe', 'iso', 'doc', 'xls', 'ppt']
+const otherFiles = ['bin', 'exe', 'iso', 'doc', 'xls', 'ppt']
 
 export async function parseLinks(content: string, context: Context): Promise<string> {
     return await processText(content, context, async (content, context) => {
         for (const [fullMatch, filePath, fileName] of content.matchAll(linkRegex)) {
+            const fileExt = path.extname(filePath).toLowerCase().slice(1)
             const fullPath = await resolveFile(filePath, context)
             if (fullPath === undefined) continue
 
-            const fileExt = path.extname(filePath).toLowerCase().slice(1)
+            let message
             if (audioFiles.includes(fileExt)) continue
-            if (imageFiles.includes(fileExt)) continue
-            if (videoFiles.includes(fileExt)) continue
-            if (otherFiles.includes(fileExt)) continue
+            if (fileExt === 'pdf') message = 'PDFs Not Supported (soon)'
+
+            if (imageFiles.includes(fileExt)) message = 'Images Not Supported (yet)'
+            if (videoFiles.includes(fileExt)) message = 'Video Files Not Supported'
+            if (otherFiles.includes(fileExt)) message = 'Binary Files Not Supported'
+
+            if (message !== undefined) {
+                message = `\n\n> [!MISSING]+ **${message}**\n> ${filePath}`
+                await fs.appendFile(context.file.path, message)
+
+                continue
+            }
 
             const header = fileName?.slice(1) ?? path.basename(filePath)
             let fileText = (await fs.readFile(fullPath, 'utf-8')).trim()
@@ -63,7 +73,7 @@ export async function resolveFile(filePath: string, context: Context): Promise<s
     if (path.extname(filePath).toLowerCase() === '.txt') filePath = filePath.slice(0, -4)
     if (path.extname(filePath) === '') return await resolveFile(filePath + '.md', context)
 
-    const missing = `\n\n> [!MISSING]+ **Linked File Not Found**\n> `
+    const missing = '\n\n> [!MISSING]+ **Linked File Not Found**\n> '
     await fs.appendFile(context.file.path, missing + filePath)
 
     return undefined
