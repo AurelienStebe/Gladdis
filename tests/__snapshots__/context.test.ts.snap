@@ -4,6 +4,7 @@ exports[`loadContext() function > loads the default values 1`] = `
 {
   "file": {
     "date": Any<Date>,
+    "disk": Any<Object>,
     "name": "input",
     "path": Any<String>,
     "text": "",
@@ -19,6 +20,7 @@ exports[`loadContext() function > loads the default values 1`] = `
   },
   "user": {
     "data": Any<String>,
+    "env": Any<Object>,
     "history": [],
     "label": "User",
     "prompt": "",

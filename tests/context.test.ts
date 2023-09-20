@@ -1,13 +1,12 @@
 import fs from 'fs-extra'
 
-import { describe, it, expect, beforeAll, afterEach } from 'vitest'
-import { setLocalEnv, cleanupTest, getTestPath } from './tests-utils.js'
+import { describe, it, expect, afterEach } from 'vitest'
+import { getLocalEnv, cleanupTest, getTestPath } from './tests-utils.js'
 
+import { diskInterface } from '../src/commands.js'
 import { loadContext } from '../src/utils/loaders.js'
 
 describe('loadContext() function', () => {
-    beforeAll(() => setLocalEnv('__DATA__'))
-
     afterEach(async () => await cleanupTest('__DATA__', 'input.md'))
 
     it('loads the default values', async () => {
@@ -15,6 +14,8 @@ describe('loadContext() function', () => {
         await fs.ensureFile(filePath)
 
         const callContext = { file: { path: filePath } } as any
+        callContext.user = { env: getLocalEnv('__DATA__') }
+        callContext.file.disk = diskInterface
         const context = await loadContext(callContext)
 
         expect(context.file.path).toBe(filePath)
@@ -26,8 +27,10 @@ describe('loadContext() function', () => {
                 name: 'input',
                 path: expect.any(String),
                 text: '',
+                disk: expect.any(Object),
             },
             user: {
+                env: expect.any(Object),
                 data: expect.any(String),
                 label: 'User',
                 prompt: '',

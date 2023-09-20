@@ -2,8 +2,8 @@ import url from 'url'
 import path from 'path'
 import fs from 'fs-extra'
 
-export function setLocalEnv(dataPath: string): any {
-    process.env.GLADDIS_DATA_PATH = getTestPath(dataPath)
+export function getLocalEnv(dataPath: string): any {
+    return { GLADDIS_DATA_PATH: getTestPath(dataPath) }
 }
 
 export async function cleanupTest(...fileNames: string[]): Promise<any> {
