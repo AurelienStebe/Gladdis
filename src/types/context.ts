@@ -1,3 +1,6 @@
+import type { ReadStream } from 'fs'
+import type { Vault } from 'obsidian'
+
 export type ChatRoleEnum = 'user' | 'system' | 'assistant'
 
 export interface ChatMessage {
@@ -6,14 +9,30 @@ export interface ChatMessage {
     name?: string
 }
 
+export interface DiskInterface {
+    vault?: Vault
+    readFile: (path: string) => Promise<string>
+    readBinary: (path: string) => ReadStream | Promise<File>
+    appendFile: (path: string, data: string) => Promise<void>
+    deleteFile: (path: string) => Promise<void>
+    pathExists: (path: string) => Promise<boolean>
+    pathEnsure: (path: string) => Promise<void>
+    baseName: (path: string, ext?: string) => string
+    extName: (path: string) => string
+    joinPath: (...paths: string[]) => string
+    dirName: (path: string) => string
+}
+
 export interface Context {
     file: {
         date: Date
         name: string
         path: string
         text: string
+        disk: DiskInterface
     }
     user: {
+        env: NodeJS.ProcessEnv
         data: string
         label: string
         prompt: string

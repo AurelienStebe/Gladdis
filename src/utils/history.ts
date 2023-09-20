@@ -71,6 +71,7 @@ export function parsePrompt(label: string, prompt: string[], quotes: string[][],
 
         if (transcriptMatch !== null) {
             const transcript = lines.slice(1).join('\n').trim()
+            if (context.whisper.deleteFile) void context.file.disk.deleteFile(transcriptMatch[1])
             content = content.replace(`![[${transcriptMatch[1]}]]`, `"${transcript}" (${context.whisper.readSuffix})`)
         }
     }

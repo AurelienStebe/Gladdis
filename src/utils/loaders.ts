@@ -1,8 +1,6 @@
-import path from 'path'
 import yaml from 'yaml'
-import fs from 'fs-extra'
-import merge from 'deepmerge'
 
+import { deepmerge } from 'deepmerge-ts'
 import { parseHistory } from './history.js'
 
 import type { Context } from '../types/context.js'
@@ -10,91 +8,91 @@ import type { Context } from '../types/context.js'
 const linkRegex = /(?<!<%.*)(?<!!)(\[\[.+?\]\])(?!.*%>)/gs
 
 export async function loadContext(context: Context): Promise<Context> {
-    const callContext = merge(context, { file: { date: new Date() } })
-    const fileContext = merge(await loadMarkdown(context), callContext)
+    const callContext = deepmerge(context, { file: { date: new Date() } })
+    const fileContext = deepmerge(await loadMarkdown(context), callContext)
 
     const coreContext = {
         file: {
-            name: path.basename(fileContext.file.path, '.md'),
+            name: context.file.disk.baseName(context.file.path, '.md'),
             text: '',
         },
         user: {
-            data: process.env.GLADDIS_DATA_PATH ?? '__DATA__',
-            label: process.env.GLADDIS_DEFAULT_USER ?? 'User',
+            data: context.user.env.GLADDIS_DATA_PATH ?? '__DATA__',
+            label: context.user.env.GLADDIS_DEFAULT_USER ?? 'User',
             prompt: '',
             history: [],
         },
         gladdis: {
-            label: process.env.GLADDIS_NAME_LABEL ?? 'Gladdis',
-            config: process.env.GLADDIS_CONFIG_FILE,
-            model: process.env.GLADDIS_DEFAULT_MODEL ?? 'gpt-3.5-turbo',
-            temperature: Number(process.env.GLADDIS_TEMPERATURE ?? 0),
-            top_p_param: Number(process.env.GLADDIS_TOP_P_PARAM ?? 100),
-            freq_penalty: Number(process.env.GLADDIS_FREQ_PENALTY ?? 0),
-            pres_penalty: Number(process.env.GLADDIS_PRES_PENALTY ?? 0),
+            label: context.user.env.GLADDIS_NAME_LABEL ?? 'Gladdis',
+            config: context.user.env.GLADDIS_CONFIG_FILE,
+            model: context.user.env.GLADDIS_DEFAULT_MODEL ?? 'gpt-3.5-turbo',
+            temperature: Number(context.user.env.GLADDIS_TEMPERATURE ?? 0),
+            top_p_param: Number(context.user.env.GLADDIS_TOP_P_PARAM ?? 100),
+            freq_penalty: Number(context.user.env.GLADDIS_FREQ_PENALTY ?? 0),
+            pres_penalty: Number(context.user.env.GLADDIS_PRES_PENALTY ?? 0),
         },
         whisper: {
-            input: process.env.GLADDIS_WHISPER_INPUT ?? 'Gladdis',
-            config: process.env.GLADDIS_WHISPER_CONFIG,
-            model: process.env.GLADDIS_WHISPER_MODEL ?? 'whisper-1',
-            liveSuffix: process.env.GLADDIS_WHISPER_LIVE_SUFFIX ?? 'dictated, but not read',
-            readSuffix: process.env.GLADDIS_WHISPER_READ_SUFFIX ?? 'transcribed and read',
-            temperature: Number(process.env.GLADDIS_WHISPER_TEMPERATURE ?? 0),
-            echoOutput: (process.env.GLADDIS_WHISPER_ECHO_OUTPUT ?? 'true').toLowerCase() === 'true',
-            deleteFile: (process.env.GLADDIS_WHISPER_DELETE_FILE ?? 'false').toLowerCase() === 'true',
-            language: process.env.GLADDIS_WHISPER_LANGUAGE_ID,
+            input: context.user.env.GLADDIS_WHISPER_INPUT ?? 'Gladdis',
+            config: context.user.env.GLADDIS_WHISPER_CONFIG,
+            model: context.user.env.GLADDIS_WHISPER_MODEL ?? 'whisper-1',
+            liveSuffix: context.user.env.GLADDIS_WHISPER_LIVE_SUFFIX ?? 'dictated, but not read',
+            readSuffix: context.user.env.GLADDIS_WHISPER_READ_SUFFIX ?? 'transcribed and read',
+            temperature: Number(context.user.env.GLADDIS_WHISPER_TEMPERATURE ?? 0),
+            echoOutput: (context.user.env.GLADDIS_WHISPER_ECHO_OUTPUT ?? 'true').toLowerCase() === 'true',
+            deleteFile: (context.user.env.GLADDIS_WHISPER_DELETE_FILE ?? 'false').toLowerCase() === 'true',
+            language: context.user.env.GLADDIS_WHISPER_LANGUAGE_ID,
         },
     }
 
-    const fullContext = merge(coreContext, fileContext)
-
-    return merge(await loadAIConfig(fullContext), fileContext)
+    const fullContext = deepmerge(coreContext, fileContext) as any
+    return deepmerge(await loadAIConfig(fullContext), fileContext) as any
 }
 
 export async function loadAIConfig(context: Context): Promise<Context> {
+    const disk = context.file.disk
     let configContext: any = { whisper: {} }
 
     if (context.gladdis?.config !== undefined) {
         if (!context.gladdis.config.toLowerCase().endsWith('.md')) context.gladdis.config += '.md'
-        const configPath = path.join(context.user.data, 'configs', context.gladdis.config)
+        const configPath = disk.joinPath(context.user.data, 'configs', context.gladdis.config)
 
-        if (await fs.pathExists(configPath)) {
-            configContext = merge(configContext, {
-                file: { path: configPath },
+        if (await disk.pathExists(configPath)) {
+            configContext = deepmerge(configContext, {
+                file: { path: configPath, disk },
                 user: { label: 'System' },
             })
 
             configContext = await loadMarkdown(configContext)
-            const configHistory = parseHistory(merge(context, configContext))
+            const configHistory = parseHistory(deepmerge(context, configContext))
 
             delete configContext.file
             delete configContext.user
 
-            context = merge(context, configContext)
+            context = deepmerge(context, configContext)
             context.user.history.unshift(...configHistory)
         } else {
             const missing = '\n\n> [!MISSING]+ **Config File Not Found**\n> '
-            await fs.appendFile(context.file.path, missing + configPath)
+            await disk.appendFile(context.file.path, missing + configPath)
         }
     }
 
     if (context.whisper?.config !== undefined) {
         if (!context.whisper.config.toLowerCase().endsWith('.md')) context.whisper.config += '.md'
-        const whisperPath = path.join(context.user.data, 'configs', context.whisper.config)
+        const whisperPath = disk.joinPath(context.user.data, 'configs', context.whisper.config)
 
-        if (await fs.pathExists(whisperPath)) {
+        if (await disk.pathExists(whisperPath)) {
             let whisperContext: any = {
-                file: { path: whisperPath },
+                file: { path: whisperPath, disk },
             }
 
             whisperContext = await loadMarkdown(whisperContext)
             configContext.whisper.input = whisperContext.file.text
 
-            whisperContext = merge(whisperContext, configContext)
-            context.whisper = merge(context.whisper, whisperContext.whisper)
+            whisperContext = deepmerge(whisperContext, configContext)
+            context.whisper = deepmerge(context.whisper, whisperContext.whisper)
         } else {
             const missing = '\n\n> [!MISSING]+ **Whisper File Not Found**\n> '
-            await fs.appendFile(context.file.path, missing + whisperPath)
+            await disk.appendFile(context.file.path, missing + whisperPath)
         }
     }
 
@@ -102,12 +100,12 @@ export async function loadAIConfig(context: Context): Promise<Context> {
 }
 
 export async function loadMarkdown(context: Context): Promise<Context> {
-    const content = (await fs.readFile(context.file.path, 'utf-8')).trim()
+    const content = (await context.file.disk.readFile(context.file.path)).trim()
 
     if (content.startsWith('---\n')) {
         const [frontMatter, ...bodyContent] = content.slice(4).split('\n---')
 
-        context = merge(yaml.parse(frontMatter), context)
+        context = deepmerge(yaml.parse(frontMatter), context)
         context.file.text = bodyContent.join('\n---').trim()
     } else context.file.text = content
 

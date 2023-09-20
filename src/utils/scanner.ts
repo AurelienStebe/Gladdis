@@ -1,6 +1,3 @@
-import path from 'path'
-import fs from 'fs-extra'
-
 import { processText } from './history.js'
 
 import type { Context } from '../types/context.js'
@@ -15,7 +12,9 @@ const otherFiles = ['bin', 'exe', 'iso', 'doc', 'xls', 'ppt']
 export async function parseLinks(content: string, context: Context): Promise<string> {
     return await processText(content, context, async (content, context) => {
         for (const [fullMatch, filePath, fileName] of content.matchAll(linkRegex)) {
-            const fileExt = path.extname(filePath).toLowerCase().slice(1)
+            const disk = context.file.disk
+
+            const fileExt = disk.extName(filePath).toLowerCase().slice(1)
             const fullPath = await resolveFile(filePath, context)
             if (fullPath === undefined) continue
 
@@ -29,13 +28,13 @@ export async function parseLinks(content: string, context: Context): Promise<str
 
             if (message !== undefined) {
                 message = `\n\n> [!MISSING]+ **${message}**\n> ${filePath}`
-                await fs.appendFile(context.file.path, message)
+                await disk.appendFile(context.file.path, message)
 
                 continue
             }
 
-            const header = fileName?.slice(1) ?? path.basename(filePath)
-            let fileText = (await fs.readFile(fullPath, 'utf-8')).trim()
+            const header = fileName?.slice(1) ?? disk.baseName(filePath)
+            let fileText = (await disk.readFile(fullPath)).trim()
 
             if (fileExt === 'txt') {
                 fileText = await parseLinks(fileText, context)
@@ -53,28 +52,30 @@ export async function parseLinks(content: string, context: Context): Promise<str
 }
 
 export async function resolveFile(filePath: string, context: Context): Promise<string | undefined> {
-    if (await fs.pathExists(filePath)) return filePath
+    const disk = context.file.disk
 
-    let fullPath = path.join(path.dirname(context.file.path), filePath)
-    if (await fs.pathExists(fullPath)) return fullPath
+    if (await disk.pathExists(filePath)) return filePath
 
-    if (process.env.OBSIDIAN_VAULT !== undefined) {
-        fullPath = path.join(process.env.OBSIDIAN_VAULT, filePath)
-        if (await fs.pathExists(fullPath)) return fullPath
+    let fullPath = disk.joinPath(disk.dirName(context.file.path), filePath)
+    if (await disk.pathExists(fullPath)) return fullPath
+
+    if (context.user.env.OBSIDIAN_VAULT !== undefined) {
+        fullPath = disk.joinPath(context.user.env.OBSIDIAN_VAULT, filePath)
+        if (await disk.pathExists(fullPath)) return fullPath
     }
 
     if (context.gladdis.config !== undefined) {
-        const configPath = path.join(context.user.data, 'configs', context.gladdis.config)
+        const configPath = disk.joinPath(context.user.data, 'configs', context.gladdis.config)
 
-        fullPath = path.join(path.dirname(configPath), filePath)
-        if (await fs.pathExists(fullPath)) return fullPath
+        fullPath = disk.joinPath(disk.dirName(configPath), filePath)
+        if (await disk.pathExists(fullPath)) return fullPath
     }
 
-    if (path.extname(filePath).toLowerCase() === '.txt') filePath = filePath.slice(0, -4)
-    if (path.extname(filePath) === '') return await resolveFile(filePath + '.md', context)
+    if (disk.extName(filePath).toLowerCase() === '.txt') filePath = filePath.slice(0, -4)
+    if (disk.extName(filePath) === '') return await resolveFile(filePath + '.md', context)
 
     const missing = '\n\n> [!MISSING]+ **Linked File Not Found**\n> '
-    await fs.appendFile(context.file.path, missing + filePath)
+    await disk.appendFile(context.file.path, missing + filePath)
 
     return undefined
 }
