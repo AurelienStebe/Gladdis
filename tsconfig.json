@@ -4,12 +4,12 @@
         "strict": true,
         "outDir": "lib",
         "rootDir": "src",
-        "module": "esnext",
-        "target": "es2020",
+        "target": "esnext",
+        "module": "nodenext",
         "skipLibCheck": true,
         "esModuleInterop": true,
         "resolveJsonModule": true,
-        "moduleResolution": "node",
+        "moduleResolution": "nodenext",
         "forceConsistentCasingInFileNames": true
     }
 }

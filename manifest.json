@@ -1,0 +1,10 @@
+{
+    "id": "gladdis",
+    "name": "Gladdis",
+    "version": "0.4.1",
+    "minAppVersion": "1.2.3",
+    "description": "Gladdis (Generative Language Artificial Dedicated & Diligent Intelligence System) - it's an AI chatbot.",
+    "author": "Aurélien Stébé",
+    "authorUrl": "https://github.com/AurelienStebe",
+    "isDesktopOnly": false
+}

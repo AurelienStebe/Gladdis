@@ -1,7 +1,7 @@
 {
     "name": "gladdis",
     "version": "0.4.1",
-    "description": "Gladdis (Generative Language Artificial Dedicated & Diligent Intelligence System) -- it's an AI chatbot.",
+    "description": "Gladdis (Generative Language Artificial Dedicated & Diligent Intelligence System) - it's an AI chatbot.",
     "keywords": [
         "gladdis",
         "generative",
@@ -22,17 +22,20 @@
     },
     "license": "MIT",
     "type": "module",
+    "exports": "./lib/commands.js",
     "files": [
         "/lib/",
-        "/CHANGELOG.md"
+        "/CHANGELOG.md",
+        "/manifest.json"
     ],
     "scripts": {
         "clean": "rimraf coverage lib",
-        "lint": "prettier -c . && eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
-        "build": "npm run clean && tsc",
+        "lint": "prettier -c . && eslint --ext .js,.ts .",
+        "build": "npm run clean && tsc && rollup -c --silent --environment NODE_ENV:production",
         "test": "vitest --ui --coverage",
         "start": "node --no-warnings ./lib/service.js",
-        "live": "nodemon --exec node --no-warnings --loader ts-node/esm ./src/service.ts"
+        "live": "nodemon --exec node --no-warnings --loader ts-node/esm ./src/service.ts",
+        "watch": "node --no-warnings ./esbuild.config.js watch"
     },
     "engines": {
         "npm": ">=6.14",
@@ -64,7 +67,7 @@
         "reportUnusedDisableDirectives": true
     },
     "release": {
-        "tagFormat": "Gladdis-v${version}",
+        "tagFormat": "${version}",
         "branches": [
             "main",
             "next"
@@ -75,16 +78,32 @@
             "@semantic-release/changelog",
             "@semantic-release/npm",
             [
+                "@semantic-release/exec",
+                {
+                    "prepareCmd": "node ./version-bump.js \"${nextRelease.version}\""
+                }
+            ],
+            [
                 "@semantic-release/git",
                 {
                     "assets": [
                         "CHANGELOG.md",
-                        "package.json"
+                        "package.json",
+                        "manifest.json",
+                        "versions.json"
                     ],
                     "message": "chore: Gladdis release version ${nextRelease.version} :tada: "
                 }
             ],
-            "@semantic-release/github"
+            [
+                "@semantic-release/github",
+                {
+                    "assets": [
+                        "lib/main.js",
+                        "manifest.json"
+                    ]
+                }
+            ]
         ]
     },
     "dependencies": {
