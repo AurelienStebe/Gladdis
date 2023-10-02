@@ -2,7 +2,7 @@ import { processText } from './history.js'
 
 import type { Context } from '../types/context.js'
 
-const linkRegex = /(?<!<%.*)!\[\[(.+?)(\|.*?)?\]\](?!.*%>)/gs
+const linkRegex = /(?<!<%.*)!\[\[([^|\]]+?)(\|[^\]]*?)?\]\](?!.*%>)/gs
 
 const audioFiles = ['flac', 'mp3', 'mp4', 'mpeg', 'mpga', 'm4a', 'ogg', 'wav', 'webm']
 const imageFiles = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'ico', 'webp']

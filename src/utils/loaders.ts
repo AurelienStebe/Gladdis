@@ -5,7 +5,7 @@ import { parseHistory } from './history.js'
 
 import type { Context } from '../types/context.js'
 
-const linkRegex = /(?<!<%.*)(?<!!)(\[\[.+?\]\])(?!.*%>)/gs
+const linkRegex = /(?<!<%.*)(?<!!)(\[\[[^\]]+?\]\])(?!.*%>)/gs
 
 export async function loadContext(context: Context): Promise<Context> {
     const callContext = deepmerge(context, { file: { date: new Date() } })
