@@ -1,3 +1,13 @@
+## [0.4.2](https://github.com/AurelienStebe/Gladdis/compare/0.4.1...0.4.2) (2023-10-02)
+
+
+### Bug Fixes
+
+* adapt the core logic to be an Obsidian plugin ([21680cc](https://github.com/AurelienStebe/Gladdis/commit/21680cc1a6746b41a9dcdffbe0b6ffbd0a4aa66f))
+* create a new commands API & adapt the service ([d6a5c16](https://github.com/AurelienStebe/Gladdis/commit/d6a5c16069224f782a24679476a387d6a84398b5))
+* create the Obsidian plugin with settings panel ([ca79915](https://github.com/AurelienStebe/Gladdis/commit/ca7991547b6790db81d97907c6f7ff550b7c8c50))
+* the WikiLinks regex & update all dependencies ([1e6d5b0](https://github.com/AurelienStebe/Gladdis/commit/1e6d5b0b99e9edd8dbe849d8b2bea56216276806))
+
 ## [0.4.1](https://github.com/AurelienStebe/Gladdis/compare/Gladdis-v0.4.0...Gladdis-v0.4.1) (2023-08-25)
 
 
