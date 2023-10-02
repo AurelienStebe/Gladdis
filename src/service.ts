@@ -1,33 +1,30 @@
 import 'dotenv/config'
-
 import express from 'express'
 
-import { askGladdis } from './gladdis.js'
-import { transcribe } from './utils/whisper.js'
-import { loadContext, loadContent } from './utils/loaders.js'
+import { chatWithGladdis, processContent, processPrompt } from './commands.js'
 
 const app = express()
-
 app.use(express.json())
 
-app.post('/askGladdis', (req, res) => {
+app.post('/chatWithGladdis', (req, res) => {
     void (async () => {
-        const context = await loadContext(req.body)
-        void askGladdis(loadContent(context))
+        void chatWithGladdis(req.body)
     })()
 
     res.status(200).end()
 })
 
-app.post('/transcribe', (req, res) => {
+app.post('/processContent', (req, res) => {
     void (async () => {
-        let context = await loadContext(req.body)
+        void processContent(req.body)
+    })()
 
-        context.whisper.echoOutput = true
-        context.whisper.deleteFile = false
+    res.status(200).end()
+})
 
-        context = loadContent(context)
-        void transcribe(context.user.prompt, context)
+app.post('/processPrompt', (req, res) => {
+    void (async () => {
+        void processPrompt(req.body)
     })()
 
     res.status(200).end()
