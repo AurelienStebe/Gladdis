@@ -1,5 +1,6 @@
 import builtins from 'builtin-modules'
 import json from '@rollup/plugin-json'
+import alias from '@rollup/plugin-alias'
 import terser from '@rollup/plugin-terser'
 import { wasm } from '@rollup/plugin-wasm'
 import commonjs from '@rollup/plugin-commonjs'
@@ -15,7 +16,11 @@ export default {
 
     plugins: [
         commonjs({ include: /node_modules/ }),
-        resolve({ preferBuiltins: true }),
+        resolve({ browser: true }),
+
+        alias({
+            entries: [{ find: 'yaml', replacement: '../obsidian' }],
+        }),
 
         wasm({ targetEnv: 'auto-inline' }),
         json({ compact: true }),

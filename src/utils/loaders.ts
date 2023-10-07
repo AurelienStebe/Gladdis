@@ -1,6 +1,6 @@
-import yaml from 'yaml'
-
+import { parse } from 'yaml'
 import { deepmerge } from 'deepmerge-ts'
+
 import { parseHistory } from './history.js'
 
 import type { Context } from '../types/context.js'
@@ -105,7 +105,7 @@ export async function loadMarkdown(context: Context): Promise<Context> {
     if (content.startsWith('---\n')) {
         const [frontMatter, ...bodyContent] = content.slice(4).split('\n---')
 
-        context = deepmerge(yaml.parse(frontMatter), context)
+        context = deepmerge(parse(frontMatter), context)
         context.file.text = bodyContent.join('\n---').trim()
     } else context.file.text = content
 

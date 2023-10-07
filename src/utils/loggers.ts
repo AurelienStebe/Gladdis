@@ -1,10 +1,10 @@
-import yaml from 'yaml'
-
+import { stringify } from 'yaml'
 import { deepmerge } from 'deepmerge-ts'
-import { writeHistory } from './history.js'
 
 import { Tiktoken } from 'js-tiktoken/lite'
 import cl100k_base from 'js-tiktoken/ranks/cl100k_base'
+
+import { writeHistory } from './history.js'
 
 import type { Context, ChatMessage } from '../types/context.js'
 
@@ -21,7 +21,7 @@ export async function logGladdisCall(context: Context): Promise<void> {
     delete logContext.file
     delete logContext.user
 
-    const frontMatter = `---\n${yaml.stringify(logContext)}---\n\n`
+    const frontMatter = `---\n${stringify(logContext)}---\n\n`
     await disk.appendFile(logFile, frontMatter + writeHistory(context))
 }
 

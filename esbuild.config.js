@@ -40,6 +40,10 @@ const context = await esbuild.context({
     target: 'es2018',
     treeShaking: true,
 
+    alias: {
+        yaml: './src/obsidian.ts',
+    },
+
     plugins: [wasmPlugin],
 
     external: [

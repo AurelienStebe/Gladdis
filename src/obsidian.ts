@@ -11,6 +11,8 @@ import type { App, Editor, MarkdownView, MarkdownFileInfo, Vault } from 'obsidia
 
 import type { Context, DiskInterface } from './types/context.js'
 
+export { stringifyYaml as stringify, parseYaml as parse } from 'obsidian'
+
 interface GladdisSettings {
     GLADDIS_DATA_PATH: string
     GLADDIS_CONFIG_FILE?: string
