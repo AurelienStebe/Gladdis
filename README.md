@@ -63,9 +63,15 @@ Gladdis provides 3 commands, map them to hotkeys in the settings or create butto
 
 ### Settings / Options
 
+The settings panel let you specify the plugin data folder, your OpenAI API key and the FrontMatter defaults.
+
 -   **Data Root Path**: Gladdis will search for config files in the `configs` subfolder, and will write the chat and call logs in the `history` subfolder.
 -   **OpenAI Secret Key**: create an OpenAI API account, [generate an API key](https://platform.openai.com/account/api-keys) and paste it in the settings panel.
 -   **FrontMatter Defaults**: adjust the various defaults for the Gladdis and Whisper options.
+
+### FrontMatter Config
+
+The defaults from the settings panel can be overridden using FrontMatter in any conversation or config file.
 
 ```yaml
 ---
@@ -85,6 +91,8 @@ whisper:
 ```
 
 ### Markdown Syntax
+
+The same familiar Obsidian syntax from your notes is used for the conversation history (it's all just text).
 
 ```md
 Just use standard Markdown text for `User` messages and prompts.
