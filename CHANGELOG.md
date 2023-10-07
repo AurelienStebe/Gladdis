@@ -1,3 +1,12 @@
+## [0.4.3](https://github.com/AurelienStebe/Gladdis/compare/0.4.2...0.4.3) (2023-10-07)
+
+
+### Bug Fixes
+
+* bug with empty config file values in settings ([0df2dc3](https://github.com/AurelienStebe/Gladdis/commit/0df2dc3f08d82bcbd6c9bcdf5eaa7dbd8c63869b))
+* remove “dotenv“ dep in Obsidian, code “parse“ ([16e202f](https://github.com/AurelienStebe/Gladdis/commit/16e202f865e4585791b4250ca50010f5d958a0c3))
+* remove YAML dep in Obsidian with import alias ([b256b1f](https://github.com/AurelienStebe/Gladdis/commit/b256b1f90ab488e07a87614100a2182dbdb2d7dc))
+
 ## [0.4.2](https://github.com/AurelienStebe/Gladdis/compare/0.4.1...0.4.2) (2023-10-02)
 
 
