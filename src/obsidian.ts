@@ -1,4 +1,3 @@
-import { parse } from 'dotenv'
 import { deepmerge } from 'deepmerge-ts'
 
 import { doGladdis } from './gladdis.js'
@@ -159,17 +158,38 @@ export default class GladdisPlugin extends Plugin {
     }
 
     async loadSecrets(): Promise<void> {
-        const path = `${this.app.vault.configDir}/plugins/${this.manifest.id}/.env`
-        const file = await this.app.vault.adapter.exists(normalizePath(path))
+        const path = normalizePath(this.manifest.dir + '/.env')
+        if (!(await this.app.vault.adapter.exists(path))) return
 
-        if (file) this.secrets = parse(await this.app.vault.adapter.read(normalizePath(path)))
+        this.secrets = this.parseDotEnv(await this.app.vault.adapter.read(path))
     }
 
     async saveSecrets(): Promise<void> {
-        const path = `${this.app.vault.configDir}/plugins/${this.manifest.id}/.env`
+        const path = normalizePath(this.manifest.dir + '/.env')
         const text = Object.keys(this.secrets).map((key) => `${key}="${this.secrets[key]}"`)
 
-        await this.app.vault.adapter.write(normalizePath(path), text.join('\n'))
+        await this.app.vault.adapter.write(path, text.join('\n') + '\n')
+    }
+
+    parseDotEnv(text: string): Record<string, string> {
+        const result: Record<string, string> = {}
+
+        text.trim()
+            .split('\n')
+            .forEach((line) => {
+                line = line.trim()
+
+                const index = line.indexOf('=')
+                if (index === -1 || line[0] === '#') return
+
+                const key = line.slice(0, index).trim()
+                let value = line.slice(index + 1).trim()
+
+                if (value[0] === '"') value = value.slice(1, -1)
+                if (key !== '' && value !== '') result[key] = value
+            })
+
+        return result
     }
 }
 
@@ -302,9 +322,7 @@ class GladdisSettingTab extends PluginSettingTab {
             .setDesc(
                 createFragment((fragment) => {
                     fragment.appendText('The secrets are stored in "')
-                    fragment.createEl('code', {
-                        text: `<vault>/${this.app.vault.configDir}/plugins/${this.plugin.manifest.id}/.env`,
-                    })
+                    fragment.createEl('code', { text: `<vault>/${this.plugin.manifest.dir}/.env` })
                     fragment.appendText('",')
                     fragment.createEl('br')
                     fragment.appendText('add the above path to your "')
@@ -455,12 +473,13 @@ class GladdisSettingTab extends PluginSettingTab {
         new Setting(this.containerEl)
             .setName('Default audio prompt')
             .setDesc('The default audio prompt, use it to spell out specific nouns or words.')
-            .addTextArea((text) =>
-                text.setValue(this.plugin.settings.GLADDIS_WHISPER_INPUT).onChange(async (value) => {
+            .addTextArea((textArea) => {
+                textArea.inputEl.style.width = '100%'
+                textArea.setValue(this.plugin.settings.GLADDIS_WHISPER_INPUT).onChange(async (value) => {
                     this.plugin.settings.GLADDIS_WHISPER_INPUT = value
                     await this.plugin.saveSettings()
-                }),
-            )
+                })
+            })
 
         new Setting(this.containerEl)
             .setName('Default audio model')
