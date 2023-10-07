@@ -9,7 +9,7 @@ export default {
     input: 'lib/obsidian.js',
 
     output: {
-        file: 'lib/main.js',
+        file: 'main.js',
         format: 'cjs',
     },
 

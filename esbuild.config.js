@@ -33,7 +33,7 @@ const wasmPlugin = {
 
 const context = await esbuild.context({
     entryPoints: ['src/obsidian.ts'],
-    outfile: 'lib/main.js',
+    outfile: 'main.js',
 
     bundle: true,
     format: 'cjs',

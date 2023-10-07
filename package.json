@@ -14,7 +14,10 @@
         "obsidian"
     ],
     "homepage": "https://github.com/AurelienStebe/Gladdis",
-    "repository": "github:AurelienStebe/Gladdis",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/AurelienStebe/Gladdis.git"
+    },
     "bugs": "https://github.com/AurelienStebe/Gladdis/issues",
     "author": {
         "name": "Aurélien Stébé",
@@ -29,7 +32,7 @@
         "/manifest.json"
     ],
     "scripts": {
-        "clean": "rimraf coverage lib",
+        "clean": "rimraf coverage lib main.js",
         "lint": "prettier -c . && eslint --ext .js,.ts .",
         "build": "npm run clean && tsc && rollup -c --silent --environment NODE_ENV:production",
         "test": "vitest --ui --coverage",
@@ -38,8 +41,7 @@
         "watch": "node --no-warnings ./esbuild.config.js watch"
     },
     "engines": {
-        "npm": ">=6.14",
-        "node": ">=16.0"
+        "node": ">=18"
     },
     "os": [
         "darwin",
@@ -99,7 +101,7 @@
                 "@semantic-release/github",
                 {
                     "assets": [
-                        "lib/main.js",
+                        "main.js",
                         "manifest.json"
                     ]
                 }
@@ -113,15 +115,16 @@
         "fs-extra": "^11.1.1",
         "js-tiktoken": "^1.0.7",
         "obsidian": "^1.4.11",
-        "openai": "^4.11.0",
+        "openai": "^4.11.1",
         "yaml": "^2.3.2"
     },
     "devDependencies": {
-        "@rollup/plugin-commonjs": "^25.0.4",
-        "@rollup/plugin-json": "^6.0.0",
-        "@rollup/plugin-node-resolve": "^15.2.1",
-        "@rollup/plugin-terser": "^0.4.3",
-        "@rollup/plugin-wasm": "^6.2.1",
+        "@rollup/plugin-alias": "^5.0.1",
+        "@rollup/plugin-commonjs": "^25.0.5",
+        "@rollup/plugin-json": "^6.0.1",
+        "@rollup/plugin-node-resolve": "^15.2.2",
+        "@rollup/plugin-terser": "^0.4.4",
+        "@rollup/plugin-wasm": "^6.2.2",
         "@semantic-release/changelog": "^6.0.3",
         "@semantic-release/commit-analyzer": "^11.0.0",
         "@semantic-release/exec": "^6.0.3",
@@ -131,23 +134,23 @@
         "@semantic-release/release-notes-generator": "^12.0.0",
         "@types/express": "^4.17.18",
         "@types/fs-extra": "^11.0.2",
-        "@types/node": "^20.8.0",
+        "@types/node": "^20.8.3",
         "@typescript-eslint/eslint-plugin": "^6.7.4",
         "@typescript-eslint/parser": "^6.7.4",
         "@vitest/coverage-v8": "^0.34.6",
         "@vitest/ui": "^0.34.6",
         "builtin-modules": "^3.3.0",
         "esbuild": "^0.19.4",
-        "eslint": "^8.50.0",
+        "eslint": "^8.51.0",
         "eslint-config-prettier": "^9.0.0",
-        "eslint-config-standard-with-typescript": "^39.1.0",
+        "eslint-config-standard-with-typescript": "^39.1.1",
         "eslint-plugin-import": "^2.28.1",
         "eslint-plugin-n": "^16.1.0",
         "eslint-plugin-promise": "^6.1.1",
         "nodemon": "^3.0.1",
         "prettier": "^3.0.3",
         "rimraf": "^5.0.5",
-        "rollup": "^3.29.4",
+        "rollup": "^4.0.2",
         "semantic-release": "^22.0.5",
         "ts-node": "^10.9.1",
         "tslib": "^2.6.2",
