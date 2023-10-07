@@ -358,7 +358,8 @@ class GladdisSettingTab extends PluginSettingTab {
                     .setPlaceholder('Gladdis.md')
                     .setValue(this.plugin.settings.GLADDIS_CONFIG_FILE ?? '')
                     .onChange(async (value) => {
-                        this.plugin.settings.GLADDIS_CONFIG_FILE = value
+                        if (value === '') delete this.plugin.settings.GLADDIS_CONFIG_FILE
+                        else this.plugin.settings.GLADDIS_CONFIG_FILE = value
                         await this.plugin.saveSettings()
                     }),
             )
@@ -467,7 +468,8 @@ class GladdisSettingTab extends PluginSettingTab {
                     .setPlaceholder('Whisper.md')
                     .setValue(this.plugin.settings.GLADDIS_WHISPER_CONFIG ?? '')
                     .onChange(async (value) => {
-                        this.plugin.settings.GLADDIS_WHISPER_CONFIG = value
+                        if (value === '') delete this.plugin.settings.GLADDIS_WHISPER_CONFIG
+                        else this.plugin.settings.GLADDIS_WHISPER_CONFIG = value
                         await this.plugin.saveSettings()
                     }),
             )

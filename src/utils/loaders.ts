@@ -52,7 +52,7 @@ export async function loadAIConfig(context: Context): Promise<Context> {
     const disk = context.file.disk
     let configContext: any = { whisper: {} }
 
-    if (context.gladdis?.config !== undefined) {
+    if (context.gladdis.config !== undefined && context.gladdis.config !== '') {
         if (!context.gladdis.config.toLowerCase().endsWith('.md')) context.gladdis.config += '.md'
         const configPath = disk.joinPath(context.user.data, 'configs', context.gladdis.config)
 
@@ -76,7 +76,7 @@ export async function loadAIConfig(context: Context): Promise<Context> {
         }
     }
 
-    if (context.whisper?.config !== undefined) {
+    if (context.whisper.config !== undefined && context.whisper.config !== '') {
         if (!context.whisper.config.toLowerCase().endsWith('.md')) context.whisper.config += '.md'
         const whisperPath = disk.joinPath(context.user.data, 'configs', context.whisper.config)
 

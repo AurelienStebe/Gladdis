@@ -64,7 +64,7 @@ export async function resolveFile(filePath: string, context: Context): Promise<s
         if (await disk.pathExists(fullPath)) return fullPath
     }
 
-    if (context.gladdis.config !== undefined) {
+    if (context.gladdis.config !== undefined && context.gladdis.config !== '') {
         const configPath = disk.joinPath(context.user.data, 'configs', context.gladdis.config)
 
         fullPath = disk.joinPath(disk.dirName(configPath), filePath)
