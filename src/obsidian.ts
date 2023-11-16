@@ -332,15 +332,15 @@ class GladdisSettingTab extends PluginSettingTab {
                     fragment.appendText('" file if you sync your vault online.')
                 }),
             )
-            .addText((text) =>
-                text
-                    .setPlaceholder('sk-***************')
+            .addText((text) => {
+                text.inputEl.type = 'password'
+                text.setPlaceholder('sk-***************')
                     .setValue(this.plugin.secrets.OPENAI_API_KEY ?? '')
                     .onChange(async (value) => {
                         this.plugin.secrets.OPENAI_API_KEY = value
                         await this.plugin.saveSecrets()
-                    }),
-            )
+                    })
+            })
 
         this.containerEl.createEl('h3', { text: 'Gladdis' })
 
@@ -369,19 +369,21 @@ class GladdisSettingTab extends PluginSettingTab {
             .setDesc(
                 createFragment((fragment) => {
                     fragment.appendText('Only OpenAI models at the moment ("')
-                    fragment.createEl('code', { text: 'gpt-3.5' })
+                    fragment.createEl('code', { text: 'GPT-3.5' })
                     fragment.appendText('" or "')
-                    fragment.createEl('code', { text: 'gpt-4' })
+                    fragment.createEl('code', { text: 'GPT-4' })
                     fragment.appendText('").')
                 }),
             )
             .addDropdown((dropdown) =>
                 dropdown
                     .addOptions({
-                        'gpt-3.5-turbo': 'gpt-3.5-turbo',
-                        'gpt-3.5-turbo-16k': 'gpt-3.5-turbo-16k',
-                        'gpt-4': 'gpt-4',
-                        'gpt-4-32k': 'gpt-4-32k',
+                        'gpt-4-1106-preview': 'GPT-4 Preview (128k)',
+                        'gpt-4-32k': 'GPT-4 (32k)',
+                        'gpt-4': 'GPT-4 (8k)',
+                        'gpt-3.5-turbo-1106': 'GPT-3.5 Updated (16k)',
+                        'gpt-3.5-turbo-16k': 'GPT-3.5 (16k)',
+                        'gpt-3.5-turbo': 'GPT-3.5 (4k)',
                     })
                     .setValue(this.plugin.settings.GLADDIS_DEFAULT_MODEL)
                     .onChange(async (value) => {
