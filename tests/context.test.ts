@@ -6,6 +6,8 @@ import { describe, it, expect, afterEach, vi } from 'vitest'
 import { diskInterface } from '../src/commands.js'
 import { loadContext, loadContent } from '../src/utils/loaders.js'
 
+import type { Context } from '../src/types/context.js'
+
 const envVars = {
     GLADDIS_DATA_PATH: 'EnvVars',
     GLADDIS_NAME_LABEL: 'EnvVars',
@@ -94,12 +96,12 @@ describe('the Context loaders', () => {
 
     it('loads default values', async () => {
         diskInterface.readFile = vi.fn().mockResolvedValue('')
-        const callContext = { file: { path: 'name.md' } } as any
+        const callContext: any = { file: { path: 'name.md' } }
 
         callContext.user = { env: { NODE_ENV: 'test' } }
         callContext.file.disk = diskInterface
 
-        const context = await loadContext(callContext)
+        const context = await loadContext(callContext as Context)
         expect(loadContent(context)).toMatchSnapshot({
             file: {
                 date: expect.any(Date),
@@ -140,12 +142,12 @@ describe('the Context loaders', () => {
 
     it('loads EnvVars values', async () => {
         diskInterface.readFile = vi.fn().mockResolvedValue('text')
-        const callContext = { file: { path: 'name.md' } } as any
+        const callContext: any = { file: { path: 'name.md' } }
 
         callContext.user = { env: envVars }
         callContext.file.disk = diskInterface
 
-        const context = await loadContext(callContext)
+        const context = await loadContext(callContext as Context)
         expect(loadContent(context)).toMatchSnapshot({
             file: {
                 date: expect.any(Date),
@@ -200,12 +202,12 @@ describe('the Context loaders', () => {
             .mockResolvedValueOnce(whisperConf)
 
         diskInterface.pathExists = vi.fn().mockResolvedValue(true)
-        const callContext = { file: { path: 'name.md' } } as any
+        const callContext: any = { file: { path: 'name.md' } }
 
         callContext.user = { env: envVars }
         callContext.file.disk = diskInterface
 
-        const context = await loadContext(callContext)
+        const context = await loadContext(callContext as Context)
         expect(loadContent(context)).toMatchSnapshot({
             file: expect.any(Object),
             user: {
@@ -246,13 +248,13 @@ describe('the Context loaders', () => {
 
         diskInterface.readFile = vi.fn().mockResolvedValue(inputFile)
         diskInterface.pathExists = vi.fn().mockResolvedValue(false)
-        diskInterface.appendFile = vi.fn() as any
+        diskInterface.appendFile = vi.fn() as typeof diskInterface.appendFile
 
-        const callContext = { file: { path: 'name.md' } } as any
+        const callContext: any = { file: { path: 'name.md' } }
         callContext.user = { env: envVars }
         callContext.file.disk = diskInterface
 
-        await loadContext(callContext)
+        await loadContext(callContext as Context)
 
         expect(diskInterface.appendFile).toHaveBeenNthCalledWith(
             2,
@@ -273,12 +275,12 @@ describe('the Context loaders', () => {
             .mockResolvedValueOnce(whisperConf)
 
         diskInterface.pathExists = vi.fn().mockResolvedValue(true)
-        const callContext = { file: { path: 'name.md' } } as any
+        const callContext: any = { file: { path: 'name.md' } }
 
         callContext.user = { env: envVars }
         callContext.file.disk = diskInterface
 
-        const context = await loadContext(callContext)
+        const context = await loadContext(callContext as Context)
         expect(loadContent(context)).toMatchSnapshot({
             file: expect.any(Object),
             user: expect.any(Object),
@@ -317,14 +319,14 @@ describe('the Context loaders', () => {
             .mockResolvedValueOnce(whisperConf)
 
         diskInterface.pathExists = vi.fn().mockResolvedValue(true)
-        let callContext = { file: { path: 'name.md' } } as any
+        let callContext: any = { file: { path: 'name.md' } }
 
         callContext.user = { env: envVars }
         callContext.file.disk = diskInterface
 
         callContext = deepmerge(callContext, callEnv)
 
-        const context = await loadContext(callContext)
+        const context = await loadContext(callContext as Context)
         expect(loadContent(context)).toMatchSnapshot({
             file: expect.any(Object),
             user: {

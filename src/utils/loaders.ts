@@ -44,8 +44,8 @@ export async function loadContext(context: Context): Promise<Context> {
         },
     }
 
-    const fullContext = deepmerge(coreContext, fileContext) as any
-    return deepmerge(await loadAIConfig(fullContext), fileContext) as any
+    const fullContext = deepmerge(coreContext, fileContext) as unknown as Context
+    return deepmerge(await loadAIConfig(fullContext), fileContext) as unknown as Context
 }
 
 export async function loadAIConfig(context: Context): Promise<Context> {
@@ -62,14 +62,14 @@ export async function loadAIConfig(context: Context): Promise<Context> {
                 user: { label: 'System' },
             })
 
-            configContext = await loadMarkdown(configContext)
-            const configHistory = parseHistory(deepmerge(context, configContext))
+            configContext = await loadMarkdown(configContext as Context)
+            const configHistory = deepmerge(context, configContext) as Context
 
             delete configContext.file
             delete configContext.user
 
             context = deepmerge(context, configContext)
-            context.user.history.unshift(...configHistory)
+            context.user.history.unshift(...parseHistory(configHistory))
         } else {
             const missing = '\n\n> [!MISSING]+ **Config File Not Found**\n> '
             await disk.appendFile(context.file.path, missing + configPath)
@@ -85,10 +85,10 @@ export async function loadAIConfig(context: Context): Promise<Context> {
                 file: { path: whisperPath, disk },
             }
 
-            whisperContext = await loadMarkdown(whisperContext)
+            whisperContext = await loadMarkdown(whisperContext as Context)
             configContext.whisper.input = whisperContext.file.text
 
-            whisperContext = deepmerge(whisperContext, configContext)
+            whisperContext = deepmerge(configContext, whisperContext)
             context.whisper = deepmerge(context.whisper, whisperContext.whisper)
         } else {
             const missing = '\n\n> [!MISSING]+ **Whisper File Not Found**\n> '
@@ -115,11 +115,11 @@ export async function loadMarkdown(context: Context): Promise<Context> {
 export function loadContent(context: Context): Context {
     context.user.history.push(...parseHistory(context))
 
-    context.user.history.forEach((message) => {
+    for (const message of context.user.history) {
         if (message.role === 'system') {
             message.content = message.content.replace(linkRegex, '!$1')
         }
-    })
+    }
 
     if (context.user.history.at(-1)?.role === 'user') {
         context.user.label = context.user.history.at(-1)?.name ?? 'User'

@@ -44,7 +44,7 @@ const DEFAULT_SETTINGS: GladdisSettings = {
 }
 
 export default class GladdisPlugin extends Plugin {
-    settings: GladdisSettings = {} as any
+    settings: GladdisSettings = DEFAULT_SETTINGS
     secrets: Record<string, string> = {}
 
     async onload(): Promise<void> {
@@ -134,14 +134,14 @@ export default class GladdisPlugin extends Plugin {
         view: MarkdownView | MarkdownFileInfo,
         processing: (context: Context) => Promise<void>,
     ): Promise<void> {
-        const context = { user: {}, file: {} } as any
+        const context: any = { user: {}, file: {} }
         context.file.path = view.file?.path ?? ''
 
         context.user.env = deepmerge(this.secrets, this.settings)
         context.file.disk = new VaultInterface(editor, view)
 
         try {
-            await processing(context)
+            await processing(context as Context)
         } catch (error: any) {
             const errorName: string = error?.message ?? 'Gladdis Unknown Error'
             const errorJSON: string = '```json\n> ' + JSON.stringify(error) + '\n> ```'
@@ -176,20 +176,18 @@ export default class GladdisPlugin extends Plugin {
     parseDotEnv(text: string): Record<string, string> {
         const result: Record<string, string> = {}
 
-        text.trim()
-            .split('\n')
-            .forEach((line) => {
-                line = line.trim()
+        for (const rawLine of text.trim().split('\n')) {
+            const line = rawLine.trim()
 
-                const index = line.indexOf('=')
-                if (index === -1 || line[0] === '#') return
+            const index = line.indexOf('=')
+            if (index === -1 || line[0] === '#') continue
 
-                const key = line.slice(0, index).trim()
-                let value = line.slice(index + 1).trim()
+            const key = line.slice(0, index).trim()
+            let value = line.slice(index + 1).trim()
 
-                if (value[0] === '"') value = value.slice(1, -1)
-                if (key !== '' && value !== '') result[key] = value
-            })
+            if (value[0] === '"') value = value.slice(1, -1)
+            if (key !== '' && value !== '') result[key] = value
+        }
 
         return result
     }

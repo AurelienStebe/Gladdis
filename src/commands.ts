@@ -7,19 +7,25 @@ import { transcribe } from './utils/whisper.js'
 import { getTokenModal } from './utils/loggers.js'
 import { loadContext, loadContent } from './utils/loaders.js'
 
-import type { Context } from './types/context.js'
+import type { Context, DiskInterface } from './types/context.js'
 
-export const diskInterface = {
-    readFile: async (path: string) => await fs.readFile(path, 'utf-8'),
-    readBinary: fs.createReadStream,
-    appendFile: fs.appendFile,
-    deleteFile: fs.remove,
-    pathExists: fs.pathExists,
-    pathEnsure: fs.ensureDir,
-    baseName: path.basename,
-    extName: path.extname,
-    joinPath: path.join,
-    dirName: path.dirname,
+export const diskInterface: DiskInterface = {
+    readFile: async (p: string) => await fs.readFile(p, 'utf-8'),
+    readBinary: (p: string) => fs.createReadStream(p),
+    appendFile: async (p: string, d: string) => {
+        await fs.appendFile(p, d)
+    },
+    deleteFile: async (p: string) => {
+        await fs.remove(p)
+    },
+    pathExists: async (p: string) => await fs.pathExists(p),
+    pathEnsure: async (p: string) => {
+        await fs.ensureDir(p)
+    },
+    baseName: (p: string, e?: string) => path.basename(p, e),
+    extName: (p: string) => path.extname(p),
+    joinPath: (...p: string[]) => path.join(...p),
+    dirName: (p: string) => path.dirname(p),
 }
 
 export async function chatWithGladdis(context: Context): Promise<void> {
@@ -74,8 +80,10 @@ export async function processPrompt(context: Context): Promise<void> {
 }
 
 function prepareContext(context: Context): Context {
-    context.user.env = context.user?.env ?? process.env
-    context.file.disk = context.file?.disk ?? diskInterface
+    context.user = context.user ?? {}
+
+    context.user.env = context.user.env ?? process.env
+    context.file.disk = context.file.disk ?? diskInterface
 
     return context
 }

@@ -3,3 +3,4 @@
 /lib/
 /node_modules/
 /main.js
+/esbuild.config.js

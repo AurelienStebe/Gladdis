@@ -17,7 +17,7 @@ export async function logGladdisCall(context: Context): Promise<void> {
 
     await disk.pathEnsure(logPath)
 
-    const logContext = deepmerge({}, context) as any
+    const logContext: any = deepmerge({}, context)
     delete logContext.file
     delete logContext.user
 
@@ -38,7 +38,7 @@ export async function logGladdisChat(context: Context): Promise<void> {
     history[0].content = `[${context.file.date.toISOString().split('T')[1]}] ${history[0].content}`
     history[1].content = `[${new Date().toISOString().split('T')[1]}] ${history[1].content}`
 
-    const logContext = deepmerge({}, context) as any
+    const logContext = deepmerge({}, context)
     logContext.user.history = history
 
     await disk.appendFile(logFile, '\n' + writeHistory(logContext))

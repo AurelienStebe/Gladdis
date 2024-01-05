@@ -3,12 +3,15 @@ import express from 'express'
 
 import { chatWithGladdis, processContent, processPrompt } from './commands.js'
 
+import type { Context } from './types/context.js'
+
 const app = express()
+
 app.use(express.json())
 
 app.post('/chatWithGladdis', (req, res) => {
     void (async () => {
-        void chatWithGladdis(req.body)
+        void chatWithGladdis(req.body as Context)
     })()
 
     res.status(200).end()
@@ -16,7 +19,7 @@ app.post('/chatWithGladdis', (req, res) => {
 
 app.post('/processContent', (req, res) => {
     void (async () => {
-        void processContent(req.body)
+        void processContent(req.body as Context)
     })()
 
     res.status(200).end()
@@ -24,7 +27,7 @@ app.post('/processContent', (req, res) => {
 
 app.post('/processPrompt', (req, res) => {
     void (async () => {
-        void processPrompt(req.body)
+        void processPrompt(req.body as Context)
     })()
 
     res.status(200).end()

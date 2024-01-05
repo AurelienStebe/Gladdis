@@ -2,6 +2,8 @@ import type { Context, ChatMessage, ChatRoleEnum } from '../types/context.js'
 
 export type Processor = (content: string, context: Context) => Promise<string>
 
+const transcriptRegex = /^\[!QUOTE\][+-]? Transcript from "(.+?)"$/i
+
 export function parseHistory(context: Context): ChatMessage[] {
     const lines = (context.file.text + '\n---\n').split('\n')
     const history: ChatMessage[] = []
@@ -65,8 +67,6 @@ export function parsePrompt(label: string, prompt: string[], quotes: string[][],
 
     for (const lines of quotes) {
         if (lines[0] === undefined) continue
-
-        const transcriptRegex = /^\[!QUOTE\][+-]? Transcript from "(.+?)"$/i
         const transcriptMatch = transcriptRegex.exec(lines[0])
 
         if (transcriptMatch !== null) {

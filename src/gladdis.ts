@@ -35,7 +35,7 @@ export async function doGladdis(context: Context): Promise<void> {
     const corePrompt = context.user.env.GLADDIS_CORE_PROMPT ?? defaultCorePrompt
     const metaPrompt = context.user.env.GLADDIS_META_PROMPT ?? defaultMetaPrompt
 
-    if (Object.entries(chatContext).length > 0) {
+    if (Object.entries(chatContext as Context).length > 0) {
         const metadata = `${metaPrompt} \`${JSON.stringify(chatContext)}\``
         context.user.history.unshift({ role: 'system', content: metadata })
     }
