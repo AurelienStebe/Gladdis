@@ -70,15 +70,12 @@ export default class GladdisPlugin extends Plugin {
                 await this.processWithContext(editor, view, async (context: Context) => {
                     context = loadContent(await loadContext(context))
 
-                    context.whisper.echoOutput = false
+                    context.whisper.echoOutput = true
                     context.whisper.deleteFile = false
 
                     for (const message of context.user.history) {
-                        message.content = await transcribe(message.content, context)
                         message.content = await parseLinks(message.content, context)
                     }
-
-                    context.whisper.echoOutput = true
 
                     context.user.prompt = await transcribe(context.user.prompt, context)
                     context.user.prompt = await parseLinks(context.user.prompt, context)

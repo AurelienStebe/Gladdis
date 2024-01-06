@@ -34,7 +34,7 @@ export async function transcribe(content: string, context: Context): Promise<str
             if (context.whisper.deleteFile) void disk.deleteFile(fullPath)
 
             if (context.whisper.echoOutput) {
-                const transcriptLabel = `\n\n> [!QUOTE]+ Transcript from "${filePath}"`
+                const transcriptLabel = `\n\n> [!QUOTE]- Transcript from "${filePath}"`
                 const transcriptQuote = '\n> ' + transcript.split('\n').join('\n>\n> ')
 
                 await disk.appendFile(context.file.path, transcriptLabel + transcriptQuote)

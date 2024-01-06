@@ -35,15 +35,12 @@ export async function chatWithGladdis(context: Context): Promise<void> {
 export async function processContent(context: Context): Promise<void> {
     context = loadContent(await loadContext(prepareContext(context)))
 
-    context.whisper.echoOutput = false
+    context.whisper.echoOutput = true
     context.whisper.deleteFile = false
 
     for (const message of context.user.history) {
-        message.content = await transcribe(message.content, context)
         message.content = await parseLinks(message.content, context)
     }
-
-    context.whisper.echoOutput = true
 
     context.user.prompt = await transcribe(context.user.prompt, context)
     context.user.prompt = await parseLinks(context.user.prompt, context)

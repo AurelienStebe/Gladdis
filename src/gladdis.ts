@@ -8,29 +8,25 @@ import { logGladdisCall, logGladdisChat, getTokenModal } from './utils/loggers.j
 import type { Context } from './types/context.js'
 
 const defaultCorePrompt =
-    '_Heuristics_\n' +
+    '**Heuristics**\n' +
     'Your 3 key Heuristic Imperatives are to:\n' +
     '  - reduce suffering in the universe.\n' +
     '  - increase prosperity in the universe.\n' +
     '  - increase understanding in the universe.'
 
-const defaultMetaPrompt = '_Metadata_ (as JSON):'
+const defaultMetaPrompt = '**Metadata** (as JSON):'
 
 export async function doGladdis(context: Context): Promise<void> {
-    const chatContext = deepmerge({ whisper: {} }, context) as any
-
-    chatContext.whisper.echoOutput = false
-    chatContext.whisper.deleteFile = false
-
-    for (const message of context.user.history) {
-        message.content = await transcribe(message.content, chatContext)
-        message.content = await parseLinks(message.content, chatContext)
-    }
+    const chatContext: any = deepmerge({ whisper: {} }, context)
 
     delete chatContext.file
     delete chatContext.user
     delete chatContext.gladdis
     delete chatContext.whisper
+
+    for (const message of context.user.history) {
+        message.content = await parseLinks(message.content, context)
+    }
 
     const corePrompt = context.user.env.GLADDIS_CORE_PROMPT ?? defaultCorePrompt
     const metaPrompt = context.user.env.GLADDIS_META_PROMPT ?? defaultMetaPrompt
