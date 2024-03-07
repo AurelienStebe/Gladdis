@@ -373,12 +373,12 @@ class GladdisSettingTab extends PluginSettingTab {
             .addDropdown((dropdown) =>
                 dropdown
                     .addOptions({
-                        'gpt-4-1106-preview': 'GPT-4 Preview (128k)',
+                        'gpt-4-turbo-preview': 'GPT-4 Preview (128k)',
                         'gpt-4-32k': 'GPT-4 (32k)',
                         'gpt-4': 'GPT-4 (8k)',
-                        'gpt-3.5-turbo-1106': 'GPT-3.5 Updated (16k)',
+                        'gpt-3.5-turbo': 'GPT-3.5 Updated (16k)',
                         'gpt-3.5-turbo-16k': 'GPT-3.5 (16k)',
-                        'gpt-3.5-turbo': 'GPT-3.5 (4k)',
+                        'gpt-3.5-turbo-0613': 'GPT-3.5 (4k)',
                     })
                     .setValue(this.plugin.settings.GLADDIS_DEFAULT_MODEL)
                     .onChange(async (value) => {

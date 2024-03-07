@@ -51,6 +51,12 @@ export async function doGladdis(context: Context): Promise<void> {
 
     void logGladdisCall(context)
     void logGladdisChat(context)
+
+    let tokenModal = getTokenModal(context)
+    if (tokenModal.contains('__@__@__@__')) tokenModal = ''
+
+    const message = `${tokenModal}\n\n---\n\n__${context.user.label}:__ `
+    await context.file.disk.appendFile(context.file.path, message)
 }
 
 export async function callGladdis(context: Context): Promise<Context> {
@@ -92,9 +98,6 @@ export async function callGladdis(context: Context): Promise<Context> {
     }
 
     context.user.history.push({ role: 'assistant', content: response.join('') })
-
-    await disk.appendFile(context.file.path, getTokenModal(context))
-    await disk.appendFile(context.file.path, `\n\n---\n\n__${context.user.label}:__ `)
 
     return context
 }
