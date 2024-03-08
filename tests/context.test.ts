@@ -307,7 +307,7 @@ describe('the Context loaders', () => {
         })
     })
 
-    it('loads method call values', async () => {
+    it('loads CallEnv values', async () => {
         const inputFile = `---\n${stringify(inputFM)}---\n`
         const gladdisConf = `---\n${stringify(gladdis)}---\n\nGladdis\n`
         const whisperConf = `---\n${stringify(whisper)}---\n\nWhisper\n`
@@ -356,6 +356,60 @@ describe('the Context loaders', () => {
                 deleteFile: false,
                 language: 'es',
             },
+        })
+    })
+
+    it('loads any extra values', async () => {
+        const callEnvExtra = deepmerge(callEnv, { whisper: { language: 'de' }, extra1: 'CallEnv' })
+        const whisperExtra = deepmerge(whisper, { whisper: { input: 'Extras' }, extra2: 'Whisper' })
+        const gladdisExtra = deepmerge(gladdis, { gladdis: { freq_penalty: 25 }, extra3: 'Gladdis' })
+        const inputFMExtra = deepmerge(inputFM, { gladdis: { pres_penalty: -25 }, extra4: 'InputFM' })
+
+        const inputFile = `---\n${stringify(inputFMExtra)}---\n\nmessage\n`
+        const gladdisConf = `---\n${stringify(gladdisExtra)}---\n\nGladdis\n`
+        const whisperConf = `---\n${stringify(whisperExtra)}---\n`
+
+        diskInterface.readFile = vi
+            .fn()
+            .mockResolvedValueOnce(inputFile)
+            .mockResolvedValueOnce(gladdisConf)
+            .mockResolvedValueOnce(whisperConf)
+
+        diskInterface.pathExists = vi.fn().mockResolvedValue(true)
+        let callContext: any = { file: { path: 'name.md' } }
+
+        callContext.user = { env: envVars }
+        callContext.file.disk = diskInterface
+
+        callContext = deepmerge(callContext, callEnvExtra)
+
+        const context = await loadContext(callContext as Context)
+        expect(loadContent(context)).toMatchSnapshot({
+            file: expect.any(Object),
+            user: expect.any(Object),
+            gladdis: {
+                label: 'Gladdis',
+                config: 'gladdis',
+                model: 'gpt-8',
+                temperature: 50,
+                top_p_param: 80,
+                freq_penalty: 25,
+                pres_penalty: -25,
+            },
+            whisper: {
+                input: 'Extras',
+                config: 'whisper',
+                model: 'whisper-4',
+                liveSuffix: 'Whisper',
+                readSuffix: 'Gladdis',
+                temperature: 50,
+                echoOutput: false,
+                deleteFile: false,
+                language: 'de',
+            },
+            extra1: 'CallEnv',
+            extra3: 'Gladdis',
+            extra4: 'InputFM',
         })
     })
 })

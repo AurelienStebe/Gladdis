@@ -1,0 +1,87 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`the history Content > parses complex messages 1`] = `
+[
+  {
+    "content": "My User Message 1",
+    "name": "Myself",
+    "role": "user",
+  },
+  {
+    "content": "User Message 2",
+    "role": "user",
+  },
+  {
+    "content": "User Message 3",
+    "name": "Myself",
+    "role": "user",
+  },
+  {
+    "content": "User Message 4",
+    "name": "MyFriend",
+    "role": "user",
+  },
+  {
+    "content": "System Message 1",
+    "role": "system",
+  },
+  {
+    "content": "Gladdis Message 1",
+    "role": "assistant",
+  },
+  {
+    "content": "Gladdis Message 2",
+    "role": "assistant",
+  },
+  {
+    "content": """"Text block 1
+---
+> is escaped"""",
+    "name": "Myself",
+    "role": "user",
+  },
+  {
+    "content": """"
+Text block 2 with
+multiline content
+and a code block:
+\`\`\`bash
+echo "Code block with Bash code"
+\`\`\`
+"""",
+    "name": "Myself",
+    "role": "user",
+  },
+  {
+    "content": "\`\`\`
+alert("Code block with JS code")
+\`\`\`",
+    "name": "Myself",
+    "role": "user",
+  },
+  {
+    "content": "\`\`\`python
+def test():
+    """Test function."""
+    print("Hello World!")
+\`\`\`",
+    "name": "Myself",
+    "role": "user",
+  },
+  {
+    "content": ""Here is the transcription of the recording." (transcribed and read)",
+    "name": "Myself",
+    "role": "user",
+  },
+  {
+    "content": "@https://mysite.com
+"""
+Here is the text content of the web page.
+"""
+
+",
+    "name": "Myself",
+    "role": "user",
+  },
+]
+`;

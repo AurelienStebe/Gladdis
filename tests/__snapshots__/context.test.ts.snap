@@ -1,5 +1,43 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`the Context loaders > loads CallEnv values 1`] = `
+{
+  "file": Any<Object>,
+  "gladdis": {
+    "config": "gladdis",
+    "freq_penalty": 20,
+    "label": "Gladdis",
+    "model": "gpt-8",
+    "pres_penalty": -20,
+    "temperature": 50,
+    "top_p_param": 80,
+  },
+  "user": {
+    "data": "CallEnv",
+    "env": Any<Object>,
+    "history": [
+      {
+        "content": "Gladdis",
+        "role": "system",
+      },
+    ],
+    "label": "CallEnv",
+    "prompt": "",
+  },
+  "whisper": {
+    "config": "whisper",
+    "deleteFile": false,
+    "echoOutput": false,
+    "input": "Whisper",
+    "language": "es",
+    "liveSuffix": "Whisper",
+    "model": "whisper-4",
+    "readSuffix": "Gladdis",
+    "temperature": 50,
+  },
+}
+`;
+
 exports[`the Context loaders > loads EnvVars values 1`] = `
 {
   "file": {
@@ -35,6 +73,36 @@ exports[`the Context loaders > loads EnvVars values 1`] = `
     "model": "whisper-2",
     "readSuffix": "EnvVars",
     "temperature": 10,
+  },
+}
+`;
+
+exports[`the Context loaders > loads any extra values 1`] = `
+{
+  "extra1": "CallEnv",
+  "extra3": "Gladdis",
+  "extra4": "InputFM",
+  "file": Any<Object>,
+  "gladdis": {
+    "config": "gladdis",
+    "freq_penalty": 25,
+    "label": "Gladdis",
+    "model": "gpt-8",
+    "pres_penalty": -25,
+    "temperature": 50,
+    "top_p_param": 80,
+  },
+  "user": Any<Object>,
+  "whisper": {
+    "config": "whisper",
+    "deleteFile": false,
+    "echoOutput": false,
+    "input": "Extras",
+    "language": "de",
+    "liveSuffix": "Whisper",
+    "model": "whisper-4",
+    "readSuffix": "Gladdis",
+    "temperature": 50,
   },
 }
 `;
@@ -136,44 +204,6 @@ exports[`the Context loaders > loads input file values 1`] = `
     "model": "whisper-4",
     "readSuffix": "Gladdis",
     "temperature": 40,
-  },
-}
-`;
-
-exports[`the Context loaders > loads method call values 1`] = `
-{
-  "file": Any<Object>,
-  "gladdis": {
-    "config": "gladdis",
-    "freq_penalty": 20,
-    "label": "Gladdis",
-    "model": "gpt-8",
-    "pres_penalty": -20,
-    "temperature": 50,
-    "top_p_param": 80,
-  },
-  "user": {
-    "data": "CallEnv",
-    "env": Any<Object>,
-    "history": [
-      {
-        "content": "Gladdis",
-        "role": "system",
-      },
-    ],
-    "label": "CallEnv",
-    "prompt": "",
-  },
-  "whisper": {
-    "config": "whisper",
-    "deleteFile": false,
-    "echoOutput": false,
-    "input": "Whisper",
-    "language": "es",
-    "liveSuffix": "Whisper",
-    "model": "whisper-4",
-    "readSuffix": "Gladdis",
-    "temperature": 50,
   },
 }
 `;
