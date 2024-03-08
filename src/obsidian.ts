@@ -11,7 +11,9 @@ import type { App, Editor, MarkdownView, MarkdownFileInfo, Vault } from 'obsidia
 
 import type { Context, DiskInterface } from './types/context.js'
 
-export { stringifyYaml as stringify, parseYaml as parse } from 'obsidian'
+export { stringifyYaml, parseYaml, request, htmlToMarkdown as turndown } from 'obsidian'
+
+export const parseDOM = (html: string): Document => new DOMParser().parseFromString(html, 'text/html')
 
 interface GladdisSettings {
     GLADDIS_DATA_PATH: string

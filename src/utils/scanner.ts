@@ -18,7 +18,7 @@ export async function parseLinks(content: string, context: Context): Promise<str
             const fullPath = await resolveFile(filePath, context)
             if (fullPath === undefined) continue
 
-            let message
+            let message: string | undefined
             if (audioFiles.includes(fileExt)) continue
             if (fileExt === 'pdf') message = 'PDFs Not Supported (soon)'
 

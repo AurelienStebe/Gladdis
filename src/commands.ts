@@ -1,5 +1,9 @@
 import path from 'path'
 import fs from 'fs-extra'
+import { JSDOM } from 'jsdom'
+import fetch from 'node-fetch'
+import TurndownService from 'turndown'
+import { gfm } from 'turndown-plugin-gfm'
 
 import { doGladdis } from './gladdis.js'
 import { parseLinks } from './utils/scanner.js'
@@ -8,6 +12,29 @@ import { getTokenModal } from './utils/loggers.js'
 import { loadContext, loadContent } from './utils/loaders.js'
 
 import type { Context, DiskInterface } from './types/context.js'
+
+export { stringify as stringifyYaml, parse as parseYaml } from 'yaml'
+
+export function parseDOM(html: string): Document {
+    return new JSDOM(html).window.document
+}
+
+export async function request(url: string): Promise<string> {
+    return await (await fetch(url)).text()
+}
+
+export function turndown(html: string): string {
+    const turndown = new TurndownService({
+        hr: '---',
+        headingStyle: 'atx',
+        bulletListMarker: '-',
+        codeBlockStyle: 'fenced',
+    })
+
+    turndown.use(gfm)
+
+    return turndown.turndown(html)
+}
 
 export const diskInterface: DiskInterface = {
     readFile: async (p: string) => await fs.readFile(p, 'utf-8'),
@@ -76,7 +103,7 @@ export async function processPrompt(context: Context): Promise<void> {
     await context.file.disk.appendFile(context.file.path, getTokenModal(context))
 }
 
-function prepareContext(context: Context): Context {
+export function prepareContext(context: Context): Context {
     context.user = context.user ?? {}
 
     context.user.env = context.user.env ?? process.env

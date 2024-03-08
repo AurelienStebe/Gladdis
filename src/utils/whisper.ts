@@ -11,10 +11,10 @@ export async function transcribe(content: string, context: Context): Promise<str
     return await processText(content, context, async (content, context) => {
         for (const [fullMatch, filePath] of content.matchAll(linkRegex)) {
             const disk = context.file.disk
+            let transcript: string | undefined
 
             const fullPath = await resolveFile(filePath, context)
             if (fullPath === undefined) continue
-            let transcript
 
             try {
                 if (context.whisper.language === undefined) {

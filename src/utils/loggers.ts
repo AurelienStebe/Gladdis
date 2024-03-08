@@ -1,14 +1,12 @@
-import { stringify } from 'yaml'
 import { deepmerge } from 'deepmerge-ts'
-
-import { Tiktoken } from 'js-tiktoken/lite'
-import cl100k_base from 'js-tiktoken/ranks/cl100k_base'
+import { getEncoding } from 'js-tiktoken'
 
 import { writeHistory } from './history.js'
+import { stringifyYaml } from '../commands.js'
 
 import type { Context, ChatMessage } from '../types/context.js'
 
-const tiktoken = new Tiktoken(cl100k_base)
+const tiktoken = getEncoding('cl100k_base')
 
 const modelLimit: Record<string, number> = {
     'gpt-3.5-turbo': 16385,
@@ -36,7 +34,7 @@ export async function logGladdisCall(context: Context): Promise<void> {
     delete logContext.file
     delete logContext.user
 
-    const frontMatter = `---\n${stringify(logContext)}---\n\n`
+    const frontMatter = `---\n${stringifyYaml(logContext)}---\n\n`
     await disk.appendFile(logFile, frontMatter + writeHistory(context))
 }
 
