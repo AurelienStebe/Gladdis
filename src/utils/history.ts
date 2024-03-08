@@ -3,6 +3,7 @@ import type { Context, ChatMessage, ChatRoleEnum } from '../types/context.js'
 export type Processor = (content: string, context: Context) => Promise<string>
 
 const transcriptRegex = /^\[!QUOTE\][+-]? Transcript from "(.+?)"$/i
+const webContentRegex = /^\[!EXAMPLE\][+-]? Content from "(.+?)"$/i
 
 export function parseHistory(context: Context): ChatMessage[] {
     const lines = (context.file.text + '\n---\n').split('\n')
@@ -67,12 +68,20 @@ export function parsePrompt(label: string, prompt: string[], quotes: string[][],
 
     for (const lines of quotes) {
         if (lines[0] === undefined) continue
+
         const transcriptMatch = transcriptRegex.exec(lines[0])
 
         if (transcriptMatch !== null) {
             const transcript = lines.slice(1).join('\n').trim()
             if (context.whisper.deleteFile) void context.file.disk.deleteFile(transcriptMatch[1])
             content = content.replace(`![[${transcriptMatch[1]}]]`, `"${transcript}" (${context.whisper.readSuffix})`)
+        }
+
+        const webContentMatch = webContentRegex.exec(lines[0])
+
+        if (webContentMatch !== null) {
+            const webContent = lines.slice(1).join('\n').trim().replaceAll('<\uFEFF', '<')
+            content = content.replace(`<${webContentMatch[1]}>`, `@${webContentMatch[1]}\n"""\n${webContent}\n"""\n\n`)
         }
     }
 

@@ -3,6 +3,7 @@ import { deepmerge } from 'deepmerge-ts'
 import { doGladdis } from './gladdis.js'
 import { parseLinks } from './utils/scanner.js'
 import { transcribe } from './utils/whisper.js'
+import { webBrowser } from './utils/browser.js'
 import { getTokenModal } from './utils/loggers.js'
 import { loadContext, loadContent } from './utils/loaders.js'
 
@@ -79,8 +80,9 @@ export default class GladdisPlugin extends Plugin {
                         message.content = await parseLinks(message.content, context)
                     }
 
-                    context.user.prompt = await transcribe(context.user.prompt, context)
                     context.user.prompt = await parseLinks(context.user.prompt, context)
+                    context.user.prompt = await transcribe(context.user.prompt, context)
+                    context.user.prompt = await webBrowser(context.user.prompt, context)
 
                     context.user.history.push({
                         role: 'user',
@@ -107,8 +109,9 @@ export default class GladdisPlugin extends Plugin {
                     context.whisper.echoOutput = true
                     context.whisper.deleteFile = false
 
-                    context.user.prompt = await transcribe(context.user.prompt, context)
                     context.user.prompt = await parseLinks(context.user.prompt, context)
+                    context.user.prompt = await transcribe(context.user.prompt, context)
+                    context.user.prompt = await webBrowser(context.user.prompt, context)
 
                     context.user.history = [
                         {

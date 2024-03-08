@@ -3,6 +3,7 @@ import { deepmerge } from 'deepmerge-ts'
 
 import { parseLinks } from './utils/scanner.js'
 import { transcribe } from './utils/whisper.js'
+import { webBrowser } from './utils/browser.js'
 import { logGladdisCall, logGladdisChat, getTokenModal } from './utils/loggers.js'
 
 import type { Context } from './types/context.js'
@@ -38,8 +39,9 @@ export async function doGladdis(context: Context): Promise<void> {
 
     context.user.history.unshift({ role: 'system', content: corePrompt })
 
-    context.user.prompt = await transcribe(context.user.prompt, context)
     context.user.prompt = await parseLinks(context.user.prompt, context)
+    context.user.prompt = await transcribe(context.user.prompt, context)
+    context.user.prompt = await webBrowser(context.user.prompt, context)
 
     context.user.history.push({
         role: 'user',

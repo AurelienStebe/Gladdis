@@ -8,6 +8,7 @@ import { gfm } from 'turndown-plugin-gfm'
 import { doGladdis } from './gladdis.js'
 import { parseLinks } from './utils/scanner.js'
 import { transcribe } from './utils/whisper.js'
+import { webBrowser } from './utils/browser.js'
 import { getTokenModal } from './utils/loggers.js'
 import { loadContext, loadContent } from './utils/loaders.js'
 
@@ -69,8 +70,9 @@ export async function processContent(context: Context): Promise<void> {
         message.content = await parseLinks(message.content, context)
     }
 
-    context.user.prompt = await transcribe(context.user.prompt, context)
     context.user.prompt = await parseLinks(context.user.prompt, context)
+    context.user.prompt = await transcribe(context.user.prompt, context)
+    context.user.prompt = await webBrowser(context.user.prompt, context)
 
     context.user.history.push({
         role: 'user',
@@ -89,8 +91,9 @@ export async function processPrompt(context: Context): Promise<void> {
     context.whisper.echoOutput = true
     context.whisper.deleteFile = false
 
-    context.user.prompt = await transcribe(context.user.prompt, context)
     context.user.prompt = await parseLinks(context.user.prompt, context)
+    context.user.prompt = await transcribe(context.user.prompt, context)
+    context.user.prompt = await webBrowser(context.user.prompt, context)
 
     context.user.history = [
         {
