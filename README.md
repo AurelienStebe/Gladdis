@@ -1,9 +1,3 @@
-<br/>
-
-<h3 align="center">Gladdis (Generative Language Artificial Dedicated & Diligent Intelligence System) - it's an AI chatbot.</h3>
-
-<hr/><br/>
-
 <p align="center">
     <a href="https://github.com/prettier/prettier">
         <img alt="Code Formatter" src="https://badgen.net/badge/code%20format/prettier/ff69b4">
@@ -36,7 +30,7 @@
 
 ## Installation
 
-### From within Obsidian (soon)
+### From within Obsidian
 
 1. Open the "Community plugins" tab in the settings.
 2. Click the "Browse" button and search for "Gladdis".
@@ -51,7 +45,7 @@
 
 1. Download the `main.js` & `manifest.json` files from the [latest release](https://github.com/AurelienStebe/Gladdis/releases) into your vault's plugins folder: `<vault>/.obsidian/plugins/gladdis/`.
 
-## Documentation [WIP]
+## Documentation
 
 ### Obsidian Commands
 
@@ -112,9 +106,23 @@ __System:__ is for System Prompts (the default in config files).
 > Quoted lines are ignored, error and token counter callouts too.
 
 [[path/file.md|WikiLinks to file]] and ![[audio_recording.mp3]] will be parsed.
+Static Web pages can be loaded using angle brackets: <https://www.example.com>.
 
 The very last message is the prompt, the LLM response streams below.
 ```
+
+### Available Models
+
+Only the OpenAI models are supported at the moment, however more APIs and local models are coming.
+
+| Label | Token Limit | Notes |
+| ----- | :-----------: | ----- |
+| `gpt-4-turbo-preview` | 128 k | The most powerful and expensive. |
+| `gpt-4-32k` | 32 k | The old GPT-4, with large context. |
+| `gpt-4` | 8 k | The original GPT-4, from June 2023. |
+| `gpt-3.5-turbo` | 16 k | The updated GPT-3.5, cheaper than 4. |
+| `gpt-3.5-turbo-16k` | 16 k | The old GPT-3.5, with large context. |
+| `gpt-3.5-turbo-0613` | 4 k | The original GPT-3.5, from June 2023. |
 
 ## Future Development
 
