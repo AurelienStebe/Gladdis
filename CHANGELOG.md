@@ -1,3 +1,18 @@
+# [0.5.0](https://github.com/AurelienStebe/Gladdis/compare/0.4.3...0.5.0) (2024-03-09)
+
+
+### Bug Fixes
+
+* add the new OpenAI models in the settings panel ([a10ccdd](https://github.com/AurelienStebe/Gladdis/commit/a10ccddd9adfc0ab65a3679db75e94ca49edaee7))
+* improve the Token Counter & correct the counting ([d06e725](https://github.com/AurelienStebe/Gladdis/commit/d06e725519d1206881c7fc581f6cc5d0663e8b8c))
+* minor code improvements, no real change ([875d053](https://github.com/AurelienStebe/Gladdis/commit/875d053fcebe97742e9c6fdfd1ba03d2ab925e74))
+* only transcribe the prompt and not all messages ([101fe19](https://github.com/AurelienStebe/Gladdis/commit/101fe1988ebeef2b5698915a69d867db96364c11))
+
+
+### Features
+
+* add the Web Browsing feature for static websites ([2357149](https://github.com/AurelienStebe/Gladdis/commit/23571495c7ece52c179acc9cc4ebf756d3f3161b))
+
 ## [0.4.3](https://github.com/AurelienStebe/Gladdis/compare/0.4.2...0.4.3) (2023-10-07)
 
 
