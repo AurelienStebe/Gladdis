@@ -32,12 +32,12 @@ export async function parseLinks(content: string, context: Context): Promise<str
                 continue
             }
 
-            const header = fileName?.slice(1) ?? disk.baseName(filePath)
+            const header = fileName?.slice(1) ?? disk.baseName(fullPath)
             let fileText = (await disk.readFile(fullPath)).trim()
 
             if (fileExt === 'txt') {
                 fileText = await parseLinks(fileText, context)
-            } else if (fileExt === '') {
+            } else if (disk.baseName(filePath) === disk.baseName(fullPath, '.md')) {
                 fileText = `${header}:\n\n"""\n${fileText}\n"""`
             } else {
                 fileText = `${header}:\n\n\`\`\`${fileExt}\n${fileText}\n\`\`\``
@@ -71,7 +71,7 @@ export async function resolveFile(filePath: string, context: Context): Promise<s
     }
 
     if (disk.extName(filePath).toLowerCase() === '.txt') filePath = filePath.slice(0, -4)
-    if (disk.extName(filePath) === '') return await resolveFile(filePath + '.md', context)
+    if (!filePath.toLowerCase().endsWith('.md')) return await resolveFile(filePath + '.md', context)
 
     await writeMissedModal(filePath, 'Linked File Not Found', context)
 
