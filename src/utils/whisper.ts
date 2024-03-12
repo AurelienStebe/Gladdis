@@ -2,6 +2,7 @@ import OpenAI, { toFile } from 'openai'
 
 import { processText } from './history.js'
 import { resolveFile } from './scanner.js'
+import { writeErrorModal, writeInvalidModal } from './loggers.js'
 
 import type { Context } from '../types/context.js'
 
@@ -23,14 +24,16 @@ export async function transcribe(content: string, context: Context): Promise<str
                     transcript = await transcription(fullPath, context)
                 }
             } catch (error: any) {
-                const errorName: string = error?.message ?? 'OpenAI Whisper API Error'
-                const errorJSON: string = '```json\n> ' + JSON.stringify(error) + '\n> ```'
-
-                const errorFull = `\n\n> [!BUG]+ **${errorName}**\n> ${errorJSON}`
-                await disk.appendFile(context.file.path, errorFull)
+                await writeErrorModal(error, 'OpenAI Whisper API Error', context)
             }
 
             if (transcript === undefined) continue
+
+            if (transcript.trim() === '') {
+                await writeInvalidModal([], `No Transcript from "${filePath}"`, context)
+                continue
+            }
+
             if (context.whisper.deleteFile) void disk.deleteFile(fullPath)
 
             if (context.whisper.echoOutput) {

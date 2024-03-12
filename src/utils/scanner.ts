@@ -1,4 +1,5 @@
 import { processText } from './history.js'
+import { writeMissedModal } from './loggers.js'
 
 import type { Context } from '../types/context.js'
 
@@ -27,9 +28,7 @@ export async function parseLinks(content: string, context: Context): Promise<str
             if (otherFiles.includes(fileExt)) message = 'Binary Files Not Supported'
 
             if (message !== undefined) {
-                message = `\n\n> [!MISSING]+ **${message}**\n> ${filePath}`
-                await disk.appendFile(context.file.path, message)
-
+                await writeMissedModal(filePath, message, context)
                 continue
             }
 
@@ -74,8 +73,7 @@ export async function resolveFile(filePath: string, context: Context): Promise<s
     if (disk.extName(filePath).toLowerCase() === '.txt') filePath = filePath.slice(0, -4)
     if (disk.extName(filePath) === '') return await resolveFile(filePath + '.md', context)
 
-    const missing = '\n\n> [!MISSING]+ **Linked File Not Found**\n> '
-    await disk.appendFile(context.file.path, missing + filePath)
+    await writeMissedModal(filePath, 'Linked File Not Found', context)
 
     return undefined
 }

@@ -4,7 +4,7 @@ import { deepmerge } from 'deepmerge-ts'
 import { parseLinks } from './utils/scanner.js'
 import { transcribe } from './utils/whisper.js'
 import { webBrowser } from './utils/browser.js'
-import { logGladdisCall, logGladdisChat, getTokenModal } from './utils/loggers.js'
+import { logGladdisCall, logGladdisChat, getTokenModal, writeErrorModal } from './utils/loggers.js'
 
 import type { Context } from './types/context.js'
 
@@ -92,11 +92,7 @@ export async function callGladdis(context: Context): Promise<Context> {
             }
         }
     } catch (error: any) {
-        const errorName: string = error?.message ?? 'OpenAI API Streaming Error'
-        const errorJSON: string = '```json\n> ' + JSON.stringify(error) + '\n> ```'
-
-        const errorFull = `\n\n> [!BUG]+ **${errorName}**\n> ${errorJSON}`
-        await disk.appendFile(context.file.path, errorFull)
+        await writeErrorModal(error, 'OpenAI API Streaming Error', context)
     }
 
     context.user.history.push({ role: 'assistant', content: response.join('') })

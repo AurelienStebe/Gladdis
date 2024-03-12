@@ -4,8 +4,8 @@ import { doGladdis } from './gladdis.js'
 import { parseLinks } from './utils/scanner.js'
 import { transcribe } from './utils/whisper.js'
 import { webBrowser } from './utils/browser.js'
-import { getTokenModal } from './utils/loggers.js'
 import { loadContext, loadContent } from './utils/loaders.js'
+import { getTokenModal, writeErrorModal } from './utils/loggers.js'
 
 import { Plugin, Setting, PluginSettingTab, TFile, normalizePath } from 'obsidian'
 import type { App, Editor, MarkdownView, MarkdownFileInfo, Vault } from 'obsidian'
@@ -145,11 +145,7 @@ export default class GladdisPlugin extends Plugin {
         try {
             await processing(context as Context)
         } catch (error: any) {
-            const errorName: string = error?.message ?? 'Gladdis Unknown Error'
-            const errorJSON: string = '```json\n> ' + JSON.stringify(error) + '\n> ```'
-
-            const errorFull = `\n\n> [!BUG]+ **${errorName}**\n> ${errorJSON}`
-            await context.file.disk.appendFile(context.file.path, errorFull)
+            await writeErrorModal(error, 'Gladdis Command Run Error', context as Context)
         }
     }
 

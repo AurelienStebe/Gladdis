@@ -99,3 +99,22 @@ export function getTokenCount(messages: ChatMessage[]): number {
 
     return tokenLength
 }
+
+export async function writeErrorModal(error: any, message: string, context: Context): Promise<void> {
+    const errorName = `\n\n> [!BUG]+ **${error?.message ?? message}**\n> `
+    const errorJSON = '```json\n> ' + JSON.stringify(error, null, '>   ') + '\n> ```'
+
+    await context.file.disk.appendFile(context.file.path, errorName + errorJSON)
+}
+
+export async function writeMissedModal(filePath: string, message: string, context: Context): Promise<void> {
+    const errorFull = `\n\n> [!MISSING]+ **${message}**\n> ${filePath}`
+    await context.file.disk.appendFile(context.file.path, errorFull)
+}
+
+export async function writeInvalidModal(errors: string[], message: string, context: Context): Promise<void> {
+    let errorFull = `\n\n> [!ERROR]+ **${message}**\n> - ${errors.join('\n> - ')}`
+    if (errors.length === 0) errorFull = `\n\n> [!ERROR] ${message}`
+
+    await context.file.disk.appendFile(context.file.path, errorFull)
+}

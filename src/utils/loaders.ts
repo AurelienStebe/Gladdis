@@ -2,6 +2,7 @@ import { deepmerge } from 'deepmerge-ts'
 
 import { parseYaml } from '../commands.js'
 import { parseHistory } from './history.js'
+import { writeMissedModal } from './loggers.js'
 
 import type { Context } from '../types/context.js'
 
@@ -71,8 +72,7 @@ export async function loadAIConfig(context: Context): Promise<Context> {
             context = deepmerge(context, configContext)
             context.user.history.unshift(...parseHistory(configHistory))
         } else {
-            const missing = '\n\n> [!MISSING]+ **Config File Not Found**\n> '
-            await disk.appendFile(context.file.path, missing + configPath)
+            await writeMissedModal(configPath, 'Config File Not Found', context)
         }
     }
 
@@ -91,8 +91,7 @@ export async function loadAIConfig(context: Context): Promise<Context> {
             whisperContext = deepmerge(configContext, whisperContext)
             context.whisper = deepmerge(context.whisper, whisperContext.whisper)
         } else {
-            const missing = '\n\n> [!MISSING]+ **Whisper File Not Found**\n> '
-            await disk.appendFile(context.file.path, missing + whisperPath)
+            await writeMissedModal(whisperPath, 'Whisper File Not Found', context)
         }
     }
 

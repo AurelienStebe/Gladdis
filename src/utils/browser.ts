@@ -2,6 +2,7 @@ import { Readability } from '@mozilla/readability'
 
 import { processText } from './history.js'
 import { parseDOM, request, turndown } from '../commands.js'
+import { writeErrorModal, writeInvalidModal } from './loggers.js'
 
 import type { Context } from '../types/context.js'
 
@@ -25,19 +26,13 @@ export async function webBrowser(content: string, context: Context): Promise<str
                 webPage = turndown(article?.content ?? 'No Content Found.')
                 if (article?.title !== undefined) webPage = `# ${article.title}\n\n${webPage}`
             } catch (error: any) {
-                const errorName: string = error?.message ?? 'Web Page Browsing Error'
-                const errorJSON: string = '```json\n> ' + JSON.stringify(error) + '\n> ```'
-
-                const errorFull = `\n\n> [!BUG]+ **${errorName}**\n> ${errorJSON}`
-                await disk.appendFile(context.file.path, errorFull)
+                await writeErrorModal(error, 'Web Page Browsing Error', context)
             }
 
             if (webPage === undefined) continue
 
             if (webPage === 'No Content Found.') {
-                const webPageError = `\n\n> [!ERROR]- No Content from "${pageURL}"\n> `
-                await disk.appendFile(context.file.path, webPageError + webPage)
-
+                await writeInvalidModal([], `No Content from "${pageURL}"`, context)
                 continue
             }
 
