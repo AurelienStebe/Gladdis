@@ -21,17 +21,17 @@ export async function webBrowser(content: string, context: Context): Promise<str
                 if (baseTag === undefined) pageDoc.head.appendChild(pageDoc.createElement('base'))
 
                 pageDoc.head.getElementsByTagName('base')[0].href = pageURL
-                const article = new Readability(pageDoc).parse()
+                const article = new Readability(pageDoc).parse() ?? { title: '', content: '' }
 
-                webPage = turndown(article?.content ?? 'No Content Found.')
-                if (article?.title !== undefined) webPage = `# ${article.title}\n\n${webPage}`
+                webPage = article.content.trim() !== '' ? turndown(article.content) : ''
+                if (article.title.trim() !== '') webPage = `# ${article.title}\n\n${webPage}`
             } catch (error: any) {
                 await writeErrorModal(error, 'Web Page Browsing Error', context)
             }
 
             if (webPage === undefined) continue
 
-            if (webPage === 'No Content Found.') {
+            if (webPage.trim() === '') {
                 await writeInvalidModal([], `No Content from "${pageURL}"`, context)
                 continue
             }
@@ -41,7 +41,7 @@ export async function webBrowser(content: string, context: Context): Promise<str
             const webPageQuote = '\n> ' + webPageEsc.split('\n').join('\n> ')
 
             await disk.appendFile(context.file.path, webPageLabel + webPageQuote)
-            content = content.replace(fullMatch, `@${pageURL}\n"""\n${webPage}\n"""\n\n`)
+            content = content.replace(fullMatch, `@${pageURL}\n\n"""\n${webPage}\n"""\n\n`)
         }
 
         return content
