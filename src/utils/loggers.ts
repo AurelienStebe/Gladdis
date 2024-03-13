@@ -101,10 +101,13 @@ export function getTokenCount(messages: ChatMessage[]): number {
 }
 
 export async function writeErrorModal(error: any, message: string, context: Context): Promise<void> {
-    const errorName = `\n\n> [!BUG]+ **${error?.message ?? message}**\n> `
-    const errorJSON = '```json\n> ' + JSON.stringify(error, null, '>   ') + '\n> ```'
+    const errorName = ` **${error?.message ?? message}**`
+    const errorJSON = JSON.stringify(error, null, '>   ')
 
-    await context.file.disk.appendFile(context.file.path, errorName + errorJSON)
+    let errorFull = '\n\n> [!BUG]' + (errorJSON !== '{}' ? '+' : '') + errorName
+    if (errorJSON !== '{}') errorFull += '\n> ```json\n> ' + errorJSON + '\n> ```'
+
+    await context.file.disk.appendFile(context.file.path, errorFull)
 }
 
 export async function writeMissedModal(filePath: string, message: string, context: Context): Promise<void> {
@@ -114,7 +117,7 @@ export async function writeMissedModal(filePath: string, message: string, contex
 
 export async function writeInvalidModal(errors: string[], message: string, context: Context): Promise<void> {
     let errorFull = `\n\n> [!ERROR]+ **${message}**\n> - ${errors.join('\n> - ')}`
-    if (errors.length === 0) errorFull = `\n\n> [!ERROR] ${message}`
+    if (errors.length === 0) errorFull = `\n\n> [!ERROR] **${message}**`
 
     await context.file.disk.appendFile(context.file.path, errorFull)
 }
