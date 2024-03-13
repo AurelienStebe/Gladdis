@@ -25,9 +25,11 @@ export async function doGladdis(context: Context): Promise<void> {
     delete chatContext.gladdis
     delete chatContext.whisper
 
-    for (const message of context.user.history) {
-        message.content = await parseLinks(message.content, context)
-    }
+    await Promise.all(
+        context.user.history.map(async (message) => {
+            message.content = await parseLinks(message.content, context)
+        }),
+    )
 
     const corePrompt = context.user.env.GLADDIS_CORE_PROMPT ?? defaultCorePrompt
     const metaPrompt = context.user.env.GLADDIS_META_PROMPT ?? defaultMetaPrompt
@@ -37,7 +39,9 @@ export async function doGladdis(context: Context): Promise<void> {
         context.user.history.unshift({ role: 'system', content: metadata })
     }
 
-    context.user.history.unshift({ role: 'system', content: corePrompt })
+    if (corePrompt.trim() !== '') {
+        context.user.history.unshift({ role: 'system', content: corePrompt.trim() })
+    }
 
     context.user.prompt = await parseLinks(context.user.prompt, context)
     context.user.prompt = await transcribe(context.user.prompt, context)

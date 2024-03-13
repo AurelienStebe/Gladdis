@@ -66,9 +66,11 @@ export async function processContent(context: Context): Promise<void> {
     context.whisper.echoOutput = true
     context.whisper.deleteFile = false
 
-    for (const message of context.user.history) {
-        message.content = await parseLinks(message.content, context)
-    }
+    await Promise.all(
+        context.user.history.map(async (message) => {
+            message.content = await parseLinks(message.content, context)
+        }),
+    )
 
     context.user.prompt = await parseLinks(context.user.prompt, context)
     context.user.prompt = await transcribe(context.user.prompt, context)
