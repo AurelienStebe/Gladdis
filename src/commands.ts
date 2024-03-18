@@ -3,24 +3,28 @@ import fs from 'fs-extra'
 import { JSDOM } from 'jsdom'
 import fetch from 'node-fetch'
 import TurndownService from 'turndown'
+import { getDocument } from 'pdfjs-dist'
 import { gfm } from 'turndown-plugin-gfm'
+import { arrayBuffer } from 'stream/consumers'
 
 import { doGladdis } from './gladdis.js'
-import { parseLinks } from './utils/scanner.js'
 import { transcribe } from './utils/whisper.js'
+import { parseLinks } from './utils/scanner.js'
 import { webBrowser } from './utils/browser.js'
 import { getTokenModal } from './utils/loggers.js'
 import { loadContext, loadContent } from './utils/loaders.js'
 
+import type { ReadStream } from 'fs'
+import type { PDFDocumentProxy } from 'pdfjs-dist'
 import type { Context, DiskInterface } from './types/context.js'
 
 export { stringify as stringifyYaml, parse as parseYaml } from 'yaml'
 
-export function parseDOM(html: string): Document {
+export function parseDom(html: string): Document {
     return new JSDOM(html).window.document
 }
 
-export async function request(url: string): Promise<string> {
+export async function getHtml(url: string): Promise<string> {
     return await (await fetch(url)).text()
 }
 
@@ -35,6 +39,12 @@ export function turndown(html: string): string {
     turndown.use(gfm)
 
     return turndown.turndown(html)
+}
+
+export async function getPdfDoc(stream: ReadStream | Promise<File>): Promise<PDFDocumentProxy> {
+    const file = stream instanceof Promise ? (await stream).arrayBuffer() : arrayBuffer(stream)
+
+    return await getDocument(await file).promise
 }
 
 export const diskInterface: DiskInterface = {
@@ -72,8 +82,8 @@ export async function processContent(context: Context): Promise<void> {
         }),
     )
 
-    context.user.prompt = await parseLinks(context.user.prompt, context)
     context.user.prompt = await transcribe(context.user.prompt, context)
+    context.user.prompt = await parseLinks(context.user.prompt, context)
     context.user.prompt = await webBrowser(context.user.prompt, context)
 
     context.user.history.push({
@@ -93,8 +103,8 @@ export async function processPrompt(context: Context): Promise<void> {
     context.whisper.echoOutput = true
     context.whisper.deleteFile = false
 
-    context.user.prompt = await parseLinks(context.user.prompt, context)
     context.user.prompt = await transcribe(context.user.prompt, context)
+    context.user.prompt = await parseLinks(context.user.prompt, context)
     context.user.prompt = await webBrowser(context.user.prompt, context)
 
     context.user.history = [

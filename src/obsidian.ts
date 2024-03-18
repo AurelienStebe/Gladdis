@@ -1,20 +1,58 @@
 import { deepmerge } from 'deepmerge-ts'
+import { BrowserWindow } from '@electron/remote'
 
 import { doGladdis } from './gladdis.js'
-import { parseLinks } from './utils/scanner.js'
 import { transcribe } from './utils/whisper.js'
+import { parseLinks } from './utils/scanner.js'
 import { webBrowser } from './utils/browser.js'
 import { loadContext, loadContent } from './utils/loaders.js'
 import { getTokenModal, writeErrorModal } from './utils/loggers.js'
 
-import { Plugin, Setting, PluginSettingTab, TFile, normalizePath } from 'obsidian'
+import { Platform, Plugin, Setting, PluginSettingTab, TFile, loadPdfJs, request, normalizePath } from 'obsidian'
+
+import type { PDFDocumentProxy } from 'pdfjs-dist'
+import type { Context, DiskInterface } from './types/context.js'
 import type { App, Editor, MarkdownView, MarkdownFileInfo, Vault } from 'obsidian'
 
-import type { Context, DiskInterface } from './types/context.js'
+export { stringifyYaml, parseYaml, htmlToMarkdown as turndown } from 'obsidian'
 
-export { stringifyYaml, parseYaml, request, htmlToMarkdown as turndown } from 'obsidian'
+export const parseDom = (html: string): Document => new DOMParser().parseFromString(html, 'text/html')
 
-export const parseDOM = (html: string): Document => new DOMParser().parseFromString(html, 'text/html')
+export async function getPdfDoc(file: Promise<File>): Promise<PDFDocumentProxy> {
+    return (await loadPdfJs()).getDocument(await (await file).arrayBuffer()).promise
+}
+
+export async function getHtml(url: string): Promise<string> {
+    let html = ''
+
+    if (Platform.isMobile) return await request(url)
+    const page = new BrowserWindow({ show: false })
+
+    try {
+        await page.loadURL(url)
+
+        let equalLoop = 1
+        let prevSize = -1
+        let iteration = 0
+
+        while (equalLoop < 3 && iteration < 33) {
+            await new Promise((resolve) => setTimeout(resolve, 33)) // Max 33 ms * 34 loops = 1.1 s
+            const size = await page.webContents.executeJavaScript('document.body.innerText.length;')
+
+            if (size === prevSize) equalLoop++
+            else equalLoop = 1
+
+            prevSize = size
+            iteration++
+        }
+
+        html = await page.webContents.executeJavaScript('document.documentElement.outerHTML;')
+    } finally {
+        page.destroy()
+    }
+
+    return html
+}
 
 interface GladdisSettings {
     GLADDIS_DATA_PATH: string
@@ -82,8 +120,8 @@ export default class GladdisPlugin extends Plugin {
                         }),
                     )
 
-                    context.user.prompt = await parseLinks(context.user.prompt, context)
                     context.user.prompt = await transcribe(context.user.prompt, context)
+                    context.user.prompt = await parseLinks(context.user.prompt, context)
                     context.user.prompt = await webBrowser(context.user.prompt, context)
 
                     context.user.history.push({
@@ -111,8 +149,8 @@ export default class GladdisPlugin extends Plugin {
                     context.whisper.echoOutput = true
                     context.whisper.deleteFile = false
 
-                    context.user.prompt = await parseLinks(context.user.prompt, context)
                     context.user.prompt = await transcribe(context.user.prompt, context)
+                    context.user.prompt = await parseLinks(context.user.prompt, context)
                     context.user.prompt = await webBrowser(context.user.prompt, context)
 
                     context.user.history = [

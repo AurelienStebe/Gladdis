@@ -1,7 +1,7 @@
 import { Readability } from '@mozilla/readability'
 
 import { processText } from './history.js'
-import { parseDOM, request, turndown } from '../commands.js'
+import { parseDom, getHtml, turndown } from '../commands.js'
 import { writeErrorModal, writeInvalidModal } from './loggers.js'
 
 import type { Context } from '../types/context.js'
@@ -15,7 +15,7 @@ export async function webBrowser(content: string, context: Context): Promise<str
             let webPage: string | undefined
 
             try {
-                const pageDoc = parseDOM(await request(pageURL))
+                const pageDoc = parseDom(await getHtml(pageURL))
 
                 const baseTag = pageDoc.head.getElementsByTagName('base')[0]
                 if (baseTag === undefined) pageDoc.head.appendChild(pageDoc.createElement('base'))
@@ -41,7 +41,7 @@ export async function webBrowser(content: string, context: Context): Promise<str
             const webPageQuote = '\n> ' + webPageEsc.split('\n').join('\n> ')
 
             await disk.appendFile(context.file.path, webPageLabel + webPageQuote)
-            content = content.replace(fullMatch, `@${pageURL}\n\n"""\n${webPage}\n"""\n\n`)
+            content = content.replace(fullMatch, `@"${pageURL}"\n"""\n${webPage}\n"""\n\n`)
         }
 
         return content

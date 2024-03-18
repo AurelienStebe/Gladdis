@@ -1,8 +1,8 @@
 import OpenAI from 'openai'
 import { deepmerge } from 'deepmerge-ts'
 
-import { parseLinks } from './utils/scanner.js'
 import { transcribe } from './utils/whisper.js'
+import { parseLinks } from './utils/scanner.js'
 import { webBrowser } from './utils/browser.js'
 import { logGladdisCall, logGladdisChat, getTokenModal, writeErrorModal } from './utils/loggers.js'
 
@@ -43,8 +43,8 @@ export async function doGladdis(context: Context): Promise<void> {
         context.user.history.unshift({ role: 'system', content: corePrompt.trim() })
     }
 
-    context.user.prompt = await parseLinks(context.user.prompt, context)
     context.user.prompt = await transcribe(context.user.prompt, context)
+    context.user.prompt = await parseLinks(context.user.prompt, context)
     context.user.prompt = await webBrowser(context.user.prompt, context)
 
     context.user.history.push({
