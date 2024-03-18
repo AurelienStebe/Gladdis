@@ -74,7 +74,16 @@ def test():
     "role": "user",
   },
   {
-    "content": "@https://mysite.com
+    "content": ""document.pdf":
+"""
+Here is the text content of the PDF file.
+"""
+
+",
+    "role": "system",
+  },
+  {
+    "content": "@"https://mysite.com"
 """
 Here is the text content of the web page.
 """

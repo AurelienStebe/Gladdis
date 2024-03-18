@@ -56,6 +56,11 @@ __Myself:__![[recording.webm]]
 > [!QUOTE]- Transcript from "recording.webm"
 > Here is the transcription of the recording.
 ---
+__System:__ [[document.pdf]]
+
+> [!ABSTRACT]- Content from "document.pdf"
+> Here is the text content of the PDF file.
+---
 __Myself:__ <https://mysite.com>
 
 > [!EXAMPLE]- Content from "https://mysite.com"
