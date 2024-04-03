@@ -1,4 +1,10 @@
 <p align="center">
+    <a href="https://github.com/AurelienStebe/Gladdis">
+        <img width="240" alt="Gladdis Logo" src="https://raw.githubusercontent.com/AurelienStebe/Gladdis/main/gladdis.svg">
+    </a>
+</p>
+
+<p align="center">
     <a href="https://github.com/prettier/prettier">
         <img alt="Code Formatter" src="https://badgen.net/badge/code%20format/prettier/ff69b4">
     </a>
