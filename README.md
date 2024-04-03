@@ -25,25 +25,9 @@
 
 -   **Simple Markdown Syntax**: the conversation window is any open Markdown file, the streaming LLM response is appended.
 -   **Whisper Transcription**: audio files WikiLinks are auto-transcribed, use the Obsidian "audio recorder" core plugin.
--   **Document Loading**: text files WikiLinks are auto-loaded, just drag and drop files into the conversation window. (no PDF yet)
+-   **Document Loading**: text files WikiLinks are auto-loaded, just drag and drop files into the conversation window.
+-   **PDF & Web Support**: load PDF WikiLinks just like text files, load web pages external links as well using `<URL>`.
 -   **System Prompts**: name your system prompts, create personalities and use FrontMatter to choose whom to talk to.
-
-## Installation
-
-### From within Obsidian
-
-1. Open the "Community plugins" tab in the settings.
-2. Click the "Browse" button and search for "Gladdis".
-3. Click the "Install" button and enable the plugin.
-
-### With the BRAT plugin
-
-1. Install the [Beta Reviewers Auto-update Tool plugin](https://github.com/TfTHacker/obsidian42-brat).
-2. Follow the instructions for ["Adding a beta plugin"](https://tfthacker.com/Obsidian+Plugins+by+TfTHacker/BRAT+-+Beta+Reviewer's+Auto-update+Tool/Quick+guide+for+using+BRAT#Adding+a+beta+plugin).
-
-### Manually from GitHub
-
-1. Download the `main.js` & `manifest.json` files from the [latest release](https://github.com/AurelienStebe/Gladdis/releases) into your vault's plugins folder: `<vault>/.obsidian/plugins/gladdis/`.
 
 ## Documentation
 
@@ -126,15 +110,31 @@ Only the OpenAI models are supported at the moment, however more APIs and local 
 
 ## Future Development
 
--   **PDF & Web Support**: load PDF WikiLinks just like text files, load web pages external links as well.
 -   **Image & Audio Out**: create images with DALL·E, speak with ElevenLabs or other API accessible models.
 -   **Code Execution**: add [Templater](https://github.com/SilentVoid13/Templater) code to your prompts, run any code the AI generates (are you sure ?!).
 -   **AI-2-AI Prompt**: let your various AI configs talk to each other, create your own "Council of Gladdises".
 
-## How to Contribute ? [WIP]
+## Installation
 
-Please be patient while I create the issue & PR templates and finish the documentation.
+### From within Obsidian
+
+1. Open the "Community plugins" tab in the settings.
+2. Click the "Browse" button and search for "Gladdis".
+3. Click the "Install" button and enable the plugin.
+
+### With the BRAT plugin
+
+1. Install the [Beta Reviewers Auto-update Tool plugin](https://github.com/TfTHacker/obsidian42-brat).
+2. Follow the instructions for ["Adding a beta plugin"](https://tfthacker.com/Obsidian+Plugins+by+TfTHacker/BRAT+-+Beta+Reviewer's+Auto-update+Tool/Quick+guide+for+using+BRAT#Adding+a+beta+plugin).
+
+### Manually from GitHub
+
+1. Download the `main.js` & `manifest.json` files from the [latest release](https://github.com/AurelienStebe/Gladdis/releases) into your vault's plugins folder: `<vault>/.obsidian/plugins/gladdis/`.
+
+## How to Contribute ?
+
+Feel free to open new issues or submit PRs, while the Gladdis community is growing.
 
 ## About the Author
 
-Gladdis is created by [Aurélien Stébé](https://github.com/AurelienStebe), a senior French freelance [Toptal Software Developer](https://www.toptal.com/resume/aurelien-stebe).
+Gladdis is created by [Aurélien Stébé](https://github.com/AurelienStebe), a senior French freelance [Toptal Software Engineer](https://www.toptal.com/resume/aurelien-stebe).
