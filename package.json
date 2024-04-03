@@ -26,15 +26,17 @@
     "license": "MIT",
     "type": "module",
     "exports": "./lib/commands.js",
+    "types": "./types/commands.d.ts",
     "files": [
         "/lib/",
+        "/types/",
         "/CHANGELOG.md"
     ],
     "scripts": {
-        "clean": "rimraf coverage lib main.js",
+        "clean": "rimraf lib types coverage main.js",
         "lint": "prettier -c . && eslint --ext .js,.ts .",
         "build": "npm run clean && tsc && node ./esbuild.config.js && rollup -c --environment NODE_ENV:production",
-        "test": "vitest --ui --coverage",
+        "test": "vitest --ui --coverage --coverage.exclude='**/*.js' --coverage.exclude='**/*.d.ts'",
         "start": "node --no-warnings ./lib/service.js",
         "live": "nodemon --exec node --no-warnings --loader ts-node/esm ./src/service.ts",
         "watch": "node --no-warnings ./esbuild.config.js watch"

@@ -1,8 +1,7 @@
-/__DATA__/
-/coverage/
 /lib/
+/types/
+/coverage/
 /node_modules/
 /.env
 /main.js
 .DS_Store
-/pnpm-lock.yaml

@@ -1,5 +1,5 @@
-/__DATA__/
-/coverage/
 /lib/
+/types/
+/coverage/
 /node_modules/
 /main.js
