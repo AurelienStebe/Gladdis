@@ -25,7 +25,7 @@ export async function webBrowser(content: string, context: Context): Promise<str
 
                 webPage = article.content.trim() !== '' ? turndown(article.content) : ''
                 if (article.title.trim() !== '') webPage = `# ${article.title}\n\n${webPage}`
-            } catch (error: any) {
+            } catch (error: unknown) {
                 await writeErrorModal(error, 'Web Page Browsing Error', context)
             }
 

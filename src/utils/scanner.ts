@@ -35,24 +35,26 @@ export async function parseLinks(content: string, context: Context): Promise<str
             if (fileExt === 'pdf') {
                 try {
                     message = await parsePdfDoc(filePath, fullPath, context)
-                } catch (error: any) {
+                } catch (error: unknown) {
                     await writeErrorModal(error, 'PDF Transcription Error', context)
                 }
 
                 if (message === undefined || message === '') continue
             }
 
-            const header = fileName?.slice(1) ?? disk.baseName(fullPath)
+            const header = fileName?.slice(1) ?? `"${disk.baseName(fullPath)}"`
             let fileText = message ?? (await disk.readFile(fullPath)).trim()
 
-            if (disk.baseName(filePath) === disk.baseName(fullPath, '.md')) fileExt = 'md'
+            if (disk.baseName(filePath) === disk.baseName(fullPath, '.md')) {
+                if (disk.extName(fullPath).toLowerCase() === '.md') fileExt = 'md'
+            }
 
             if (fileExt === 'txt') {
                 fileText = await parseLinks(fileText, context)
             } else if (fileExt === 'pdf' || fileExt === 'md') {
-                fileText = `"${header}":\n"""\n${fileText}\n"""`
+                fileText = `${header}:\n"""\n${fileText}\n"""`
             } else {
-                fileText = `"${header}":\n\`\`\`${fileExt}\n${fileText}\n\`\`\``
+                fileText = `${header}:\n\`\`\`${fileExt}\n${fileText}\n\`\`\``
             }
 
             content = content.replace(fullMatch, `${fileText}\n\n`)

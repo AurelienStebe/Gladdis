@@ -95,7 +95,7 @@ export async function callGladdis(context: Context): Promise<Context> {
                 await disk.appendFile(context.file.path, data.choices[0].delta?.content ?? '')
             }
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         await writeErrorModal(error, 'OpenAI API Streaming Error', context)
     }
 

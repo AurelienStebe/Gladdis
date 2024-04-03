@@ -184,7 +184,7 @@ export default class GladdisPlugin extends Plugin {
 
         try {
             await processing(context as Context)
-        } catch (error: any) {
+        } catch (error: unknown) {
             await writeErrorModal(error, 'Gladdis Command Run Error', context as Context)
         }
     }

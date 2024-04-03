@@ -23,7 +23,7 @@ export async function transcribe(content: string, context: Context): Promise<str
                 } else {
                     transcript = await transcription(fullPath, context)
                 }
-            } catch (error: any) {
+            } catch (error: unknown) {
                 await writeErrorModal(error, 'OpenAI Whisper API Error', context)
             }
 
