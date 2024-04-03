@@ -8,7 +8,17 @@ import { webBrowser } from './utils/browser.js'
 import { loadContext, loadContent } from './utils/loaders.js'
 import { getTokenModal, writeErrorModal } from './utils/loggers.js'
 
-import { Platform, Plugin, Setting, PluginSettingTab, TFile, loadPdfJs, request, normalizePath } from 'obsidian'
+import {
+    TFile,
+    Plugin,
+    Setting,
+    Platform,
+    PluginSettingTab,
+    addIcon,
+    request,
+    loadPdfJs,
+    normalizePath,
+} from 'obsidian'
 
 import type { PDFDocumentProxy } from 'pdfjs-dist'
 import type { Context, DiskInterface } from './types/context.js'
@@ -92,7 +102,12 @@ export default class GladdisPlugin extends Plugin {
         await this.loadSettings()
         await this.loadSecrets()
 
+        addIcon('gladdisLogo', `<path ${logoPathAttr} d="${logoMainPath}"/>`)
+        addIcon('gladdisHalf', `<path ${logoPathAttr} d="${logoMainPath}${logoLeftPath}"/>`)
+        addIcon('gladdisFull', `<path ${logoPathAttr} d="${logoMainPath}${logoLeftPath}${logoFullPath}"/>`)
+
         this.addCommand({
+            icon: 'gladdisLogo',
             id: 'chat-with-gladdis',
             name: 'Chat with Gladdis',
 
@@ -104,6 +119,7 @@ export default class GladdisPlugin extends Plugin {
         })
 
         this.addCommand({
+            icon: 'gladdisFull',
             id: 'process-the-content',
             name: 'Process the full content',
 
@@ -136,6 +152,7 @@ export default class GladdisPlugin extends Plugin {
         })
 
         this.addCommand({
+            icon: 'gladdisHalf',
             id: 'process-the-prompt',
             name: 'Process just the prompt (or selection)',
 
@@ -582,3 +599,65 @@ class GladdisSettingTab extends PluginSettingTab {
             )
     }
 }
+
+const logoPathAttr = `fill="white"
+style="transform: scale(1.5625);"
+stroke="currentColor"
+stroke-width="2.5px"`
+
+const logoMainPath = `
+M61.5 31.5
+c-1 -2.5 -5 -10.5 -10.6 -16
+c-1.5 -1.5 -6 2 -8 4
+c-2 2 -1 5.5 .2 4
+c1.5 -1.5 5 -7 6.5 -6.5
+c1.5 .5 5 6 9 14
+c-1.5 0 -4 0 -7.25 -.25
+c-4.5 0 -8 .5 -11.5 1.25
+c-3.5 .5 -6 1 -8 1
+c-2 0 -4.5 -.5 -8 -1
+c-3.5 -.5 -7 -1 -11.5 -1.25
+c-3 0 -5.5 0 -7.25 .25
+c4 -8 7.5 -13.5 9 -14
+c1.5 -.5 5 5 6.5 6.5
+c1 1.5 2 -2 .2 -4
+c-2 -2 -6.5 -5.5 -8 -4
+C7.5 21 3.5 29 2.4 31.5
+C2 32.5 2 33 2 33.5
+c0 3.5 .5 4 .5 4
+c0 0 1 .5 1 1
+c0 0 .5 2 .5 2.5
+C5 47 6.5 49 15.5 49
+c8 0 12 -2 14 -8.4
+c0 -.5 .5 -2.5 .5 -2.5
+c0 0 0 -.5 .5 -.5
+c.5 0 1 0 1.5 0
+s1 0 1.5 0
+c.5 0 .5 .5 .5 .5
+c0 .5 .5 2.5 .5 2.5
+C36 46.5 40 49 48.5 49
+c9 0 10 -2 11.4 -8
+c0 0 .25 -2 .5 -2.5
+c0 0 1 -.5 1 -1
+c0 0 .5 -.5 .5 -4
+c0 -.5 0 -1 0 -1.3`
+
+const logoLeftPath = `
+m-34 6
+a8 8 0 0 1 -.5 1.75
+c-1 4 -4 7 -11.75 7
+c-8 0 -9 -2 -9.5 -6.5
+c-.5 -1.5 -1 -3.5 -.2 -5.3
+c.5 -1 1 -2 3.3 -2.2
+c2 0 10 0 15.3 1.2
+c1.5 .5 4 1 3.33 4`
+
+const logoFullPath = `
+m30 2.5
+c-.5 4.5 -1.5 6.5 -9.5 6.5
+c-8 0 -11 -3 -11.75 -7
+a8 8 0 0 1 -.5 -1.75
+c-.5 -3 2 -3.5 3.33 -4
+c5 -1 13 -1 15.3 -1.2
+c2.5 0 3 1 3.3 2.2
+c.5 1.5 0 3.5 -.2 5.3`
