@@ -1,3 +1,17 @@
+## [0.5.1](https://github.com/AurelienStebe/Gladdis/compare/0.5.0...0.5.1) (2024-04-03)
+
+
+### Bug Fixes
+
+* add icons to the Commands and new logo ([686499c](https://github.com/AurelienStebe/Gladdis/commit/686499c1c3bbcc35d2a13eb199f5edbe322bb64c))
+* add PDF parsing & improve the Web Browsing on Desktop ([561626f](https://github.com/AurelienStebe/Gladdis/commit/561626f0afd635d2ca04f0a4cb03c1044348b85f))
+* improve the empty Web Browsing results handling ([6e1ab98](https://github.com/AurelienStebe/Gladdis/commit/6e1ab98f84291ecf445199a57c6fd2997c0bef3b))
+* improve the Error Modal formating with empty errors ([ed39133](https://github.com/AurelienStebe/Gladdis/commit/ed39133a489aab582c86f63708d57e52982044c7))
+* refactor all error messages outputs into 3 functions ([13dd0b3](https://github.com/AurelienStebe/Gladdis/commit/13dd0b3301b2094fab7fe98f985a89e0eeca8492))
+* run the "parseLinks" utils in parallel with "Promise.all" ([4f851a7](https://github.com/AurelienStebe/Gladdis/commit/4f851a7e02a0b6e8a69b67e0b8be07823b8bc175))
+* scanner's MD file detector and error type ([89d348b](https://github.com/AurelienStebe/Gladdis/commit/89d348b139c0e8fb29b3d1ccb24537ee1ff4dc3d))
+* WikiLinks scanner with MD filenames with a dot in it ([95b67b9](https://github.com/AurelienStebe/Gladdis/commit/95b67b90e4eef585048196dcc60562ebdd09b01d))
+
 # [0.5.0](https://github.com/AurelienStebe/Gladdis/compare/0.4.3...0.5.0) (2024-03-09)
 
 
