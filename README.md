@@ -1,5 +1,7 @@
 <p align="center">
-    <img width="320" alt="Gladdis Logo" src="https://raw.githubusercontent.com/AurelienStebe/Gladdis/main/gladdis.svg">
+    <a href="#">
+        <img height="230" width="320" alt="Gladdis Logo" src="https://raw.githubusercontent.com/AurelienStebe/Gladdis/main/gladdis.svg">
+    </a>
 </p>
 
 <p align="center">
