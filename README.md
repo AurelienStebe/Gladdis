@@ -1,26 +1,5 @@
 <p align="center">
-    <a href="#">
-        <img height="230" width="320" alt="Gladdis Logo" src="https://raw.githubusercontent.com/AurelienStebe/Gladdis/main/gladdis.svg">
-    </a>
-</p>
-
-<p align="center">
-    <a href="https://github.com/prettier/prettier">
-        <img alt="Code Formatter" src="https://badgen.net/badge/code%20format/prettier/ff69b4">
-    </a>
-    &nbsp;
-    <a href="https://github.com/standard/standard">
-        <img alt="TypeScript Style" src="https://badgen.net/badge/code%20style/standard/green">
-    </a>
-    &nbsp;
-    <a href="https://github.com/semantic-release/semantic-release">
-        <img alt="Semantic Release" src="https://badgen.net/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80/semantic-release/e10079">
-    </a>
-    &nbsp;
-    <a href="https://github.com/AurelienStebe/Gladdis/blob/main/LICENSE">
-        <img alt="GitHub License" src="https://badgen.net/github/license/AurelienStebe/Gladdis">
-    </a>
-    &nbsp;
+    <img height="230" width="320" alt="Gladdis Logo" src="https://raw.githubusercontent.com/AurelienStebe/Gladdis/main/gladdis.svg">
 </p>
 
 ## Description

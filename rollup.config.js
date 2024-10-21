@@ -1,8 +1,8 @@
+import process from 'process'
 import builtins from 'builtin-modules'
 import json from '@rollup/plugin-json'
 import alias from '@rollup/plugin-alias'
 import terser from '@rollup/plugin-terser'
-import { wasm } from '@rollup/plugin-wasm'
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 
@@ -16,14 +16,13 @@ export default {
 
     plugins: [
         commonjs({ include: /node_modules/ }),
+
         resolve({ browser: true }),
+        json({ compact: true }),
 
         alias({
             entries: [{ find: '../commands.js', replacement: '../obsidian.js' }],
         }),
-
-        wasm({ targetEnv: 'auto-inline' }),
-        json({ compact: true }),
 
         process.env.NODE_ENV === 'production' &&
             terser({

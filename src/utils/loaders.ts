@@ -64,7 +64,7 @@ export async function loadAIConfig(context: Context): Promise<Context> {
             })
 
             configContext = await loadMarkdown(configContext as Context)
-            const configHistory = deepmerge(context, configContext) as Context
+            const configHistory = deepmerge(context, configContext)
 
             delete configContext.file
             delete configContext.user

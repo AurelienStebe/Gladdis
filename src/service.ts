@@ -34,7 +34,7 @@ app.post('/processPrompt', (req, res) => {
 })
 
 const name = process.env.GLADDIS_NAME_LABEL ?? 'Gladdis'
-const port = Number(process.env.GLADDIS_SERVER_PORT) ?? 3000
+const port = Number(process.env.GLADDIS_SERVER_PORT ?? 3000)
 
 app.listen(port, () => {
     console.log(`${name} is listening on port ${port} ...`)
