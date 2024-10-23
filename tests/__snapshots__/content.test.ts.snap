@@ -78,16 +78,14 @@ def test():
 """
 Here is the text content of the PDF file.
 """
-
 ",
     "role": "system",
   },
   {
-    "content": "@"https://mysite.com"
+    "content": "@"http://mysite.com"
 """
-Here is the text content of the web page.
+Here is the main content of the Web Page.
 """
-
 ",
     "name": "Myself",
     "role": "user",

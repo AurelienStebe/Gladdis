@@ -61,10 +61,10 @@ __System:__ [[document.pdf]]
 > [!ABSTRACT]- Content from "document.pdf"
 > Here is the text content of the PDF file.
 ---
-__Myself:__ <https://mysite.com>
+__Myself:__ <http://mysite.com>
 
-> [!EXAMPLE]- Content from "https://mysite.com"
-> Here is the text content of the web page.
+> [!EXAMPLE]- Web Page from <http://mysite.com>
+> Here is the main content of the Web Page.
 ---
 __User:__Prompt Text`
 

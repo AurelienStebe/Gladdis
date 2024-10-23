@@ -6,7 +6,7 @@ import { writeErrorModal, writeInvalidModal } from './loggers.js'
 
 import type { Context } from '../types/context.js'
 
-const linkRegex = /(?<!<%.*)<(https:\/\/[^>]+?)>(?!.*%>)/gis
+const linkRegex = /(?<!<%.*)<(https?:\/\/[^>]+?)>(?!.*%>)/gis
 
 export async function webBrowser(content: string, context: Context): Promise<string> {
     return await processText(content, context, async (content, context) => {
@@ -37,11 +37,11 @@ export async function webBrowser(content: string, context: Context): Promise<str
             }
 
             const webPageEsc = webPage.replace(/<(\/?[!a-z])/gi, '<\uFEFF$1')
-            const webPageLabel = `\n\n> [!EXAMPLE]- Content from "${pageURL}"`
+            const webPageLabel = `\n\n> [!EXAMPLE]- Web Page from <${pageURL}>`
             const webPageQuote = '\n> ' + webPageEsc.split('\n').join('\n> ')
 
             await disk.appendFile(context.file.path, webPageLabel + webPageQuote)
-            content = content.replace(fullMatch, `@"${pageURL}"\n"""\n${webPage}\n"""\n\n`)
+            content = content.replace(fullMatch, `@"${pageURL}"\n"""\n${webPage}\n"""\n`)
         }
 
         return content

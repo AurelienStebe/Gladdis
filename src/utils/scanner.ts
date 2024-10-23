@@ -42,8 +42,10 @@ export async function parseLinks(content: string, context: Context): Promise<str
                 if (message === undefined || message === '') continue
             }
 
-            const header = fileName?.slice(1) ?? `"${disk.baseName(fullPath)}"`
+            let header = fileName?.slice(1) ?? `"${disk.baseName(fullPath)}"`
             let fileText = message ?? (await disk.readFile(fullPath)).trim()
+
+            if (fileExt === 'pdf') header = `"${filePath}"`
 
             if (disk.baseName(filePath) === disk.baseName(fullPath, '.md')) {
                 if (disk.extName(fullPath).toLowerCase() === '.md') fileExt = 'md'
@@ -52,12 +54,12 @@ export async function parseLinks(content: string, context: Context): Promise<str
             if (fileExt === 'txt') {
                 fileText = await parseLinks(fileText, context)
             } else if (fileExt === 'pdf' || fileExt === 'md') {
-                fileText = `${header}:\n"""\n${fileText}\n"""`
+                fileText = `${header}:\n"""\n${fileText}\n"""\n`
             } else {
-                fileText = `${header}:\n\`\`\`${fileExt}\n${fileText}\n\`\`\``
+                fileText = `${header}:\n\`\`\`${fileExt}\n${fileText}\n\`\`\`\n`
             }
 
-            content = content.replace(fullMatch, `${fileText}\n\n`)
+            content = content.replace(fullMatch, fileText)
         }
 
         return content

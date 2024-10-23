@@ -4,7 +4,7 @@ export type Processor = (content: string, context: Context) => Promise<string>
 
 const transcriptRegex = /^\[!QUOTE\][+-]? Transcript from "([^"]+?)"$/i
 const pdfContentRegex = /^\[!ABSTRACT\][+-]? Content from "([^"]+?\.pdf)"$/i
-const webContentRegex = /^\[!EXAMPLE\][+-]? Content from "(https:\/\/[^"]+?)"$/i
+const webContentRegex = /^\[!EXAMPLE\][+-]? Web Page from <(https?:\/\/[^"]+?)>$/i
 
 export function parseHistory(context: Context): ChatMessage[] {
     const lines = (context.file.text + '\n---\n').split('\n')
@@ -72,7 +72,7 @@ export function parsePrompt(label: string, prompt: string[], quotes: string[][],
 
         const transcriptMatch = transcriptRegex.exec(lines[0])
         if (transcriptMatch !== null) {
-            const transcript = lines.slice(1).join('\n').trim()
+            const transcript = lines.slice(1).join('\n').trim().replaceAll('\uFEFF- ', '>> ')
             if (context.whisper.deleteFile) void context.file.disk.deleteFile(transcriptMatch[1])
             content = content.replace(`![[${transcriptMatch[1]}]]`, `"${transcript}" (${context.whisper.readSuffix})`)
         }
@@ -80,18 +80,16 @@ export function parsePrompt(label: string, prompt: string[], quotes: string[][],
         const pdfContentMatch = pdfContentRegex.exec(lines[0])
         if (pdfContentMatch !== null) {
             const pdfContent = lines.slice(1).join('\n').trim().replaceAll('<\uFEFF', '<')
-            content = content
-                .replace(`![[${pdfContentMatch[1]}]]`, `"${pdfContentMatch[1]}":\n"""\n${pdfContent}\n"""\n\n`)
-                .replace(`[[${pdfContentMatch[1]}]]`, `"${pdfContentMatch[1]}":\n"""\n${pdfContent}\n"""\n\n`)
+            content = content.replace(
+                new RegExp(`!?\\[\\[${pdfContentMatch[1]}(\\|[^\\]]*?)?\\]\\]`),
+                `"${pdfContentMatch[1]}":\n"""\n${pdfContent}\n"""\n`,
+            )
         }
 
         const webContentMatch = webContentRegex.exec(lines[0])
         if (webContentMatch !== null) {
             const webContent = lines.slice(1).join('\n').trim().replaceAll('<\uFEFF', '<')
-            content = content.replace(
-                `<${webContentMatch[1]}>`,
-                `@"${webContentMatch[1]}"\n"""\n${webContent}\n"""\n\n`,
-            )
+            content = content.replace(`<${webContentMatch[1]}>`, `@"${webContentMatch[1]}"\n"""\n${webContent}\n"""\n`)
         }
     }
 
