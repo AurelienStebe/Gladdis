@@ -26,7 +26,8 @@ export async function loadContext(context: Context): Promise<Context> {
         gladdis: {
             label: context.user.env.GLADDIS_NAME_LABEL ?? 'Gladdis',
             config: context.user.env.GLADDIS_CONFIG_FILE,
-            model: context.user.env.GLADDIS_DEFAULT_MODEL ?? 'gpt-3.5-turbo',
+            model: context.user.env.GLADDIS_DEFAULT_MODEL ?? 'gpt-4o-mini',
+            server: context.user.env.GLADDIS_DEFAULT_SERVER,
             temperature: Number(context.user.env.GLADDIS_TEMPERATURE ?? 0),
             top_p_param: Number(context.user.env.GLADDIS_TOP_P_PARAM ?? 100),
             freq_penalty: Number(context.user.env.GLADDIS_FREQ_PENALTY ?? 0),
@@ -36,6 +37,7 @@ export async function loadContext(context: Context): Promise<Context> {
             input: context.user.env.GLADDIS_WHISPER_INPUT ?? 'Gladdis',
             config: context.user.env.GLADDIS_WHISPER_CONFIG,
             model: context.user.env.GLADDIS_WHISPER_MODEL ?? 'whisper-1',
+            server: context.user.env.GLADDIS_WHISPER_SERVER,
             liveSuffix: context.user.env.GLADDIS_WHISPER_LIVE_SUFFIX ?? 'dictated, but not read',
             readSuffix: context.user.env.GLADDIS_WHISPER_READ_SUFFIX ?? 'transcribed and read',
             temperature: Number(context.user.env.GLADDIS_WHISPER_TEMPERATURE ?? 0),

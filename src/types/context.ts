@@ -42,6 +42,7 @@ export interface Context {
         label: string
         config?: string
         model: string
+        server?: string
         temperature: number
         top_p_param: number
         freq_penalty: number
@@ -51,6 +52,7 @@ export interface Context {
         input: string
         config?: string
         model: string
+        server?: string
         liveSuffix: string
         readSuffix: string
         temperature: number

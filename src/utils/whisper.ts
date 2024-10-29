@@ -18,7 +18,7 @@ export async function transcribe(content: string, context: Context): Promise<str
             if (fullPath === undefined) continue
 
             try {
-                if (context.whisper.language === undefined) {
+                if (context.whisper.language === undefined && context.whisper.server === undefined) {
                     transcript = await translation(fullPath, context)
                 } else {
                     transcript = await transcription(fullPath, context)
@@ -73,6 +73,7 @@ export async function translation(filePath: string, context: Context): Promise<s
 export async function transcription(filePath: string, context: Context): Promise<string> {
     const openai = new OpenAI({
         apiKey: context.user.env.OPENAI_API_KEY,
+        baseURL: context.whisper.server,
         dangerouslyAllowBrowser: true,
     })
 
@@ -84,6 +85,11 @@ export async function transcription(filePath: string, context: Context): Promise
         temperature: context.whisper.temperature / 100,
         language: context.whisper.language,
     })
+
+    // The LocalAI API does not join segments correctly.
+    if ((transcription as any).segments !== undefined) {
+        return (transcription as any).segments.map((segment: any) => segment.text).join(' ')
+    }
 
     return transcription.text
 }

@@ -46,7 +46,9 @@ export async function getHtml(url: string): Promise<string> {
         let iteration = 0
 
         while (equalLoop < 3 && iteration < 33) {
-            await new Promise((resolve) => setTimeout(resolve, 33)) // Max 33 ms * 34 loops = 1.1 s
+            page.webContents.scrollToBottom()
+
+            await new Promise((resolve) => setTimeout(resolve, 33)) // Max: 33 ms * 34 loops = 1.1 s
             const size = await page.webContents.executeJavaScript('document.body.innerText.length;')
 
             if (size === prevSize) equalLoop++
@@ -70,11 +72,15 @@ interface GladdisSettings {
     GLADDIS_NAME_LABEL: string
     GLADDIS_DEFAULT_USER: string
     GLADDIS_DEFAULT_MODEL: string
+    GLADDIS_DEFAULT_SERVER?: string
     GLADDIS_TEMPERATURE: string
     GLADDIS_TOP_P_PARAM: string
     GLADDIS_WHISPER_CONFIG?: string
     GLADDIS_WHISPER_INPUT: string
     GLADDIS_WHISPER_MODEL: string
+    GLADDIS_WHISPER_SERVER?: string
+    GLADDIS_WHISPER_LIVE_SUFFIX: string
+    GLADDIS_WHISPER_READ_SUFFIX: string
     GLADDIS_WHISPER_TEMPERATURE: string
     GLADDIS_WHISPER_ECHO_OUTPUT: string
     GLADDIS_WHISPER_DELETE_FILE: string
@@ -84,11 +90,13 @@ const DEFAULT_SETTINGS: GladdisSettings = {
     GLADDIS_DATA_PATH: 'Gladdis',
     GLADDIS_NAME_LABEL: 'Gladdis',
     GLADDIS_DEFAULT_USER: 'User',
-    GLADDIS_DEFAULT_MODEL: 'gpt-3.5-turbo',
+    GLADDIS_DEFAULT_MODEL: 'gpt-4o-mini',
     GLADDIS_TEMPERATURE: '42',
     GLADDIS_TOP_P_PARAM: '100',
-    GLADDIS_WHISPER_INPUT: 'Hi Gladdis, please transcribe this file.',
+    GLADDIS_WHISPER_INPUT: 'Hi Gladdis, please transcribe this.',
     GLADDIS_WHISPER_MODEL: 'whisper-1',
+    GLADDIS_WHISPER_LIVE_SUFFIX: 'dictated, but not read',
+    GLADDIS_WHISPER_READ_SUFFIX: 'transcribed and read',
     GLADDIS_WHISPER_TEMPERATURE: '24',
     GLADDIS_WHISPER_ECHO_OUTPUT: 'true',
     GLADDIS_WHISPER_DELETE_FILE: 'false',
@@ -308,7 +316,7 @@ class VaultInterface implements DiskInterface {
         await this.vault.createFolder(normalizePath(path))
     }
 
-    baseName(path: string, ext?: string | undefined): string {
+    baseName(path: string, ext?: string): string {
         const fileName = normalizePath(path).split('/').at(-1) ?? ''
 
         const fileExt = this.extName(path).toLowerCase()
@@ -365,12 +373,13 @@ class GladdisSettingTab extends PluginSettingTab {
                     fragment.appendText('" subfolder.')
                 }),
             )
-            .addText((text) =>
+            .addText((text) => {
+                text.inputEl.style.width = '24ch'
                 text.setValue(this.plugin.settings.GLADDIS_DATA_PATH).onChange(async (value) => {
                     this.plugin.settings.GLADDIS_DATA_PATH = value
                     await this.plugin.saveSettings()
-                }),
-            )
+                })
+            })
 
         new Setting(this.containerEl)
             .setName('OpenAI secret API key')
@@ -387,7 +396,8 @@ class GladdisSettingTab extends PluginSettingTab {
             )
             .addText((text) => {
                 text.inputEl.type = 'password'
-                text.setPlaceholder('sk-***************')
+                text.inputEl.style.width = '24ch'
+                text.setPlaceholder('--OPENAI API KEY--')
                     .setValue(this.plugin.secrets.OPENAI_API_KEY ?? '')
                     .onChange(async (value) => {
                         this.plugin.secrets.OPENAI_API_KEY = value
@@ -401,7 +411,7 @@ class GladdisSettingTab extends PluginSettingTab {
             .setName('Default config file')
             .setDesc(
                 createFragment((fragment) => {
-                    fragment.appendText('The path to the default config file ("')
+                    fragment.appendText('The path to the Gladdis config file ("')
                     fragment.createEl('code', { text: '.md' })
                     fragment.appendText('" extension optional).')
                 }),
@@ -421,29 +431,44 @@ class GladdisSettingTab extends PluginSettingTab {
             .setName('Default LLM model')
             .setDesc(
                 createFragment((fragment) => {
-                    fragment.appendText('Only OpenAI models at the moment ("')
-                    fragment.createEl('code', { text: 'GPT-3.5' })
-                    fragment.appendText('" or "')
-                    fragment.createEl('code', { text: 'GPT-4' })
-                    fragment.appendText('").')
+                    fragment.appendText('Choose an ')
+                    fragment.createEl('a', {
+                        href: 'https://platform.openai.com/docs/models',
+                        text: 'OpenAI',
+                    })
+                    fragment.appendText(' or ')
+                    fragment.createEl('a', {
+                        href: 'https://ollama.com/library',
+                        text: 'local model',
+                    })
+                    fragment.appendText(' from the ')
+                    fragment.createEl('a', {
+                        href: 'https://github.com/AurelienStebe/Gladdis#available-models',
+                        text: 'documentation',
+                    })
+                    fragment.appendText('.')
                 }),
             )
-            .addDropdown((dropdown) =>
-                dropdown
-                    .addOptions({
-                        'gpt-4-turbo-preview': 'GPT-4 Preview (128k)',
-                        'gpt-4-32k': 'GPT-4 (32k)',
-                        'gpt-4': 'GPT-4 (8k)',
-                        'gpt-3.5-turbo': 'GPT-3.5 Updated (16k)',
-                        'gpt-3.5-turbo-16k': 'GPT-3.5 (16k)',
-                        'gpt-3.5-turbo-0613': 'GPT-3.5 (4k)',
-                    })
-                    .setValue(this.plugin.settings.GLADDIS_DEFAULT_MODEL)
-                    .onChange(async (value) => {
-                        this.plugin.settings.GLADDIS_DEFAULT_MODEL = value
-                        await this.plugin.saveSettings()
-                    }),
+            .addText((text) =>
+                text.setValue(this.plugin.settings.GLADDIS_DEFAULT_MODEL).onChange(async (value) => {
+                    this.plugin.settings.GLADDIS_DEFAULT_MODEL = value
+                    await this.plugin.saveSettings()
+                }),
             )
+
+        new Setting(this.containerEl)
+            .setName('Default LLM server')
+            .setDesc('The default LLM server, use it to point to a local LLM model.')
+            .addText((text) => {
+                text.inputEl.style.width = '24ch'
+                text.setPlaceholder('http://localhost:8080/v1')
+                    .setValue(this.plugin.settings.GLADDIS_DEFAULT_SERVER ?? '')
+                    .onChange(async (value) => {
+                        if (value === '') delete this.plugin.settings.GLADDIS_DEFAULT_SERVER
+                        else this.plugin.settings.GLADDIS_DEFAULT_SERVER = value
+                        await this.plugin.saveSettings()
+                    })
+            })
 
         new Setting(this.containerEl)
             .setName('Default AI label')
@@ -481,7 +506,7 @@ class GladdisSettingTab extends PluginSettingTab {
             .setName('Default temperature')
             .setDesc('Value in Celsius, from 0 (freezing), 100 (boiling), to 200 (steaming).')
             .addSlider((slider) => {
-                slider.sliderEl.style.width = '100%'
+                slider.sliderEl.style.width = '80%'
                 slider
                     .setDynamicTooltip()
                     .setLimits(0, 200, 1)
@@ -496,7 +521,7 @@ class GladdisSettingTab extends PluginSettingTab {
             .setName('Default top P param')
             .setDesc('Value in literal percentage of probability mass, from 0 % to 100 %.')
             .addSlider((slider) => {
-                slider.sliderEl.style.width = '100%'
+                slider.sliderEl.style.width = '80%'
                 slider
                     .setDynamicTooltip()
                     .setLimits(0, 100, 1)
@@ -513,7 +538,7 @@ class GladdisSettingTab extends PluginSettingTab {
             .setName('Default config file')
             .setDesc(
                 createFragment((fragment) => {
-                    fragment.appendText('The path to the default config file ("')
+                    fragment.appendText('The path to the Whisper config file ("')
                     fragment.createEl('code', { text: '.md' })
                     fragment.appendText('" extension optional).')
                 }),
@@ -531,9 +556,10 @@ class GladdisSettingTab extends PluginSettingTab {
 
         new Setting(this.containerEl)
             .setName('Default audio prompt')
-            .setDesc('The default audio prompt, use it to spell out specific nouns or words.')
+            .setDesc('The default audio prompt, use it to spell out any specific words.')
             .addTextArea((textArea) => {
-                textArea.inputEl.style.width = '100%'
+                textArea.inputEl.style.width = '24ch'
+                textArea.inputEl.style.resize = 'none'
                 textArea.setValue(this.plugin.settings.GLADDIS_WHISPER_INPUT).onChange(async (value) => {
                     this.plugin.settings.GLADDIS_WHISPER_INPUT = value
                     await this.plugin.saveSettings()
@@ -544,26 +570,59 @@ class GladdisSettingTab extends PluginSettingTab {
             .setName('Default audio model')
             .setDesc(
                 createFragment((fragment) => {
-                    fragment.appendText('Only one OpenAI model is supported at the moment ("')
+                    fragment.appendText('Only one OpenAI model available ("')
                     fragment.createEl('code', { text: 'whisper-1' })
-                    fragment.appendText('").')
+                    fragment.appendText('") or a local model.')
                 }),
             )
             .addText((text) =>
-                text
-                    .setDisabled(true)
-                    .setValue(this.plugin.settings.GLADDIS_WHISPER_MODEL)
-                    .onChange(async (value) => {
-                        this.plugin.settings.GLADDIS_WHISPER_MODEL = value
-                        await this.plugin.saveSettings()
-                    }),
+                text.setValue(this.plugin.settings.GLADDIS_WHISPER_MODEL).onChange(async (value) => {
+                    this.plugin.settings.GLADDIS_WHISPER_MODEL = value
+                    await this.plugin.saveSettings()
+                }),
             )
+
+        new Setting(this.containerEl)
+            .setName('Default audio server')
+            .setDesc('The default audio server, use it to point to a local Whisper model.')
+            .addText((text) => {
+                text.inputEl.style.width = '24ch'
+                text.setPlaceholder('http://localhost:8080/v1')
+                    .setValue(this.plugin.settings.GLADDIS_WHISPER_SERVER ?? '')
+                    .onChange(async (value) => {
+                        if (value === '') delete this.plugin.settings.GLADDIS_WHISPER_SERVER
+                        else this.plugin.settings.GLADDIS_WHISPER_SERVER = value
+                        await this.plugin.saveSettings()
+                    })
+            })
+
+        new Setting(this.containerEl)
+            .setName('Default "live" suffix')
+            .setDesc('The default suffix, inserted after "on the fly" transcriptions.')
+            .addText((text) => {
+                text.inputEl.style.width = '24ch'
+                text.setValue(this.plugin.settings.GLADDIS_WHISPER_LIVE_SUFFIX).onChange(async (value) => {
+                    this.plugin.settings.GLADDIS_WHISPER_LIVE_SUFFIX = value
+                    await this.plugin.saveSettings()
+                })
+            })
+
+        new Setting(this.containerEl)
+            .setName('Default "read" suffix')
+            .setDesc('The default suffix, inserted after already seen transcriptions.')
+            .addText((text) => {
+                text.inputEl.style.width = '24ch'
+                text.setValue(this.plugin.settings.GLADDIS_WHISPER_READ_SUFFIX).onChange(async (value) => {
+                    this.plugin.settings.GLADDIS_WHISPER_READ_SUFFIX = value
+                    await this.plugin.saveSettings()
+                })
+            })
 
         new Setting(this.containerEl)
             .setName('Default temperature')
             .setDesc('Value in percentage (or Celsius), from 0 (freezing) to 100 (boiling).')
             .addSlider((slider) => {
-                slider.sliderEl.style.width = '100%'
+                slider.sliderEl.style.width = '80%'
                 slider
                     .setDynamicTooltip()
                     .setLimits(0, 100, 1)

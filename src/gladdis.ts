@@ -71,6 +71,7 @@ export async function callGladdis(context: Context): Promise<Context> {
 
     const openai = new OpenAI({
         apiKey: context.user.env.OPENAI_API_KEY,
+        baseURL: context.gladdis.server,
         dangerouslyAllowBrowser: true,
     })
 
@@ -85,14 +86,12 @@ export async function callGladdis(context: Context): Promise<Context> {
             presence_penalty: context.gladdis.pres_penalty / 100,
         })
 
-        for await (const data of stream) {
-            if (data.choices[0].delta?.role === 'assistant') {
-                await disk.appendFile(context.file.path, `\n\n__${context.gladdis.label}:__ `)
-            }
+        await disk.appendFile(context.file.path, `\n\n__${context.gladdis.label}:__ `)
 
-            if ((data.choices[0].delta?.content ?? '') !== '') {
-                response.push(data.choices[0].delta?.content ?? '')
-                await disk.appendFile(context.file.path, data.choices[0].delta?.content ?? '')
+        for await (const data of stream) {
+            if ((data.choices[0].delta.content ?? '') !== '') {
+                response.push(data.choices[0].delta.content ?? '')
+                await disk.appendFile(context.file.path, data.choices[0].delta.content ?? '')
             }
         }
     } catch (error: unknown) {

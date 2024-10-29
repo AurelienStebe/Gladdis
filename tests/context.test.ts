@@ -120,7 +120,7 @@ describe('the Context loaders', () => {
             gladdis: {
                 label: 'Gladdis',
                 config: undefined,
-                model: 'gpt-3.5-turbo',
+                model: 'gpt-4o-mini',
                 temperature: 0,
                 top_p_param: 100,
                 freq_penalty: 0,
