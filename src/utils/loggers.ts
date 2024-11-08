@@ -8,19 +8,6 @@ import type { Context, ChatMessage } from '../types/context.js'
 
 const tiktoken = getEncoding('cl100k_base')
 
-const modelLimit: Record<string, number> = {
-    'gpt-3.5-turbo': 16385,
-    'gpt-3.5-turbo-0125': 16385,
-    'gpt-3.5-turbo-1106': 16385,
-    'gpt-3.5-turbo-16k': 16385,
-    'gpt-3.5-turbo-16k-0613': 16385,
-    'gpt-4-turbo-preview': 128000,
-    'gpt-4-0125-preview': 128000,
-    'gpt-4-1106-preview': 128000,
-    'gpt-4-32k': 32768,
-    'gpt-4-32k-0613': 32768,
-}
-
 export async function logGladdisCall(context: Context): Promise<void> {
     const disk = context.file.disk
 
@@ -62,8 +49,7 @@ export async function logGladdisChat(context: Context): Promise<void> {
 }
 
 export function getTokenModal(context: Context): string {
-    const lowerLimit = context.gladdis.model.startsWith('gpt-4') ? 8192 : 4096
-    const tokenLimit = modelLimit[context.gladdis.model] ?? lowerLimit
+    const tokenLimit = context.gladdis.model.limit ?? 128000
 
     const getTokenRatio = (count: number): number => Math.min(Math.ceil((count / tokenLimit) * 36), 36)
 

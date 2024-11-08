@@ -4,6 +4,7 @@ import { deepmerge } from 'deepmerge-ts'
 import { transcribe } from './utils/whisper.js'
 import { parseLinks } from './utils/scanner.js'
 import { webBrowser } from './utils/browser.js'
+import { modelCatalog } from './types/catalog.js'
 import { logGladdisCall, logGladdisChat, getTokenModal, writeErrorModal } from './utils/loggers.js'
 
 import type { Context } from './types/context.js'
@@ -75,10 +76,17 @@ export async function callGladdis(context: Context): Promise<Context> {
         dangerouslyAllowBrowser: true,
     })
 
+    if (typeof context.gladdis.model === 'string') {
+        const label = context.gladdis.model as string
+        const model = modelCatalog.find((model) => label.startsWith(model.label))
+
+        context.gladdis.model = model ? { ...model, label } : { label }
+    }
+
     try {
         const stream = await openai.chat.completions.create({
             stream: true,
-            model: context.gladdis.model,
+            model: context.gladdis.model.label,
             messages: context.user.history,
             temperature: context.gladdis.temperature / 100,
             top_p: context.gladdis.top_p_param / 100,

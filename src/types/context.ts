@@ -9,6 +9,14 @@ export interface ChatMessage {
     name?: string
 }
 
+export interface ModelDetails {
+    label: string
+    limit?: number
+    vision?: boolean
+    hearing?: boolean
+    speaking?: boolean
+}
+
 export interface DiskInterface {
     vault?: Vault
     readFile: (path: string) => Promise<string>
@@ -41,7 +49,7 @@ export interface Context {
     gladdis: {
         label: string
         config?: string
-        model: string
+        model: ModelDetails
         server?: string
         temperature: number
         top_p_param: number
