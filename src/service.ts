@@ -11,7 +11,7 @@ app.use(express.json())
 
 app.post('/chatWithGladdis', (req, res) => {
     void (async () => {
-        void chatWithGladdis(req.body as Context)
+        await chatWithGladdis(req.body as Context)
     })()
 
     res.status(200).end()
@@ -19,7 +19,7 @@ app.post('/chatWithGladdis', (req, res) => {
 
 app.post('/processContent', (req, res) => {
     void (async () => {
-        void processContent(req.body as Context)
+        await processContent(req.body as Context)
     })()
 
     res.status(200).end()
@@ -27,7 +27,7 @@ app.post('/processContent', (req, res) => {
 
 app.post('/processPrompt', (req, res) => {
     void (async () => {
-        void processPrompt(req.body as Context)
+        await processPrompt(req.body as Context)
     })()
 
     res.status(200).end()

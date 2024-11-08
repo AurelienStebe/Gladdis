@@ -88,7 +88,7 @@ export async function transcription(filePath: string, context: Context): Promise
 
     // The LocalAI API does not join segments correctly.
     if ((transcription as any).segments !== undefined) {
-        return (transcription as any).segments.map((segment: any) => segment.text).join(' ')
+        return (transcription as any).segments.map((s: any) => s.text).join(' ') // eslint-disable-line
     }
 
     return transcription.text

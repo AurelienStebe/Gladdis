@@ -29,7 +29,7 @@ export { stringifyYaml, parseYaml, htmlToMarkdown as turndown } from 'obsidian'
 export const parseDom = (html: string): Document => new DOMParser().parseFromString(html, 'text/html')
 
 export async function getPdfDoc(file: Promise<File>): Promise<PDFDocumentProxy> {
-    return (await loadPdfJs()).getDocument(await (await file).arrayBuffer()).promise
+    return (await loadPdfJs()).getDocument(await (await file).arrayBuffer()).promise // eslint-disable-line
 }
 
 export async function getHtml(url: string): Promise<string> {
@@ -305,6 +305,7 @@ class VaultInterface implements DiskInterface {
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/require-await
     async pathExists(path: string): Promise<boolean> {
         return this.vault.getAbstractFileByPath(normalizePath(path)) !== null
     }

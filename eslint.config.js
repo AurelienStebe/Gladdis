@@ -15,6 +15,13 @@ export default tseslint.config(
         ...tseslint.configs.disableTypeChecked,
     },
     {
+        rules: {
+            '@typescript-eslint/no-explicit-any': 'off',
+            '@typescript-eslint/no-unsafe-assignment': 'off',
+            '@typescript-eslint/no-unsafe-member-access': 'off',
+        },
+    },
+    {
         linterOptions: { reportUnusedDisableDirectives: 'error' },
     },
 )

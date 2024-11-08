@@ -88,7 +88,7 @@ export async function loadAIConfig(context: Context): Promise<Context> {
             }
 
             whisperContext = await loadMarkdown(whisperContext as Context)
-            configContext.whisper.input = whisperContext.file.text
+            configContext.whisper.input = whisperContext.file.text as string
 
             whisperContext = deepmerge(configContext, whisperContext)
             context.whisper = deepmerge(context.whisper, whisperContext.whisper)
