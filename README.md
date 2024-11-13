@@ -4,7 +4,7 @@
 
 ## Description
 
-[Obsidian](https://obsidian.md) exists to help you build a second brain. Gladdis exists to give that brain a pen (let it do the writing for once), ears (talking is easier than typing) and multiple split personalities (give your system prompts names). Further plans for v1.0 include: a brush (let it paint like a true artist), a voice (listening is easier than reading), an internal monologue (together we are more than our sum) and the ability to execute code (what could possibly go wrong ?).
+[Obsidian](https://obsidian.md) exists to help you build a second brain. Gladdis exists to give that brain a pen (let it do the writing for once), ears (talking is easier than typing) and multiple split personalities (give your system prompts names). Further plans for v1.0 include: a brush (let it paint like an artist), a voice (listening is easier than reading), an internal monologue (together we are more than our sum) and the ability to execute code (what could possibly go wrong ?).
 
 ### Current Features
 
@@ -12,6 +12,7 @@
 -   **Whisper Transcription**: audio files WikiLinks are auto-transcribed, use the Obsidian "audio recorder" core plugin.
 -   **Document Loading**: text files WikiLinks are auto-loaded, just drag and drop files into the conversation window.
 -   **PDF & Web Support**: load PDF WikiLinks just like text files, load web pages external links as well using `<URL>`.
+-   **Image Vision AIs**: send images to vision supporting LLMs using local WikiLinks or Markdown external web links.
 -   **System Prompts**: name your system prompts, create personalities and use FrontMatter to choose whom to talk to.
 
 ## Documentation
@@ -39,16 +40,16 @@ The defaults from the settings panel can be overridden using FrontMatter in any 
 ```yaml
 ---
 gladdis:
-    label: Gladdis    # name the AI in the config
-    config: Gladdis   # switch the AI you talk to
-    model: gpt-3.5-turbo # switch the model at any time
+    config: Gladdis   # select which AI you talk to
+    model: gpt-4o     # choose the current AI model
+    server: http://   # use local or custom servers
     temperature: 42   # test different temperatures
-    top_p_param: 100  # or various probability mass
+    top_p_param: 88   # or various probability mass
 whisper:
-    config: Whisper   # switch transcription language
-    model: whisper-1  # only one model at the moment
+    config: Whisper   # switch transcription config
+    model: whisper-1  # change the transcription AI
     temperature: 24   # test different temperatures
-    echoOutput: true  # output transcription callout
+    echoOutput: true  # write transcription callout
     deleteFile: false # cleanup after transcription
 ---
 ```
@@ -82,16 +83,26 @@ The very last message is the prompt, the LLM response streams below.
 
 ### Available Models
 
-Only the OpenAI models are supported at the moment, however more APIs and local models are coming.
+The following [OpenAI models](https://platform.openai.com/docs/models) are supported via the paying API:
 
-| Label | Token Limit | Notes |
-| ----- | :-----------: | ----- |
-| `gpt-4-turbo-preview` | 128 k | The most powerful and expensive. |
-| `gpt-4-32k` | 32 k | The old GPT-4, with large context. |
-| `gpt-4` | 8 k | The original GPT-4, from June 2023. |
-| `gpt-3.5-turbo` | 16 k | The updated GPT-3.5, cheaper than 4. |
-| `gpt-3.5-turbo-16k` | 16 k | The old GPT-3.5, with large context. |
-| `gpt-3.5-turbo-0613` | 4 k | The original GPT-3.5, from June 2023. |
+| Label | Tokens | Vision | Notes |
+| ----- | :----: | :----: | ----- |
+| `gpt-4o` | 128 k | ✅ | OpenAI's high-intelligence flagship model for complex, multi-step tasks. |
+| `gpt-4o-mini` | 128 k | ✅ | OpenAI's affordable and intelligent small model for fast, lightweight tasks. |
+| `chatgpt-4o-latest` | 128 k | ✅ | Dynamic model continuously updated to the current version of GPT-4o in ChatGPT. |
+| `gpt-4-turbo` | 128 k | ✅ | The latest GPT-4 Turbo model with vision capabilities (GPT-4o is cheaper and faster). |
+| `gpt-3.5-turbo` | 16 k | | The latest GPT-3.5 Turbo model with higher accuracy (GPT-4o mini is cheaper and more capable). |
+
+Open Source models can be used locally via [Ollama](https://ollama.com/) or [LocalAI](https://localai.io/):
+
+| Label | Tokens | Vision | Notes |
+| ----- | :----: | :----: | ----- |
+| `llama3.2` | 128 k | | Meta's new 1B and 3B models optimized for multilingual dialogue use cases. |
+| `llama3.1` | 128 k | | Meta's 8B, 70B and 405B models with overall stronger reasoning capabilities. |
+| `phi3.5` / `phi3` | 128 k | | Microsoft's new Phi 3.5 "Mini" (3.8B) and Phi 3 "Medium" (14B) open models. |
+| `qwen2.5` | 128 k | | Alibaba Cloud's Qwen multilingual Chinese models ranging from 0.5B to 72B. |
+| `gemma2` | 128 k | | Google's Gemma 2B, 9B and 27B models featuring a brand new architecture. |
+| `llava` | 4 k | ✅ | Family of Large Language-and-Vision Assistant models between 7B and 34B. |
 
 ## Future Development
 
@@ -110,7 +121,7 @@ Only the OpenAI models are supported at the moment, however more APIs and local 
 ### With the BRAT plugin
 
 1. Install the [Beta Reviewers Auto-update Tool plugin](https://github.com/TfTHacker/obsidian42-brat).
-2. Follow the instructions for ["Adding a beta plugin"](https://tfthacker.com/Obsidian+Plugins+by+TfTHacker/BRAT+-+Beta+Reviewer's+Auto-update+Tool/Quick+guide+for+using+BRAT#Adding+a+beta+plugin).
+2. Follow the instructions for ["Adding a beta plugin"](https://tfthacker.com/brat-quick-guide#Adding+a+beta+plugin).
 
 ### Manually from GitHub
 
