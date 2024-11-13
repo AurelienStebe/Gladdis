@@ -20,8 +20,14 @@ export async function webBrowser(content: string, context: Context): Promise<str
                 const baseTag = pageDoc.head.getElementsByTagName('base')[0]
                 if (baseTag === undefined) pageDoc.head.appendChild(pageDoc.createElement('base'))
 
+                const options = {
+                    charThreshold: 50,
+                    nbTopCandidates: 5000,
+                    linkDensityModifier: 0.5,
+                }
+
                 pageDoc.head.getElementsByTagName('base')[0].href = pageURL
-                const article = new Readability(pageDoc).parse() ?? { title: '', content: '' }
+                const article = new Readability(pageDoc, options).parse() ?? { title: '', content: '' }
 
                 webPage = article.content.trim() !== '' ? turndown(article.content) : ''
                 if (article.title.trim() !== '') webPage = `# ${article.title}\n\n${webPage}`

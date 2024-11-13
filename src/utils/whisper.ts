@@ -6,7 +6,7 @@ import { writeErrorModal, writeInvalidModal } from './loggers.js'
 
 import type { Context } from '../types/context.js'
 
-const linkRegex = /(?<!<%.*)!\[\[([^\]]+?\.(flac|mp3|mp4|mpeg|mpga|m4a|ogg|wav|webm))\]\](?!.*%>)/gis
+const linkRegex = /(?<!<%.*)!\[\[([^\]]+?\.(flac|mp3|mp4|m4a|wav|mpeg|mpga|ogg|webm))\]\](?!.*%>)/gis
 
 export async function transcribe(content: string, context: Context): Promise<string> {
     return await processText(content, context, async (content, context) => {

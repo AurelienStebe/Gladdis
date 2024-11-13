@@ -1,10 +1,13 @@
+import { arrayBuffer } from 'stream/consumers'
+
 import { getPdfDoc } from '../commands.js'
 import { processText } from './history.js'
 import { writeErrorModal, writeMissedModal, writeInvalidModal } from './loggers.js'
 
-import type { Context } from '../types/context.js'
+import type { Context, ChatMessage } from '../types/context.js'
 
 const linkRegex = /(?<!<%.*)!\[\[([^|\]]+?)(\|[^\]]*?)?\]\](?!.*%>)/gs
+const imageRegex = /!\[([^\]]*?)\]\(((https:\/|data:image)?\/[^)]+?)\)/gs
 
 const audioFiles = ['flac', 'mp3', 'mp4', 'm4a', 'wav', 'mpeg', 'mpga', 'ogg', 'webm']
 const imageFiles = ['jpeg', 'jpg', 'png', 'gif', 'bmp', 'ico', 'avif', 'webp']
@@ -23,7 +26,6 @@ export async function parseLinks(content: string, context: Context): Promise<str
             if (fullPath === undefined) continue
             if (audioFiles.includes(fileExt)) continue
 
-            if (imageFiles.includes(fileExt)) message = 'Images Not Supported (yet)'
             if (videoFiles.includes(fileExt)) message = 'Video Files Not Supported'
             if (otherFiles.includes(fileExt)) message = 'Binary Files Not Supported'
 
@@ -55,6 +57,8 @@ export async function parseLinks(content: string, context: Context): Promise<str
                 fileText = await parseLinks(fileText, context)
             } else if (fileExt === 'pdf' || fileExt === 'md') {
                 fileText = `${header}:\n"""\n${fileText}\n"""\n`
+            } else if (imageFiles.includes(fileExt)) {
+                fileText = `![data:image/${fileExt};base64,](/${fullPath})`
             } else {
                 fileText = `${header}:\n\`\`\`${fileExt}\n${fileText}\n\`\`\`\n`
             }
@@ -123,4 +127,49 @@ export async function parsePdfDoc(filePath: string, fullPath: string, context: C
     }
 
     return content
+}
+
+export async function loadImages(context: Context): Promise<ChatMessage[]> {
+    return await Promise.all(
+        context.user.history.map(async (message) => {
+            const content = []
+
+            let currentMatch
+            let lastIndex = 0
+
+            while ((currentMatch = imageRegex.exec(message.content)) !== null) {
+                const [fullMatch, imageTag, imageUrl] = currentMatch
+
+                if (lastIndex < currentMatch.index) {
+                    content.push({
+                        type: 'text',
+                        text: message.content.slice(lastIndex, currentMatch.index).trim(),
+                    })
+                }
+
+                content.push({
+                    type: 'image_url',
+                    image_url: { url: imageUrl },
+                })
+
+                if (imageTag.startsWith('data:image/')) {
+                    const stream = context.file.disk.readBinary(imageUrl)
+                    const buffer = stream instanceof Promise ? (await stream).arrayBuffer() : arrayBuffer(stream)
+
+                    content.at(-1)!.image_url!.url = imageTag + Buffer.from(await buffer).toString('base64')
+                }
+
+                lastIndex = currentMatch.index + fullMatch.length
+            }
+
+            if (lastIndex < message.content.length) {
+                content.push({
+                    type: 'text',
+                    text: message.content.slice(lastIndex).trim(),
+                })
+            }
+
+            return { ...message, content }
+        }) as unknown as ChatMessage[],
+    )
 }

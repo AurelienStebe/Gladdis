@@ -2,7 +2,7 @@ import OpenAI from 'openai'
 import { deepmerge } from 'deepmerge-ts'
 
 import { transcribe } from './utils/whisper.js'
-import { parseLinks } from './utils/scanner.js'
+import { parseLinks, loadImages } from './utils/scanner.js'
 import { webBrowser } from './utils/browser.js'
 import { modelCatalog } from './types/catalog.js'
 import { logGladdisCall, logGladdisChat, getTokenModal, writeErrorModal } from './utils/loggers.js'
@@ -87,7 +87,7 @@ export async function callGladdis(context: Context): Promise<Context> {
         const stream = await openai.chat.completions.create({
             stream: true,
             model: context.gladdis.model.label,
-            messages: context.user.history,
+            messages: context.gladdis.model.vision ? await loadImages(context) : context.user.history,
             temperature: context.gladdis.temperature / 100,
             top_p: context.gladdis.top_p_param / 100,
             frequency_penalty: context.gladdis.freq_penalty / 100,

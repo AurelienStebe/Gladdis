@@ -237,7 +237,7 @@ export default class GladdisPlugin extends Plugin {
     }
 
     parseDotEnv(text: string): Record<string, string> {
-        const result: Record<string, string> = {}
+        const record: Record<string, string> = {}
 
         for (const rawLine of text.trim().split('\n')) {
             const line = rawLine.trim()
@@ -249,10 +249,10 @@ export default class GladdisPlugin extends Plugin {
             let value = line.slice(index + 1).trim()
 
             if (value[0] === '"') value = value.slice(1, -1)
-            if (key !== '' && value !== '') result[key] = value
+            if (key !== '' && value !== '') record[key] = value
         }
 
-        return result
+        return record
     }
 }
 
