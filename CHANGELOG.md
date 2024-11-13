@@ -1,3 +1,18 @@
+# [0.6.0](https://github.com/AurelienStebe/Gladdis/compare/0.5.1...0.6.0) (2024-11-13)
+
+
+### Bug Fixes
+
+* add ESLint rules exceptions and fixes ([51a81b5](https://github.com/AurelienStebe/Gladdis/commit/51a81b5f42f0fbb87e9032c9e8c26935264bfcc7))
+* improve PDF, Whisper & Web pages modals ([ad68498](https://github.com/AurelienStebe/Gladdis/commit/ad684988104e1304ac9f57ee2d4b42e33b17005e))
+
+
+### Features
+
+* add a model catalog and details FM params ([1f50162](https://github.com/AurelienStebe/Gladdis/commit/1f50162b927f0a2fd173f42cf8025ef3c98f7dc1))
+* add support for local LLM & Whisper servers ([76f8737](https://github.com/AurelienStebe/Gladdis/commit/76f87378fa0cf5493153f2558632c03ae72ad80d))
+* add support for vision LLMs and image loading ([20ef157](https://github.com/AurelienStebe/Gladdis/commit/20ef1575b677db562943c34e19a430d49a690b98))
+
 ## [0.5.1](https://github.com/AurelienStebe/Gladdis/compare/0.5.0...0.5.1) (2024-04-03)
 
 
