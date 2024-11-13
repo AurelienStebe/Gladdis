@@ -42,7 +42,7 @@
         "watch": "node --no-warnings ./esbuild.config.js watch"
     },
     "engines": {
-        "node": ">=18"
+        "node": ">=20"
     },
     "os": [
         "darwin",
@@ -109,7 +109,7 @@
         "obsidian": "1.7.2",
         "openai": "^4.72.0",
         "pdfjs-dist": "^4.8.69",
-        "puppeteer-core": "^23.7.1",
+        "puppeteer-core": "^23.8.0",
         "turndown": "^7.2.0",
         "turndown-plugin-gfm": "^1.0.2",
         "yaml": "^2.6.0"
