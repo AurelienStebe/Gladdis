@@ -44,15 +44,17 @@ export async function doGladdis(context: Context): Promise<void> {
         context.user.history.unshift({ role: 'system', content: corePrompt.trim() })
     }
 
-    context.user.prompt = await transcribe(context.user.prompt, context)
-    context.user.prompt = await parseLinks(context.user.prompt, context)
-    context.user.prompt = await webBrowser(context.user.prompt, context)
+    if (context.user.prompt !== '') {
+        context.user.prompt = await transcribe(context.user.prompt, context)
+        context.user.prompt = await parseLinks(context.user.prompt, context)
+        context.user.prompt = await webBrowser(context.user.prompt, context)
 
-    context.user.history.push({
-        role: 'user',
-        content: context.user.prompt,
-        name: context.user.label,
-    })
+        context.user.history.push({
+            role: 'user',
+            content: context.user.prompt,
+            name: context.user.label,
+        })
+    }
 
     context = await callGladdis(context)
 

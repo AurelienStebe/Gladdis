@@ -29,8 +29,8 @@ export async function webBrowser(content: string, context: Context): Promise<str
                 pageDoc.head.getElementsByTagName('base')[0].href = pageURL
                 const article = new Readability(pageDoc, options).parse() ?? { title: '', content: '' }
 
-                webPage = article.content.trim() !== '' ? turndown(article.content) : ''
-                if (article.title.trim() !== '') webPage = `# ${article.title}\n\n${webPage}`
+                webPage = article.content.trim() !== '' ? turndown(article.content).trim() : ''
+                if (article.title.trim() !== '') webPage = `# ${article.title.trim()}\n\n${webPage}`
             } catch (error: unknown) {
                 await writeErrorModal(error, 'Web Page Browsing Error', context)
             }

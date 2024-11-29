@@ -86,10 +86,10 @@ interface GladdisSettings {
     GLADDIS_WHISPER_DELETE_FILE: string
 }
 
-const DEFAULT_SETTINGS: GladdisSettings = {
+const defaultSettings: GladdisSettings = {
     GLADDIS_DATA_PATH: 'Gladdis',
     GLADDIS_NAME_LABEL: 'Gladdis',
-    GLADDIS_DEFAULT_USER: 'User',
+    GLADDIS_DEFAULT_USER: 'Hooman',
     GLADDIS_DEFAULT_MODEL: 'gpt-4o-mini',
     GLADDIS_TEMPERATURE: '42',
     GLADDIS_TOP_P_PARAM: '100',
@@ -103,7 +103,7 @@ const DEFAULT_SETTINGS: GladdisSettings = {
 }
 
 export default class GladdisPlugin extends Plugin {
-    settings: GladdisSettings = DEFAULT_SETTINGS
+    settings: GladdisSettings = defaultSettings
     secrets: Record<string, string> = {}
 
     async onload(): Promise<void> {
@@ -191,8 +191,6 @@ export default class GladdisPlugin extends Plugin {
             },
         })
 
-        this.registerExtensions(['txt'], 'markdown')
-
         this.addSettingTab(new GladdisSettingTab(this.app, this))
     }
 
@@ -215,7 +213,7 @@ export default class GladdisPlugin extends Plugin {
     }
 
     async loadSettings(): Promise<void> {
-        this.settings = deepmerge(DEFAULT_SETTINGS, (await this.loadData()) ?? {})
+        this.settings = deepmerge(defaultSettings, (await this.loadData()) ?? {})
     }
 
     async saveSettings(): Promise<void> {
@@ -305,9 +303,10 @@ class VaultInterface implements DiskInterface {
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/require-await
     async pathExists(path: string): Promise<boolean> {
-        return this.vault.getAbstractFileByPath(normalizePath(path)) !== null
+        return new Promise((resolve) => {
+            resolve(this.vault.getAbstractFileByPath(normalizePath(path)) !== null)
+        })
     }
 
     async pathEnsure(path: string): Promise<void> {
@@ -440,7 +439,12 @@ class GladdisSettingTab extends PluginSettingTab {
                     fragment.appendText(' or ')
                     fragment.createEl('a', {
                         href: 'https://ollama.com/library',
-                        text: 'local model',
+                        text: 'local',
+                    })
+                    fragment.appendText(' ')
+                    fragment.createEl('a', {
+                        href: 'https://localai.io/gallery.html',
+                        text: 'model',
                     })
                     fragment.appendText(' from the ')
                     fragment.createEl('a', {
@@ -601,7 +605,6 @@ class GladdisSettingTab extends PluginSettingTab {
             .setName('Default "live" suffix')
             .setDesc('The default suffix, inserted after "on the fly" transcriptions.')
             .addText((text) => {
-                text.inputEl.style.width = '24ch'
                 text.setValue(this.plugin.settings.GLADDIS_WHISPER_LIVE_SUFFIX).onChange(async (value) => {
                     this.plugin.settings.GLADDIS_WHISPER_LIVE_SUFFIX = value
                     await this.plugin.saveSettings()
@@ -612,7 +615,6 @@ class GladdisSettingTab extends PluginSettingTab {
             .setName('Default "read" suffix')
             .setDesc('The default suffix, inserted after already seen transcriptions.')
             .addText((text) => {
-                text.inputEl.style.width = '24ch'
                 text.setValue(this.plugin.settings.GLADDIS_WHISPER_READ_SUFFIX).onChange(async (value) => {
                     this.plugin.settings.GLADDIS_WHISPER_READ_SUFFIX = value
                     await this.plugin.saveSettings()
