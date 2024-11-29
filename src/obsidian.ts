@@ -8,29 +8,12 @@ import { webBrowser } from './utils/browser.js'
 import { loadContext, loadContent } from './utils/loaders.js'
 import { getTokenModal, writeErrorModal } from './utils/loggers.js'
 
-import {
-    TFile,
-    Plugin,
-    Setting,
-    Platform,
-    PluginSettingTab,
-    addIcon,
-    request,
-    loadPdfJs,
-    normalizePath,
-} from 'obsidian'
+import { TFile, Plugin, Setting, Platform, PluginSettingTab, addIcon, request, normalizePath } from 'obsidian'
 
-import type { PDFDocumentProxy } from 'pdfjs-dist'
 import type { Context, DiskInterface } from './types/context.js'
 import type { App, Editor, MarkdownView, MarkdownFileInfo, Vault } from 'obsidian'
 
 export { stringifyYaml, parseYaml, htmlToMarkdown as turndown } from 'obsidian'
-
-export const parseDom = (html: string): Document => new DOMParser().parseFromString(html, 'text/html')
-
-export async function getPdfDoc(file: Promise<File>): Promise<PDFDocumentProxy> {
-    return (await loadPdfJs()).getDocument(await (await file).arrayBuffer()).promise // eslint-disable-line
-}
 
 export async function getHtml(url: string): Promise<string> {
     let html = ''
@@ -65,6 +48,8 @@ export async function getHtml(url: string): Promise<string> {
 
     return html
 }
+
+export const parseDom = (html: string): Document => new DOMParser().parseFromString(html, 'text/html')
 
 interface GladdisSettings {
     GLADDIS_DATA_PATH: string

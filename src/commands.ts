@@ -3,7 +3,6 @@ import fs from 'fs-extra'
 import { JSDOM } from 'jsdom'
 import fetch from 'node-fetch'
 import TurndownService from 'turndown'
-import { getDocument } from 'pdfjs-dist'
 import { gfm } from 'turndown-plugin-gfm'
 import { arrayBuffer } from 'stream/consumers'
 
@@ -14,8 +13,6 @@ import { webBrowser } from './utils/browser.js'
 import { getTokenModal } from './utils/loggers.js'
 import { loadContext, loadContent } from './utils/loaders.js'
 
-import type { ReadStream } from 'fs'
-import type { PDFDocumentProxy } from 'pdfjs-dist'
 import type { Context, DiskInterface } from './types/context.js'
 
 export { stringify as stringifyYaml, parse as parseYaml } from 'yaml'
@@ -39,12 +36,6 @@ export function turndown(html: string): string {
     turndown.use(gfm)
 
     return turndown.turndown(html)
-}
-
-export async function getPdfDoc(stream: ReadStream | Promise<File>): Promise<PDFDocumentProxy> {
-    const file = stream instanceof Promise ? (await stream).arrayBuffer() : arrayBuffer(stream)
-
-    return await getDocument(await file).promise
 }
 
 export const diskInterface: DiskInterface = {

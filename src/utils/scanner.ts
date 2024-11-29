@@ -1,6 +1,5 @@
-import { arrayBuffer } from 'stream/consumers'
+import pdf2md from '@opendocsg/pdf2md'
 
-import { getPdfDoc } from '../commands.js'
 import { processText } from './history.js'
 import { writeErrorModal, writeMissedModal, writeInvalidModal } from './loggers.js'
 
@@ -99,22 +98,7 @@ export async function resolveFile(filePath: string, context: Context): Promise<s
 }
 
 export async function parsePdfDoc(filePath: string, fullPath: string, context: Context): Promise<string> {
-    const pdf = await getPdfDoc(context.file.disk.readBinary(fullPath))
-
-    const pdfPages = await Promise.all(
-        Array.from({ length: pdf.numPages }, async (_, i) => {
-            return await (await pdf.getPage(i + 1)).getTextContent()
-        }),
-    )
-
-    const pdfItems = pdfPages.map((page) =>
-        page.items.map((item: any): string => {
-            return item.str + (item.hasEOL === true ? '\n' : '')
-        }),
-    )
-
-    pdfItems.map((page) => page.push('\n\n'))
-    const content = pdfItems.flat().join('').trim()
+    const content = (await pdf2md(await context.file.disk.readBinary(fullPath))).trim()
 
     if (content !== '') {
         const pdfTextEsc = content.replace(/<(\/?[!a-z])/gi, '<\uFEFF$1')
