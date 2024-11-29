@@ -6,6 +6,6 @@ labels: ':books: | documentation'
 
 Issue type for any improvement to anything _not_ code related.
 
--   Fixing any typo or grammar / spelling / phrasing mistake ?
--   Suggesting modifications / additions / deletions to any doc ?
--   Pointing out some missing materials / references / examples... ?
+- Fixing any typo or grammar / spelling / phrasing mistake ?
+- Suggesting modifications / additions / deletions to any doc ?
+- Pointing out some missing materials / references / examples... ?

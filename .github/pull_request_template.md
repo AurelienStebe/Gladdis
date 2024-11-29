@@ -14,6 +14,6 @@ If necessary, save this PR as a Draft, open a new issue, then use its number.
 
 ## Check List
 
--   [ ] Testing: any fresh new tests ? are the old ones still passing ?
--   [ ] Linting: did you "npm run lint" ? because GitHub won't forget.
--   [ ] Documentation: is it updated or are there related open issues ?
+- [ ] Testing: any fresh new tests ? are the old ones still passing ?
+- [ ] Linting: did you "npm run lint" ? because GitHub won't forget.
+- [ ] Documentation: is it updated or are there related open issues ?
