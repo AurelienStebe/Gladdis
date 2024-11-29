@@ -1,24 +1,17 @@
 import esbuild from 'esbuild'
-import process from 'process'
-import builtins from 'builtin-modules'
 
-const context = await esbuild.context({
-    entryPoints: ['src/tools/*.ts'],
-    outdir: 'lib/tools',
+await esbuild.build({
+    entryPoints: ['src/startup.ts'],
+    outfile: 'vault/.obsidian/plugins/gladdis-startup/main.js',
 
     bundle: true,
-    target: 'es2018',
+    minify: true,
+
+    format: 'cjs',
+    target: 'es2020',
+
     treeShaking: true,
-
     legalComments: 'none',
-    minify: process.argv[2] !== 'watch',
 
-    external: ['obsidian', 'electron', ...builtins],
+    external: ['obsidian'],
 })
-
-if (process.argv[2] === 'watch') {
-    await context.watch()
-} else {
-    await context.rebuild()
-    process.exit(0)
-}
