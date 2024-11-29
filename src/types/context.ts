@@ -1,4 +1,3 @@
-import type { ReadStream } from 'fs'
 import type { Vault } from 'obsidian'
 
 export type ChatRoleEnum = 'user' | 'system' | 'assistant'
@@ -20,7 +19,7 @@ export interface ModelDetails {
 export interface DiskInterface {
     vault?: Vault
     readFile: (path: string) => Promise<string>
-    readBinary: (path: string) => ReadStream | Promise<File>
+    readBinary: (path: string) => Promise<ArrayBuffer>
     appendFile: (path: string, data: string) => Promise<void>
     deleteFile: (path: string) => Promise<void>
     pathExists: (path: string) => Promise<boolean>

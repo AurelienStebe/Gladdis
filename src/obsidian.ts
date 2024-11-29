@@ -280,11 +280,8 @@ class VaultInterface implements DiskInterface {
         return await this.vault.cachedRead(this.loadFile(path))
     }
 
-    async readBinary(path: string): Promise<File> {
-        const binary = this.loadFile(path)
-        const buffer = await this.vault.readBinary(binary)
-
-        return new File([buffer], `${binary.basename}.${binary.extension}`)
+    async readBinary(path: string): Promise<ArrayBuffer> {
+        return await this.vault.readBinary(this.loadFile(path))
     }
 
     async appendFile(path: string, data: string): Promise<void> {

@@ -153,10 +153,8 @@ export async function loadImages(context: Context): Promise<ChatMessage[]> {
                 })
 
                 if (imageTag.startsWith('data:image/')) {
-                    const stream = context.file.disk.readBinary(imageUrl)
-                    const buffer = stream instanceof Promise ? (await stream).arrayBuffer() : arrayBuffer(stream)
-
-                    content.at(-1)!.image_url!.url = imageTag + Buffer.from(await buffer).toString('base64')
+                    const imageFile = Buffer.from(await context.file.disk.readBinary(imageUrl))
+                    content.at(-1)!.image_url!.url = imageTag + imageFile.toString('base64')
                 }
 
                 lastIndex = currentMatch.index + fullMatch.length

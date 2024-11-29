@@ -49,17 +49,11 @@ export async function getPdfDoc(stream: ReadStream | Promise<File>): Promise<PDF
 
 export const diskInterface: DiskInterface = {
     readFile: async (p: string) => await fs.readFile(p, 'utf-8'),
-    readBinary: (p: string) => fs.createReadStream(p),
-    appendFile: async (p: string, d: string) => {
-        await fs.appendFile(p, d)
-    },
-    deleteFile: async (p: string) => {
-        await fs.remove(p)
-    },
+    readBinary: async (p: string) => await arrayBuffer(fs.createReadStream(p)),
+    appendFile: async (p: string, d: string) => await fs.appendFile(p, d),
+    deleteFile: async (p: string) => await fs.remove(p),
     pathExists: async (p: string) => await fs.pathExists(p),
-    pathEnsure: async (p: string) => {
-        await fs.ensureDir(p)
-    },
+    pathEnsure: async (p: string) => await fs.ensureDir(p),
     baseName: (p: string, e?: string) => path.basename(p, e),
     extName: (p: string) => path.extname(p),
     joinPath: (...p: string[]) => path.join(...p),
