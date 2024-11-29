@@ -3,7 +3,7 @@ import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
     {
-        ignores: ['main.js', 'lib/', 'types/', 'coverage/'],
+        ignores: ['main.js', 'lib/', 'types/', 'coverage/', 'vault/'],
     },
     eslint.configs.recommended,
     {
