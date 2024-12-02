@@ -1,5 +1,6 @@
 import fs from 'fs-extra'
 import process from 'process'
+import { tar, zip } from 'zip-a-folder'
 
 const targetVersion = process.argv[2] ?? process.env.npm_package_version
 
@@ -14,4 +15,4 @@ const versions = JSON.parse(fs.readFileSync('versions.json', 'utf-8'))
 versions[targetVersion] = minAppVersion
 fs.writeFileSync('versions.json', JSON.stringify(versions, null, '    ') + '\n')
 
-process.exit(0)
+tar('vault', 'vault.tgz').then(() => zip('vault', 'vault.zip').then(() => process.exit(0)))

@@ -7,3 +7,4 @@
 .DS_Store
 /stats.html
 /vault/.obsidian/plugins/*/main.js
+/vault.*

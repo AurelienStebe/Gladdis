@@ -35,7 +35,7 @@
         "/CHANGELOG.md"
     ],
     "scripts": {
-        "clean": "rimraf lib types coverage main.js stats.html vault/.obsidian/plugins/*/main.js",
+        "clean": "rimraf lib types coverage main.js stats.html vault/.obsidian/plugins/*/main.js vault.*",
         "lint": "prettier -c . && eslint .",
         "build": "npm run clean && tsc && rollup -c --silent && node ./esbuild.config.js",
         "test": "vitest --ui --coverage --coverage.include='src/utils/**'"
@@ -88,6 +88,8 @@
                 {
                     "assets": [
                         "main.js",
+                        "vault.tgz",
+                        "vault.zip",
                         "manifest.json"
                     ]
                 }
@@ -142,6 +144,7 @@
         "tslib": "^2.8.1",
         "typescript": "^5.7.2",
         "typescript-eslint": "^8.16.0",
-        "vitest": "^2.1.7"
+        "vitest": "^2.1.7",
+        "zip-a-folder": "^3.1.8"
     }
 }
