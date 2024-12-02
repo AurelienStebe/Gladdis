@@ -1,12 +1,10 @@
 import { deepmerge } from 'deepmerge-ts'
-import { getEncoding } from 'js-tiktoken'
+import { encodeChat } from 'gpt-tokenizer/model/gpt-4'
 
 import { writeHistory } from './history.js'
 import { stringifyYaml } from '../commands.js'
 
-import type { Context, ChatMessage } from '../types/context.js'
-
-const tiktoken = getEncoding('cl100k_base')
+import type { Context } from '../types/context.js'
 
 export async function logGladdisCall(context: Context): Promise<void> {
     const disk = context.file.disk
@@ -49,20 +47,20 @@ export async function logGladdisChat(context: Context): Promise<void> {
 }
 
 export function getTokenModal(context: Context): string {
-    const tokenLimit = context.gladdis.model.limit ?? 128000
+    const tokenLimit = context.gladdis.model.limit ?? 128_000
 
     const getTokenRatio = (count: number): number => Math.min(Math.ceil((count / tokenLimit) * 36), 36)
 
     const systemIndex = context.user.history.findIndex((message) => message.role !== 'system')
     const promptIndex = context.user.history.findLastIndex((message) => message.role === 'user')
 
-    const systemCount = getTokenCount(context.user.history.slice(0, systemIndex))
+    const systemCount = encodeChat(context.user.history.slice(0, systemIndex)).length
     const systemGraph = '@'.repeat(Math.max(getTokenRatio(systemCount), 1))
 
-    const middleCount = getTokenCount(context.user.history.slice(systemIndex, promptIndex))
+    const middleCount = encodeChat(context.user.history.slice(systemIndex, promptIndex)).length
     const middleGraph = '@'.repeat(Math.max(getTokenRatio(middleCount), 1))
 
-    const promptCount = getTokenCount(context.user.history.slice(promptIndex))
+    const promptCount = encodeChat(context.user.history.slice(promptIndex)).length
     const promptGraph = '@'.repeat(Math.max(getTokenRatio(promptCount), 1))
 
     const tokenCount = systemCount + middleCount + promptCount
@@ -73,17 +71,6 @@ export function getTokenModal(context: Context): string {
 
     const label = tokenRatio > 33 ? 'DANGER' : tokenRatio > 22 ? 'WARNING' : 'NOTE'
     return `\n\n> [!${label}]- ${tokenGraph}\n> Using ${tokenUsage} max tokens.`
-}
-
-export function getTokenCount(messages: ChatMessage[]): number {
-    let tokenLength = messages.length * 4
-
-    for (const message of messages) {
-        const prefix = message.name !== undefined ? message.name + '\n' : ''
-        tokenLength += tiktoken.encode(prefix + message.content).length
-    }
-
-    return tokenLength
 }
 
 export async function writeErrorModal(error: any, message: string, context: Context): Promise<void> {
