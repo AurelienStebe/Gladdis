@@ -8,7 +8,7 @@
 
 ### Current Features
 
-- **Simple Markdown Syntax**: the conversation window is any open Markdown file, the streaming LLM response is appended.
+- **Native Markdown Syntax**: the conversation window is any open Markdown file, the streaming LLM response is appended.
 - **Whisper Transcription**: audio files WikiLinks are auto-transcribed, use the Obsidian "audio recorder" core plugin.
 - **Document Loading**: text files WikiLinks are auto-loaded, just drag and drop files into the conversation window.
 - **PDF & Web Support**: load PDF WikiLinks just like text files, load web pages external links as well using `<URL>`.

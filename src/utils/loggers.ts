@@ -1,5 +1,5 @@
 import { deepmerge } from 'deepmerge-ts'
-import { encodeChat } from 'gpt-tokenizer/model/gpt-4'
+import { countTokens } from 'gpt-tokenizer/model/gpt-4'
 
 import { writeHistory } from './history.js'
 import { stringifyYaml } from '../commands.js'
@@ -54,13 +54,13 @@ export function getTokenModal(context: Context): string {
     const systemIndex = context.user.history.findIndex((message) => message.role !== 'system')
     const promptIndex = context.user.history.findLastIndex((message) => message.role === 'user')
 
-    const systemCount = encodeChat(context.user.history.slice(0, systemIndex)).length
+    const systemCount = countTokens(context.user.history.slice(0, systemIndex))
     const systemGraph = '@'.repeat(Math.max(getTokenRatio(systemCount), 1))
 
-    const middleCount = encodeChat(context.user.history.slice(systemIndex, promptIndex)).length
+    const middleCount = countTokens(context.user.history.slice(systemIndex, promptIndex))
     const middleGraph = '@'.repeat(Math.max(getTokenRatio(middleCount), 1))
 
-    const promptCount = encodeChat(context.user.history.slice(promptIndex)).length
+    const promptCount = countTokens(context.user.history.slice(promptIndex))
     const promptGraph = '@'.repeat(Math.max(getTokenRatio(promptCount), 1))
 
     const tokenCount = systemCount + middleCount + promptCount
