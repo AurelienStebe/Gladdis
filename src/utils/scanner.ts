@@ -36,7 +36,7 @@ export async function parseLinks(content: string, context: Context): Promise<str
             if (fileExt === 'pdf') {
                 try {
                     message = await parsePdfDoc(filePath, fullPath, context)
-                } catch (error: unknown) {
+                } catch (error) {
                     await writeErrorModal(error, 'PDF Transcription Error', context)
                 }
 

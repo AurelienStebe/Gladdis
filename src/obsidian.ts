@@ -6,7 +6,7 @@ import { transcribe } from './utils/whisper.js'
 import { parseLinks } from './utils/scanner.js'
 import { webBrowser } from './utils/browser.js'
 import { loadContext, loadContent } from './utils/loaders.js'
-import { getTokenModal, writeErrorModal } from './utils/loggers.js'
+import { logGladdisCall, getTokenModal, writeErrorModal } from './utils/loggers.js'
 
 import { TFile, Plugin, Setting, Platform, PluginSettingTab, addIcon, request, normalizePath } from 'obsidian'
 
@@ -129,15 +129,19 @@ export default class GladdisPlugin extends Plugin {
                         }),
                     )
 
-                    context.user.prompt = await transcribe(context.user.prompt, context)
-                    context.user.prompt = await parseLinks(context.user.prompt, context)
-                    context.user.prompt = await webBrowser(context.user.prompt, context)
+                    if (context.user.prompt !== '') {
+                        context.user.prompt = await transcribe(context.user.prompt, context)
+                        context.user.prompt = await parseLinks(context.user.prompt, context)
+                        context.user.prompt = await webBrowser(context.user.prompt, context)
 
-                    context.user.history.push({
-                        role: 'user',
-                        content: context.user.prompt,
-                        name: context.user.label,
-                    })
+                        context.user.history.push({
+                            role: 'user',
+                            content: context.user.prompt,
+                            name: context.user.label,
+                        })
+                    }
+
+                    void logGladdisCall(context)
 
                     await context.file.disk.appendFile(context.file.path, getTokenModal(context))
                 })
@@ -159,17 +163,19 @@ export default class GladdisPlugin extends Plugin {
                     context.whisper.echoOutput = true
                     context.whisper.deleteFile = false
 
-                    context.user.prompt = await transcribe(context.user.prompt, context)
-                    context.user.prompt = await parseLinks(context.user.prompt, context)
-                    context.user.prompt = await webBrowser(context.user.prompt, context)
+                    if (context.user.prompt !== '') {
+                        context.user.prompt = await transcribe(context.user.prompt, context)
+                        context.user.prompt = await parseLinks(context.user.prompt, context)
+                        context.user.prompt = await webBrowser(context.user.prompt, context)
 
-                    context.user.history = [
-                        {
-                            role: 'user',
-                            content: context.user.prompt,
-                            name: context.user.label,
-                        },
-                    ]
+                        context.user.history = [
+                            {
+                                role: 'user',
+                                content: context.user.prompt,
+                                name: context.user.label,
+                            },
+                        ]
+                    }
 
                     await context.file.disk.appendFile(context.file.path, getTokenModal(context))
                 })
@@ -192,7 +198,7 @@ export default class GladdisPlugin extends Plugin {
 
         try {
             await processing(context as Context)
-        } catch (error: unknown) {
+        } catch (error) {
             await writeErrorModal(error, 'Gladdis Command Run Error', context as Context)
         }
     }
@@ -398,16 +404,15 @@ class GladdisSettingTab extends PluginSettingTab {
                     fragment.appendText('" extension optional).')
                 }),
             )
-            .addText((text) =>
-                text
-                    .setPlaceholder('Gladdis.md')
+            .addText((text) => {
+                text.setPlaceholder('Gladdis.md')
                     .setValue(this.plugin.settings.GLADDIS_CONFIG_FILE ?? '')
                     .onChange(async (value) => {
                         if (value === '') delete this.plugin.settings.GLADDIS_CONFIG_FILE
                         else this.plugin.settings.GLADDIS_CONFIG_FILE = value
                         await this.plugin.saveSettings()
-                    }),
-            )
+                    })
+            })
 
         new Setting(this.containerEl)
             .setName('Default LLM model')
@@ -436,12 +441,12 @@ class GladdisSettingTab extends PluginSettingTab {
                     fragment.appendText('.')
                 }),
             )
-            .addText((text) =>
+            .addText((text) => {
                 text.setValue(this.plugin.settings.GLADDIS_DEFAULT_MODEL).onChange(async (value) => {
                     this.plugin.settings.GLADDIS_DEFAULT_MODEL = value
                     await this.plugin.saveSettings()
-                }),
-            )
+                })
+            })
 
         new Setting(this.containerEl)
             .setName('Default LLM server')
@@ -466,12 +471,12 @@ class GladdisSettingTab extends PluginSettingTab {
                     fragment.appendText('").')
                 }),
             )
-            .addText((text) =>
+            .addText((text) => {
                 text.setValue(this.plugin.settings.GLADDIS_NAME_LABEL).onChange(async (value) => {
                     this.plugin.settings.GLADDIS_NAME_LABEL = value
                     await this.plugin.saveSettings()
-                }),
-            )
+                })
+            })
 
         new Setting(this.containerEl)
             .setName('Default user label')
@@ -482,12 +487,12 @@ class GladdisSettingTab extends PluginSettingTab {
                     fragment.appendText('").')
                 }),
             )
-            .addText((text) =>
+            .addText((text) => {
                 text.setValue(this.plugin.settings.GLADDIS_DEFAULT_USER).onChange(async (value) => {
                     this.plugin.settings.GLADDIS_DEFAULT_USER = value
                     await this.plugin.saveSettings()
-                }),
-            )
+                })
+            })
 
         new Setting(this.containerEl)
             .setName('Default temperature')
@@ -530,16 +535,15 @@ class GladdisSettingTab extends PluginSettingTab {
                     fragment.appendText('" extension optional).')
                 }),
             )
-            .addText((text) =>
-                text
-                    .setPlaceholder('Whisper.md')
+            .addText((text) => {
+                text.setPlaceholder('Whisper.md')
                     .setValue(this.plugin.settings.GLADDIS_WHISPER_CONFIG ?? '')
                     .onChange(async (value) => {
                         if (value === '') delete this.plugin.settings.GLADDIS_WHISPER_CONFIG
                         else this.plugin.settings.GLADDIS_WHISPER_CONFIG = value
                         await this.plugin.saveSettings()
-                    }),
-            )
+                    })
+            })
 
         new Setting(this.containerEl)
             .setName('Default audio prompt')
@@ -562,12 +566,12 @@ class GladdisSettingTab extends PluginSettingTab {
                     fragment.appendText('") or a local model.')
                 }),
             )
-            .addText((text) =>
+            .addText((text) => {
                 text.setValue(this.plugin.settings.GLADDIS_WHISPER_MODEL).onChange(async (value) => {
                     this.plugin.settings.GLADDIS_WHISPER_MODEL = value
                     await this.plugin.saveSettings()
-                }),
-            )
+                })
+            })
 
         new Setting(this.containerEl)
             .setName('Default audio server')
@@ -621,26 +625,26 @@ class GladdisSettingTab extends PluginSettingTab {
         new Setting(this.containerEl)
             .setName('Default echo output')
             .setDesc('Should the transcription output be echoed in the chat ?')
-            .addToggle((toggle) =>
+            .addToggle((toggle) => {
                 toggle
                     .setValue((this.plugin.settings.GLADDIS_WHISPER_ECHO_OUTPUT ?? 'true') === 'true')
                     .onChange(async (value) => {
                         this.plugin.settings.GLADDIS_WHISPER_ECHO_OUTPUT = value ? 'true' : 'false'
                         await this.plugin.saveSettings()
-                    }),
-            )
+                    })
+            })
 
         new Setting(this.containerEl)
             .setName('Default delete file')
             .setDesc('Should the audio file be deleted after the transcription ?')
-            .addToggle((toggle) =>
+            .addToggle((toggle) => {
                 toggle
                     .setValue((this.plugin.settings.GLADDIS_WHISPER_DELETE_FILE ?? 'true') === 'true')
                     .onChange(async (value) => {
                         this.plugin.settings.GLADDIS_WHISPER_DELETE_FILE = value ? 'true' : 'false'
                         await this.plugin.saveSettings()
-                    }),
-            )
+                    })
+            })
     }
 }
 

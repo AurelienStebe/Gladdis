@@ -4,7 +4,6 @@ import { deepmerge } from 'deepmerge-ts'
 import { transcribe } from './utils/whisper.js'
 import { parseLinks, loadImages } from './utils/scanner.js'
 import { webBrowser } from './utils/browser.js'
-import { modelCatalog } from './types/catalog.js'
 import { logGladdisCall, logGladdisChat, getTokenModal, writeErrorModal } from './utils/loggers.js'
 
 import type { Context } from './types/context.js'
@@ -78,13 +77,6 @@ export async function callGladdis(context: Context): Promise<Context> {
         dangerouslyAllowBrowser: true,
     })
 
-    if (typeof context.gladdis.model === 'string') {
-        const label = context.gladdis.model as string
-        const model = modelCatalog.find((model) => label.startsWith(model.label))
-
-        context.gladdis.model = model ? { ...model, label } : { label }
-    }
-
     try {
         const stream = await openai.chat.completions.create({
             stream: true,
@@ -104,7 +96,7 @@ export async function callGladdis(context: Context): Promise<Context> {
                 await disk.appendFile(context.file.path, data.choices[0].delta.content ?? '')
             }
         }
-    } catch (error: unknown) {
+    } catch (error) {
         await writeErrorModal(error, 'OpenAI API Streaming Error', context)
     }
 

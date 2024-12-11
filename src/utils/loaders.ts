@@ -3,6 +3,7 @@ import { deepmerge } from 'deepmerge-ts'
 import { parseYaml } from '../commands.js'
 import { parseHistory } from './history.js'
 import { writeMissedModal } from './loggers.js'
+import { modelCatalog } from '../types/catalog.js'
 
 import type { Context } from '../types/context.js'
 
@@ -115,6 +116,13 @@ export async function loadMarkdown(context: Context): Promise<Context> {
 
 export function loadContent(context: Context): Context {
     context.user.history.push(...parseHistory(context))
+
+    if (typeof context.gladdis.model === 'string') {
+        const label = context.gladdis.model as string
+        const model = modelCatalog.find((model) => new RegExp(`^${model.label}`, 'i').test(label))
+
+        context.gladdis.model = model ? { ...model, label } : { label }
+    }
 
     for (const message of context.user.history) {
         if (message.role === 'system') {

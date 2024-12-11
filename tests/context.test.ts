@@ -120,7 +120,7 @@ describe('the Context loaders', () => {
             gladdis: {
                 label: 'Gladdis',
                 config: undefined,
-                model: 'gpt-4o-mini',
+                model: { label: 'gpt-4o-mini' },
                 temperature: 0,
                 top_p_param: 100,
                 freq_penalty: 0,
@@ -166,7 +166,7 @@ describe('the Context loaders', () => {
             gladdis: {
                 label: 'EnvVars',
                 config: undefined,
-                model: 'gpt-4',
+                model: { label: 'gpt-4' },
                 temperature: 10,
                 top_p_param: 90,
                 freq_penalty: 10,
@@ -220,7 +220,7 @@ describe('the Context loaders', () => {
             gladdis: {
                 label: 'Gladdis',
                 config: 'gladdis',
-                model: 'gpt-5',
+                model: { label: 'gpt-5' },
                 temperature: 20,
                 top_p_param: 80,
                 freq_penalty: 20,
@@ -287,7 +287,7 @@ describe('the Context loaders', () => {
             gladdis: {
                 label: 'Gladdis',
                 config: 'gladdis',
-                model: 'gpt-7',
+                model: { label: 'gpt-7' },
                 temperature: 40,
                 top_p_param: 80,
                 freq_penalty: 20,
@@ -339,7 +339,7 @@ describe('the Context loaders', () => {
             gladdis: {
                 label: 'Gladdis',
                 config: 'gladdis',
-                model: 'gpt-8',
+                model: { label: 'gpt-8' },
                 temperature: 50,
                 top_p_param: 80,
                 freq_penalty: 20,
@@ -390,7 +390,7 @@ describe('the Context loaders', () => {
             gladdis: {
                 label: 'Gladdis',
                 config: 'gladdis',
-                model: 'gpt-8',
+                model: { label: 'gpt-8' },
                 temperature: 50,
                 top_p_param: 80,
                 freq_penalty: 25,

@@ -10,8 +10,8 @@ import { doGladdis } from './gladdis.js'
 import { transcribe } from './utils/whisper.js'
 import { parseLinks } from './utils/scanner.js'
 import { webBrowser } from './utils/browser.js'
-import { getTokenModal } from './utils/loggers.js'
 import { loadContext, loadContent } from './utils/loaders.js'
+import { logGladdisCall, getTokenModal } from './utils/loggers.js'
 
 import type { Context, DiskInterface } from './types/context.js'
 
@@ -67,15 +67,19 @@ export async function processContent(context: Context): Promise<void> {
         }),
     )
 
-    context.user.prompt = await transcribe(context.user.prompt, context)
-    context.user.prompt = await parseLinks(context.user.prompt, context)
-    context.user.prompt = await webBrowser(context.user.prompt, context)
+    if (context.user.prompt !== '') {
+        context.user.prompt = await transcribe(context.user.prompt, context)
+        context.user.prompt = await parseLinks(context.user.prompt, context)
+        context.user.prompt = await webBrowser(context.user.prompt, context)
 
-    context.user.history.push({
-        role: 'user',
-        content: context.user.prompt,
-        name: context.user.label,
-    })
+        context.user.history.push({
+            role: 'user',
+            content: context.user.prompt,
+            name: context.user.label,
+        })
+    }
+
+    void logGladdisCall(context)
 
     await context.file.disk.appendFile(context.file.path, getTokenModal(context))
 }
@@ -88,17 +92,19 @@ export async function processPrompt(context: Context): Promise<void> {
     context.whisper.echoOutput = true
     context.whisper.deleteFile = false
 
-    context.user.prompt = await transcribe(context.user.prompt, context)
-    context.user.prompt = await parseLinks(context.user.prompt, context)
-    context.user.prompt = await webBrowser(context.user.prompt, context)
+    if (context.user.prompt !== '') {
+        context.user.prompt = await transcribe(context.user.prompt, context)
+        context.user.prompt = await parseLinks(context.user.prompt, context)
+        context.user.prompt = await webBrowser(context.user.prompt, context)
 
-    context.user.history = [
-        {
-            role: 'user',
-            content: context.user.prompt,
-            name: context.user.label,
-        },
-    ]
+        context.user.history = [
+            {
+                role: 'user',
+                content: context.user.prompt,
+                name: context.user.label,
+            },
+        ]
+    }
 
     await context.file.disk.appendFile(context.file.path, getTokenModal(context))
 }

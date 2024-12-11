@@ -1,6 +1,10 @@
 import type { ModelDetails } from './context.js'
 
-export const modelCatalog: Array<ModelDetails> = [
+export const modelCatalog: ModelDetails[] = [
+    {
+        label: 'o1',
+        limit: 128_000,
+    },
     {
         label: 'gpt-4o-audio',
         limit: 128_000,
@@ -8,18 +12,9 @@ export const modelCatalog: Array<ModelDetails> = [
         speaking: true,
     },
     {
-        label: 'gpt-4o',
+        label: '(chat)?gpt-4o',
         limit: 128_000,
         vision: true,
-    },
-    {
-        label: 'chatgpt-4o',
-        limit: 128_000,
-        vision: true,
-    },
-    {
-        label: 'o1',
-        limit: 128_000,
     },
     {
         label: 'gpt-4-turbo',
@@ -36,15 +31,15 @@ export const modelCatalog: Array<ModelDetails> = [
         limit: 16_385,
     },
     {
-        label: 'llama3',
+        label: '(meta-)?llama-?3',
         limit: 128_000,
     },
     {
-        label: 'llama',
+        label: '(meta-)?llama',
         limit: 4_096,
     },
     {
-        label: 'phi3',
+        label: 'phi-?3',
         limit: 128_000,
     },
     {
@@ -60,7 +55,7 @@ export const modelCatalog: Array<ModelDetails> = [
         limit: 8_192,
     },
     {
-        label: 'gemma2',
+        label: 'gemma-?2',
         limit: 128_000,
     },
     {
