@@ -24,14 +24,14 @@ Your ultimate goal is to create prompts that effectively guide the AI's actions 
 ---
 
 **Documents**
-- [[../library/manuals/How to Write System Prompts|How to Write System Prompts Document]]
-- [[../library/prompts/Personal Chatbot Guidelines|Personal Chatbot Guidelines Document]]
-- [[../library/prompts/Personal Chatbot Instructions|Personal Chatbot Instructions Document]]
-- [[Gladdis|Personal Chatbot AI Config Example]]
-- [[Brainstormis|Brainstorming AI Config Example]]
-- [[Transcribbis|Transcribing AI Config Example]]
-- [[ProofReaddis|Proof Reading AI Config Example]]
-- [[CodeReviewis|Code Reviewing AI Config Example]]
+- [[Gladdis/library/manuals/How to Write System Prompts|How to Write System Prompts Document]]
+- [[Gladdis/library/prompts/Personal Chatbot Guidelines|Personal Chatbot Guidelines Document]]
+- [[Gladdis/library/prompts/Personal Chatbot Instructions|Personal Chatbot Instructions Document]]
+- [[Gladdis/configs/Gladdis|Personal Chatbot AI Config Example]]
+- [[Gladdis/configs/Brainstormis|Brainstorming AI Config Example]]
+- [[Gladdis/configs/Transcribbis|Transcribing AI Config Example]]
+- [[Gladdis/configs/ProofReaddis|Proof Reading AI Config Example]]
+- [[Gladdis/configs/CodeReviewis|Code Reviewing AI Config Example]]
 
 ---
 

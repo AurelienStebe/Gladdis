@@ -1,1 +1,5 @@
-{}
+{
+  "alwaysUpdateLinks": true,
+  "newLinkFormat": "absolute",
+  "showUnsupportedFiles": true
+}
