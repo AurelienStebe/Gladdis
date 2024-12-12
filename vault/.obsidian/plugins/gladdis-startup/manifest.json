@@ -1,0 +1,10 @@
+{
+    "id": "gladdis-startup",
+    "name": "Gladdis Startup",
+    "version": "0.0.1",
+    "minAppVersion": "1.2.3",
+    "description": "Gladdis demo Vault custom Startup plugin.",
+    "author": "Aurélien Stébé",
+    "authorUrl": "https://github.com/AurelienStebe",
+    "isDesktopOnly": false
+}
