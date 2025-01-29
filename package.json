@@ -35,7 +35,7 @@
         "/CHANGELOG.md"
     ],
     "scripts": {
-        "clean": "rimraf lib types coverage main.js vault.* stats.html vault/.obsidian/plugins/*/main.js vault/.obsidian/plugins/*/styles.css",
+        "clean": "rimraf lib types coverage main.js vault.* stats.html vault/.obsidian/themes/*/theme.css vault/.obsidian/plugins/*/{main.js,styles.css}",
         "lint": "prettier -c . && eslint .",
         "build": "npm run clean && tsc && rollup -c --silent && node ./esbuild.config.js",
         "test": "vitest --ui --coverage --coverage.include='src/utils/**'"
