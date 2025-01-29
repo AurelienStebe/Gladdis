@@ -57,7 +57,8 @@ export async function parseLinks(content: string, context: Context): Promise<str
             } else if (fileExt === 'pdf' || fileExt === 'md') {
                 fileText = `${header}:\n"""\n${fileText}\n"""\n`
             } else if (imageFiles.includes(fileExt)) {
-                fileText = `![data:image/${fileExt};base64,](/${fullPath})`
+                if (!context.gladdis.model.vision) continue
+                fileText = `![data:image/${fileExt};base64,](/${encodeURI(fullPath)})`
             } else {
                 fileText = `${header}:\n\`\`\`${fileExt}\n${fileText}\n\`\`\`\n`
             }
@@ -131,14 +132,11 @@ export async function loadImages(context: Context): Promise<ChatMessage[]> {
                     })
                 }
 
-                content.push({
-                    type: 'image_url',
-                    image_url: { url: imageUrl },
-                })
+                content.push({ type: 'image_url', image_url: { url: imageUrl } })
 
                 if (imageTag.startsWith('data:image/')) {
-                    const imageFile = Buffer.from(await context.file.disk.readBinary(imageUrl))
-                    content.at(-1)!.image_url!.url = imageTag + imageFile.toString('base64')
+                    const imageFile = await context.file.disk.readBinary(decodeURI(imageUrl))
+                    content.at(-1)!.image_url!.url = imageTag + Buffer.from(imageFile).toString('base64')
                 }
 
                 lastIndex = currentMatch.index + fullMatch.length
