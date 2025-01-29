@@ -14,6 +14,7 @@ export interface ModelDetails {
     vision?: boolean
     hearing?: boolean
     speaking?: boolean
+    reasoning?: boolean
 }
 
 export interface DiskInterface {

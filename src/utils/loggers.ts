@@ -51,7 +51,7 @@ export function getTokenModal(context: Context): string {
 
     const getTokenRatio = (count: number): number => Math.min(Math.ceil((count / tokenLimit) * 36), 36)
 
-    const systemIndex = context.user.history.findIndex((message) => message.role !== 'system')
+    const systemIndex = context.user.history.findIndex((message) => !['system', 'developer'].includes(message.role))
     const promptIndex = context.user.history.findLastIndex((message) => message.role === 'user')
 
     const systemCount = countTokens(context.user.history.slice(0, systemIndex))
@@ -75,7 +75,7 @@ export function getTokenModal(context: Context): string {
 
 export async function writeErrorModal(error: any, message: string, context: Context): Promise<void> {
     const errorName = ` **${error?.message ?? message}**`
-    const errorJSON = JSON.stringify(error, null, '>   ')
+    const errorJSON = JSON.stringify(error, null, 2).replaceAll('\n', '\n> ')
 
     let errorFull = '\n\n> [!BUG]' + (errorJSON !== '{}' ? '+' : '') + errorName
     if (errorJSON !== '{}') errorFull += '\n> ```json\n> ' + errorJSON + '\n> ```'

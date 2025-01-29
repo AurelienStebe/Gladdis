@@ -125,9 +125,7 @@ export function loadContent(context: Context): Context {
     }
 
     for (const message of context.user.history) {
-        if (message.role === 'system') {
-            message.content = message.content.replace(linkRegex, '!$1')
-        }
+        if (message.role === 'system') message.content = message.content.replace(linkRegex, '!$1')
     }
 
     if (context.user.history.at(-1)?.role === 'user') {

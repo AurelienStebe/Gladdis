@@ -108,7 +108,7 @@ export function writeHistory(context: Context): string {
     const history = context.user.history.map((message) => {
         let label = message.name ?? context.user.label
 
-        if (message.role === 'system') label = 'System'
+        if (['system', 'developer'].includes(message.role)) label = 'System'
         if (message.role === 'assistant') label = context.gladdis.label
 
         return `__${label}:__ ${message.content}`
@@ -155,7 +155,9 @@ export async function processText(content: string, context: Context, process: Pr
         }
     }
 
-    result.push(await process(liveText.join('\n'), context))
+    if (liveText.length > 0) {
+        result.push(await process(liveText.join('\n'), context))
+    }
 
     return result.join('\n').trim()
 }

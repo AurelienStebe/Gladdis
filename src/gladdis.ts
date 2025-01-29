@@ -6,7 +6,7 @@ import { parseLinks, loadImages } from './utils/scanner.js'
 import { webBrowser } from './utils/browser.js'
 import { logGladdisCall, logGladdisChat, getTokenModal, writeErrorModal } from './utils/loggers.js'
 
-import type { Context } from './types/context.js'
+import type { Context, ChatRoleEnum } from './types/context.js'
 
 const defaultCorePrompt =
     '**Heuristics**\n' +
@@ -77,6 +77,26 @@ export async function callGladdis(context: Context): Promise<Context> {
         dangerouslyAllowBrowser: true,
     })
 
+    if (context.gladdis.model.reasoning) {
+        context.gladdis.temperature = 100
+
+        context.user.history = context.user.history.map((message) => {
+            if (message.role === 'system') {
+                message.role = 'developer' as ChatRoleEnum
+
+                if (
+                    context.gladdis.model.label.startsWith('o1-mini') ||
+                    context.gladdis.model.label.startsWith('o1-preview')
+                ) {
+                    message.role = 'user'
+                    message.name = 'System'
+                }
+            }
+
+            return message
+        })
+    }
+
     try {
         const stream = await openai.chat.completions.create({
             stream: true,
@@ -91,9 +111,9 @@ export async function callGladdis(context: Context): Promise<Context> {
         await disk.appendFile(context.file.path, `\n\n__${context.gladdis.label}:__ `)
 
         for await (const data of stream) {
-            if ((data.choices[0].delta.content ?? '') !== '') {
+            if ((data.choices[0]?.delta?.content ?? '') !== '') {
                 response.push(data.choices[0].delta.content ?? '')
-                await disk.appendFile(context.file.path, data.choices[0].delta.content ?? '')
+                await disk.appendFile(context.file.path, response.at(-1)!)
             }
         }
     } catch (error) {

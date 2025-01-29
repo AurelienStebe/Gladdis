@@ -2,11 +2,18 @@ import type { ModelDetails } from './context.js'
 
 export const modelCatalog: ModelDetails[] = [
     {
-        label: 'o1',
+        label: 'o1-(mini|preview)',
         limit: 128_000,
+        reasoning: true,
     },
     {
-        label: 'gpt-4o-audio',
+        label: 'o1',
+        limit: 200_000,
+        vision: true,
+        reasoning: true,
+    },
+    {
+        label: 'gpt-4o(-mini)?-audio',
         limit: 128_000,
         hearing: true,
         speaking: true,
