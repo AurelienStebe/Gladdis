@@ -61,9 +61,9 @@ export async function doGladdis(context: Context): Promise<void> {
     void logGladdisChat(context)
 
     let tokenModal = getTokenModal(context)
-    if (tokenModal.contains('__@__@__@__')) tokenModal = ''
+    if (tokenModal.includes('__@__@__@__')) tokenModal = ''
 
-    const message = `${tokenModal}\n\n---\n\n__${context.user.label}:__ `
+    const message = `${tokenModal}\n\n___\n\n__${context.user.label}:__ `
     await context.file.disk.appendFile(context.file.path, message)
 }
 

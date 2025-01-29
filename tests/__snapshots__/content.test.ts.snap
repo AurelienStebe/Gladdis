@@ -35,7 +35,7 @@ exports[`the history Content > parses complex messages 1`] = `
   },
   {
     "content": """"Text block 1
----
+___
 > is escaped"""",
     "name": "Myself",
     "role": "user",

@@ -7,7 +7,7 @@ const pdfContentRegex = /^\[!ABSTRACT\][+-]? Content from "([^"]+?\.pdf)"$/i
 const webContentRegex = /^\[!EXAMPLE\][+-]? Web Page from <(https?:\/\/[^"]+?)>$/i
 
 export function parseHistory(context: Context): ChatMessage[] {
-    const lines = (context.file.text + '\n---\n').split('\n')
+    const lines = (context.file.text + '\n___\n').split('\n')
     const history: ChatMessage[] = []
 
     let label = context.user.label
@@ -38,7 +38,7 @@ export function parseHistory(context: Context): ChatMessage[] {
             if (line.trim() === '"""') textBlock = true
 
             prompt.push(line)
-        } else if (line.trim() === '---') {
+        } else if (line.trim() === '___') {
             history.push(parsePrompt(label, prompt, quotes, context))
             label = context.user.label
 

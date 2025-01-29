@@ -96,8 +96,8 @@ export default class GladdisPlugin extends Plugin {
         await this.loadSecrets()
 
         addIcon('gladdisLogo', `<path ${logoPathAttr} d="${logoMainPath}"/>`)
-        addIcon('gladdisHalf', `<path ${logoPathAttr} d="${logoMainPath}${logoLeftPath}"/>`)
-        addIcon('gladdisFull', `<path ${logoPathAttr} d="${logoMainPath}${logoLeftPath}${logoFullPath}"/>`)
+        addIcon('gladdisHalf', `<path ${logoPathAttr} d="${logoLeftPath}"/>`)
+        addIcon('gladdisFull', `<path ${logoPathAttr} d="${logoFullPath}"/>`)
 
         this.addCommand({
             icon: 'gladdisLogo',
@@ -157,7 +157,7 @@ export default class GladdisPlugin extends Plugin {
                 await this.processWithContext(editor, view, async (context: Context) => {
                     context = await loadContext(context)
                     if (editor.somethingSelected()) context.file.text = editor.getSelection()
-                    else context.file.text = context.file.text.split('\n---').at(-1) ?? ''
+                    else context.file.text = context.file.text.split('\n___\n').at(-1) ?? ''
                     context = loadContent(context)
 
                     context.whisper.echoOutput = true
@@ -314,7 +314,7 @@ class VaultInterface implements DiskInterface {
     extName(path: string): string {
         const fileName = normalizePath(path).split('/').at(-1) ?? ''
 
-        if (!fileName.contains('.')) return ''
+        if (!fileName.includes('.')) return ''
         return '.' + fileName.split('.').at(-1)
     }
 
@@ -691,6 +691,7 @@ c0 0 .5 -.5 .5 -4
 c0 -.5 0 -1 0 -1.3`
 
 const logoLeftPath = `
+${logoMainPath}
 m-34 6
 a8 8 0 0 1 -.5 1.75
 c-1 4 -4 7 -11.75 7
@@ -701,6 +702,7 @@ c2 0 10 0 15.3 1.2
 c1.5 .5 4 1 3.33 4`
 
 const logoFullPath = `
+${logoLeftPath}
 m30 2.5
 c-.5 4.5 -1.5 6.5 -9.5 6.5
 c-8 0 -11 -3 -11.75 -7

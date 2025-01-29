@@ -86,7 +86,7 @@ export async function processContent(context: Context): Promise<void> {
 
 export async function processPrompt(context: Context): Promise<void> {
     context = await loadContext(prepareContext(context))
-    context.file.text = context.file.text.split('\n---').at(-1) ?? ''
+    context.file.text = context.file.text.split('\n___\n').at(-1) ?? ''
     context = loadContent(context)
 
     context.whisper.echoOutput = true

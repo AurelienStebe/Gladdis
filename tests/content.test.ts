@@ -10,26 +10,26 @@ import type { Context } from '../src/types/context.js'
 const complexFile = `
 > Quoted Message 1
 My User Message 1
----
+___
 __User:__ User Message 2
----
+___
 __Myself:__ User Message 3
----
+___
 __MyFriend:__ User Message 4
----
+___
 >__User:__ Quoted Message 2
 
 __System:__ System Message 1
----
+___
 __Gladdis:__ Gladdis Message 1
----
+___
 __Assistant:__ Gladdis Message 2
----
+___
 > """Quoted Message 3"""
 """Text block 1
----
+___
 > is escaped"""
----
+___
 """
 Text block 2 with
 multiline content
@@ -38,34 +38,34 @@ and a code block:
 echo "Code block with Bash code"
 \`\`\`
 """
----
+___
 >Quoted Message 4
 > with multilines
 \`\`\`
 alert("Code block with JS code")
 \`\`\`
----
+___
 \`\`\`python
 def test():
     """Test function."""
     print("Hello World!")
 \`\`\`
----
+___
 __Myself:__![[recording.webm]]
 
 > [!QUOTE]- Transcript from "recording.webm"
 > Here is the transcription of the recording.
----
+___
 __System:__ [[document.pdf]]
 
 > [!ABSTRACT]- Content from "document.pdf"
 > Here is the text content of the PDF file.
----
+___
 __Myself:__ <http://mysite.com>
 
 > [!EXAMPLE]- Web Page from <http://mysite.com>
 > Here is the main content of the Web Page.
----
+___
 __User:__Prompt Text`
 
 describe('the history Content', () => {
@@ -74,7 +74,7 @@ describe('the history Content', () => {
     })
 
     it('parses simple messages', async () => {
-        const simpleFile = 'Message 1\n---\nMessage 2\n---\nMessage 3'
+        const simpleFile = 'Message 1\n___\nMessage 2\n___\nMessage 3'
         diskInterface.readFile = vi.fn().mockResolvedValue(simpleFile)
 
         const callContext: any = {
@@ -117,8 +117,8 @@ describe('the history Content', () => {
             whisper: { config: 'whisper' },
         })}---\n`
 
-        const gladdisConf = 'System Prompt 1\n---\nSystem Prompt 2'
-        const whisperConf = 'Whisper input is not parsed\n---\n> !'
+        const gladdisConf = 'System Prompt 1\n___\nSystem Prompt 2'
+        const whisperConf = 'Whisper input is not parsed\n___\n> !'
 
         diskInterface.pathExists = vi.fn().mockResolvedValue(true)
 

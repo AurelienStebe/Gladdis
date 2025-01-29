@@ -61,9 +61,9 @@ The same familiar Obsidian syntax from your notes is used for the conversation h
 ```md
 Just use standard Markdown text for `User` messages and prompts.
 The content of the Gladdis config file will be prepended to this.
-Use triple dashes to separate messages / sections of conversation.
+Use triple underscores to separate the sections of conversation.
 
----
+___
 
 __UserName:__ labels also start a new message with custom names.
 
@@ -71,7 +71,7 @@ __Gladdis:__ Gladdis' label and `Assistant` are for AI messages.
 
 __System:__ is for System Prompts (the default in config files).
 
----
+___
 
 > Quoted lines are ignored, error and token counter callouts too.
 
