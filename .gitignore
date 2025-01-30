@@ -10,8 +10,6 @@
 /stats.html
 
 /vault/.obsidian/plugins/*/main.js
-/vault/.obsidian/themes/*/theme.css
 /vault/.obsidian/plugins/*/styles.css
-
 /vault/.obsidian/plugins/gladdis/.env
 /vault/.obsidian/plugins/gladdis/data.json

@@ -28,7 +28,7 @@ const pluginList = {
 
 export default class GladdisStartupPlugin extends Plugin {
     async onload(): Promise<void> {
-        const { plugins } = this.app as any
+        const { plugins, customCss } = this.app as any
 
         // eslint-disable-next-line
         if (!plugins.enabledPlugins.has('gladdis')) {
@@ -49,11 +49,14 @@ export default class GladdisStartupPlugin extends Plugin {
             await plugins.installPlugin(plugin.repo, plugin.version, plugin.manifest) // eslint-disable-line
         }
 
-        try {
-            this.registerExtensions(['txt'], 'markdown')
-        } catch (error) {} // eslint-disable-line
+        await customCss.checkForUpdates() // eslint-disable-line
 
-        new Notice('Gladdis is installed and updated.').noticeEl.addClass('mod-success')
+        // eslint-disable-next-line
+        for (const theme of Object.values(customCss.updates) as any) {
+            await customCss.installTheme(theme.themeInfo, theme.version) // eslint-disable-line
+        }
+
+        new Notice('Gladdis is deployed and updated.').noticeEl.addClass('mod-success')
     }
 
     onunload(): void {
@@ -94,8 +97,6 @@ export class GladdisWelcomeModal extends Modal {
         this.setTitle('Welcome to your Personal Gladdis Vault !')
         this.titleEl.style.textAlign = 'center'
 
-        new Setting(this.contentEl).settingEl.style.border = 'none'
-
         const userSetting = new Setting(this.contentEl).setName('Hello ! 👋').addText((text) => {
             text.setValue(this.config.default_user).onChange((value) => {
                 this.config.default_user = value
@@ -104,6 +105,8 @@ export class GladdisWelcomeModal extends Modal {
 
         userSetting.settingEl.style.float = 'left'
         userSetting.settingEl.style.border = 'none'
+        userSetting.settingEl.style.marginBlock = '2em'
+        userSetting.settingEl.style.backgroundColor = 'unset'
 
         const nameSetting = new Setting(this.contentEl).setName('My name is').addText((text) => {
             text.setValue(this.config.name_label).onChange((value) => {
@@ -113,10 +116,10 @@ export class GladdisWelcomeModal extends Modal {
 
         nameSetting.settingEl.style.border = 'none'
         nameSetting.settingEl.style.textAlign = 'end'
+        nameSetting.settingEl.style.marginBlock = '2em'
         nameSetting.settingEl.style.width = 'fit-content'
+        nameSetting.settingEl.style.backgroundColor = 'unset'
         nameSetting.settingEl.style.marginInlineStart = 'auto'
-
-        new Setting(this.contentEl).settingEl.style.border = 'none'
 
         const modelChoice = this.contentEl.createDiv()
         modelChoice.style.paddingBlock = '1em'
@@ -160,7 +163,7 @@ export class GladdisWelcomeModal extends Modal {
             .setName('Select the default AI model I should use.')
             .setDesc(
                 createFragment((fragment) => {
-                    fragment.appendText('Choose one from the ')
+                    fragment.appendText('Pick one from the ')
                     fragment.createEl('a', {
                         href: 'https://github.com/AurelienStebe/Gladdis#available-models',
                         text: 'README',
@@ -214,7 +217,7 @@ export class GladdisWelcomeModal extends Modal {
             .setName('Select the default AI model I should use.')
             .setDesc(
                 createFragment((fragment) => {
-                    fragment.appendText('Choose one from the ')
+                    fragment.appendText('Pick one from the ')
                     fragment.createEl('a', {
                         href: 'https://github.com/AurelienStebe/Gladdis#available-models',
                         text: 'README',
@@ -283,7 +286,7 @@ export class GladdisWelcomeModal extends Modal {
             .setName('Select the default AI model I should use.')
             .setDesc(
                 createFragment((fragment) => {
-                    fragment.appendText('Choose one from the ')
+                    fragment.appendText('Pick one from the ')
                     fragment.createEl('a', {
                         href: 'https://github.com/AurelienStebe/Gladdis#available-models',
                         text: 'README',
@@ -326,8 +329,6 @@ export class GladdisWelcomeModal extends Modal {
             LocalAI: localAIModel,
         })
 
-        new Setting(this.contentEl).settingEl.style.border = 'none'
-
         const audioChoice = this.contentEl.createDiv()
         audioChoice.style.paddingBlock = '1em'
         audioChoice.style.textAlign = 'center'
@@ -335,9 +336,12 @@ export class GladdisWelcomeModal extends Modal {
 
         const openAIAudio = this.contentEl.createDiv()
 
-        new Setting(openAIAudio)
-            .setName('OpenAI only serves one speech-to-text model.')
-            .addText((text) => text.setDisabled(true).setValue(this.config.whisper_model['OpenAI']))
+        new Setting(openAIAudio).setName('OpenAI only serves one speech-to-text model.').addDropdown((dropdown) => {
+            dropdown
+                .setDisabled(true)
+                .addOptions({ 'whisper-1': 'Whisper-1' })
+                .setValue(this.config.whisper_model['OpenAI'])
+        })
 
         const localAIAudio = this.contentEl.createDiv()
 
@@ -356,9 +360,7 @@ export class GladdisWelcomeModal extends Modal {
 
         const audioButton = this.createTabs(this.contentEl, { OpenAI: openAIAudio, LocalAI: localAIAudio })
 
-        new Setting(this.contentEl).settingEl.style.border = 'none'
-
-        new Setting(this.contentEl).addButton((button) => {
+        const closeButton = new Setting(this.contentEl).addButton((button) => {
             button
                 .setCta()
                 .setButtonText('Confirm')
@@ -366,10 +368,13 @@ export class GladdisWelcomeModal extends Modal {
                     this.config.default_gladdis = modelButton.find((b) => b.hasClass('mod-cta'))!.getText()
                     this.config.default_whisper = audioButton.find((b) => b.hasClass('mod-cta'))!.getText()
 
-                                        onSubmit(this.config)
-this.close()
+                    onSubmit(this.config)
+                    this.close()
                 })
-        }).settingEl.style.border = 'none'
+        })
+
+        closeButton.settingEl.style.border = 'none'
+        closeButton.settingEl.style.backgroundColor = 'unset'
     }
 
     createTabs(root: HTMLElement, tabs: { [tabName: string]: HTMLElement }): HTMLElement[] {
@@ -382,6 +387,8 @@ this.close()
         tabHeader.style.display = 'flex'
         tabHeader.style.paddingBlock = '1em'
         tabHeader.style.justifyContent = 'space-evenly'
+
+        tabContainer.style.marginBlockEnd = '2em'
 
         Object.entries(tabs).forEach(([name, html]) => {
             const tabButton = tabHeader.createEl('button', { text: name })
