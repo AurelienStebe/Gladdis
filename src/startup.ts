@@ -27,19 +27,25 @@ const pluginList = {
 }
 
 export default class GladdisStartupPlugin extends Plugin {
-    async onload(): Promise<void> {
+    onload(): void {
+        // eslint-disable-next-line
+        if (!(this.app as any).plugins.enabledPlugins.has('gladdis')) void this.startupPlugin()
+    }
+
+    onunload(): void {
+        ;(this.app as any).plugins.disablePluginAndSave('gladdis') // eslint-disable-line
+    }
+
+    async startupPlugin(): Promise<void> {
         const { plugins, customCss } = this.app as any
 
-        // eslint-disable-next-line
-        if (!plugins.enabledPlugins.has('gladdis')) {
-            new GladdisWelcomeModal(this.app, (config) => void this.writeConfig(config)).open()
+        new GladdisWelcomeModal(this.app, (config) => void this.writeConfig(config)).open()
 
-            for (const [name, repo] of Object.entries(pluginList)) {
-                const manifest = plugins.manifests[name]
+        for (const [name, repo] of Object.entries(pluginList)) {
+            const manifest = plugins.manifests[name]
 
-                await plugins.installPlugin(repo, manifest.version, manifest) // eslint-disable-line
-                await plugins.enablePluginAndSave(name) // eslint-disable-line
-            }
+            await plugins.installPlugin(repo, manifest.version, manifest) // eslint-disable-line
+            await plugins.enablePluginAndSave(name) // eslint-disable-line
         }
 
         await plugins.checkForUpdates() // eslint-disable-line
@@ -57,10 +63,6 @@ export default class GladdisStartupPlugin extends Plugin {
         }
 
         new Notice('Gladdis is deployed and updated.').noticeEl.addClass('mod-success')
-    }
-
-    onunload(): void {
-        ;(this.app as any).plugins.disablePluginAndSave('gladdis') // eslint-disable-line
     }
 
     async writeConfig(config: GladdisConfig): Promise<void> {
