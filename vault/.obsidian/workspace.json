@@ -90,7 +90,7 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": true
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -228,7 +228,8 @@
       "canvas:Create new canvas": false,
       "templates:Insert template": false,
       "random-note:Open random note": false,
-      "audio-recorder:Start/stop recording": false
+      "audio-recorder:Start/stop recording": false,
+      "cmdr:Stop Recorder & Chat with Gladdis": false
     }
   },
   "active": "efcf8898d1d505f7",
