@@ -1,5 +1,11 @@
 {
   "alwaysUpdateLinks": true,
   "newLinkFormat": "absolute",
-  "showUnsupportedFiles": true
+  "showUnsupportedFiles": true,
+  "showLineNumber": false,
+  "propertiesInDocument": "source",
+  "readableLineLength": false,
+  "userIgnoreFilters": [
+    "Gladdis/history/"
+  ]
 }

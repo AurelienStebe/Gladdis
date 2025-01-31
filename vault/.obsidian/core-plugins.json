@@ -13,12 +13,12 @@
   "templates": true,
   "note-composer": true,
   "command-palette": true,
-  "slash-command": false,
+  "slash-command": true,
   "editor-status": true,
   "bookmarks": true,
   "markdown-importer": true,
-  "zk-prefixer": false,
-  "random-note": false,
+  "zk-prefixer": true,
+  "random-note": true,
   "outline": true,
   "word-count": false,
   "slides": false,
@@ -26,5 +26,6 @@
   "workspaces": false,
   "file-recovery": true,
   "publish": false,
-  "sync": false
+  "sync": false,
+  "webviewer": true
 }
