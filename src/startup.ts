@@ -23,7 +23,14 @@ const initConfig: GladdisConfig = {
 
 const pluginList = {
     gladdis: 'AurelienStebe/Gladdis',
+    cmdr: 'phibr0/obsidian-commander',
+    'obsidian-hider': 'kepano/obsidian-hider',
+    'vertical-tabs': 'oxdc/obsidian-vertical-tabs',
+    'obsidian-outliner': 'vslinko/obsidian-outliner',
     'better-word-count': 'lukeleppan/better-word-count',
+    'editing-toolbar': 'PKM-er/obsidian-editing-toolbar',
+    'obsidian-style-settings': 'mgmeyers/obsidian-style-settings',
+    'obsidian-custom-file-extensions-plugin': 'MeepTech/obsidian-custom-file-extensions-plugin',
 }
 
 export default class GladdisStartupPlugin extends Plugin {
