@@ -122,7 +122,13 @@
               "icon": "lucide-bookmark",
               "title": "Bookmarks"
             }
-          },
+          }
+        ]
+      },
+      {
+        "id": "a408c16386fd55d6",
+        "type": "tabs",
+        "children": [
           {
             "id": "fd4d1bb141029fa9",
             "type": "leaf",

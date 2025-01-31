@@ -4,15 +4,48 @@
   "debug": false,
   "editorMenu": [],
   "fileMenu": [],
-  "leftRibbon": [],
+  "leftRibbon": [
+    {
+      "id": "cmdr:macro-0",
+      "icon": "gladdisLogo",
+      "name": "Stop Recorder & Chat with Gladdis",
+      "mode": "any"
+    }
+  ],
   "rightRibbon": [],
   "titleBar": [],
   "statusBar": [],
   "pageHeader": [],
-  "macros": [],
+  "macros": [
+    {
+      "macro": [
+        {
+          "action": 0,
+          "commandId": "audio-recorder:stop"
+        },
+        {
+          "action": 1,
+          "delay": "150"
+        },
+        {
+          "action": 0,
+          "commandId": "editor:save-file"
+        },
+        {
+          "action": 0,
+          "commandId": "gladdis:chat-with-gladdis"
+        }
+      ],
+      "name": "Stop Recorder & Chat with Gladdis",
+      "icon": "gladdisLogo",
+      "startup": false
+    }
+  ],
   "explorer": [],
   "hide": {
-    "statusbar": [],
+    "statusbar": [
+      "backlink"
+    ],
     "leftRibbon": []
   },
   "spacing": 8,

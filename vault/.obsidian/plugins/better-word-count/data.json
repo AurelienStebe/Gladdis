@@ -15,6 +15,14 @@
         "type": 0,
         "counter": 1
       }
+    },
+    {
+      "prefix": " ",
+      "suffix": " tokens",
+      "metric": {
+        "type": 0,
+        "counter": 5
+      }
     }
   ],
   "altBar": [
@@ -30,6 +38,6 @@
   "countComments": false,
   "collectStats": false,
   "displaySectionCounts": false,
-  "pageWords": 300,
+  "pageWords": 0.75,
   "statsPath": ".obsidian/vault-stats.json"
 }

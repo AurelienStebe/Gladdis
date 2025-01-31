@@ -1,6 +1,6 @@
 {
   "hideStatus": false,
-  "hideTabs": false,
+  "hideTabs": true,
   "hideScroll": false,
   "hideSidebarButtons": false,
   "hideTooltips": false,
@@ -8,6 +8,6 @@
   "hideSearchSuggestions": false,
   "hideSearchCounts": false,
   "hideInstructions": false,
-  "hidePropertiesReading": false,
+  "hidePropertiesReading": true,
   "hideVault": false
 }

@@ -19,9 +19,7 @@
     ]
   },
   "configIsValid": true,
-  "errors": {
-    "txt": "Could not register extension: 'txt' to view type: markdown. txt is already registered to markdown."
-  },
+  "errors": {},
   "allowMdOverride": false,
   "mobileSettings": {
     "enabled": false,

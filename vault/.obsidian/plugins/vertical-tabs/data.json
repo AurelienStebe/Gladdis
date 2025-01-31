@@ -1,26 +1,26 @@
 {
   "showActiveTabs": false,
-  "autoUncollapseGroup": false,
+  "autoUncollapseGroup": true,
   "hideSidebars": true,
   "sidebarTabTypes": [
     "markdown"
   ],
   "sidebarExcludeSelf": true,
-  "trimTabNames": false,
-  "showMoreButtons": false,
+  "trimTabNames": true,
+  "showMoreButtons": true,
   "useTabEditing": true,
   "zenMode": false,
   "enableTabZoom": false,
   "enhancedKeyboardTabSwitch": false,
   "alwaysOpenInNewTab": false,
-  "deduplicateTabs": false,
-  "ephemeralTabs": false,
+  "deduplicateTabs": true,
+  "ephemeralTabs": true,
   "smartNavigation": true,
-  "navigationStrategy": "obsidian-plus",
+  "navigationStrategy": "ide",
   "autoCloseEphemeralTabs": true,
   "deduplicateSameGroupTabs": false,
   "deduplicateSidebarTabs": false,
   "deduplicatePopupTabs": false,
   "backgroundMode": false,
-  "installationID": "lrf2Zr8UdU6ATFZk9jjt6"
+  "installationID": "vWvSW7UavwjVNC84icYEs"
 }
