@@ -7,7 +7,7 @@ export const modelCatalog: ModelDetails[] = [
         reasoning: true,
     },
     {
-        label: 'o1',
+        label: 'o(1|3)',
         limit: 200_000,
         vision: true,
         reasoning: true,
