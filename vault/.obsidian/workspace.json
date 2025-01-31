@@ -8,20 +8,69 @@
         "type": "tabs",
         "children": [
           {
-            "id": "ea579cef664e3807",
+            "id": "efcf8898d1d505f7",
             "type": "leaf",
+            "pinned": true,
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Welcome.md",
+                "file": "README.md",
                 "mode": "source",
-                "source": false
+                "source": true
               },
+              "pinned": true,
               "icon": "lucide-file",
-              "title": "Welcome"
+              "title": "README"
             }
           }
         ]
+      },
+      {
+        "id": "f71e14ed95c8c630",
+        "type": "split",
+        "children": [
+          {
+            "id": "0513d5db18d74232",
+            "type": "tabs",
+            "children": [
+              {
+                "id": "ea579cef664e3807",
+                "type": "leaf",
+                "pinned": true,
+                "state": {
+                  "type": "markdown",
+                  "state": {
+                    "file": "Welcome.md",
+                    "mode": "source",
+                    "source": false
+                  },
+                  "pinned": true,
+                  "icon": "lucide-file",
+                  "title": "Welcome"
+                }
+              }
+            ]
+          },
+          {
+            "id": "7353f0adf595f30f",
+            "type": "tabs",
+            "children": [
+              {
+                "id": "23445d431c146af2",
+                "type": "leaf",
+                "pinned": true,
+                "state": {
+                  "type": "graph",
+                  "state": {},
+                  "pinned": true,
+                  "icon": "lucide-git-fork",
+                  "title": "Graph view"
+                }
+              }
+            ]
+          }
+        ],
+        "direction": "horizontal"
       }
     ],
     "direction": "vertical"
@@ -40,7 +89,8 @@
             "state": {
               "type": "file-explorer",
               "state": {
-                "sortOrder": "alphabetical"
+                "sortOrder": "alphabetical",
+                "autoReveal": false
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -93,7 +143,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Welcome.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -103,7 +152,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Welcome"
+              "title": "Backlinks"
             }
           },
           {
@@ -166,8 +215,9 @@
       "audio-recorder:Start/stop recording": false
     }
   },
-  "active": "ea579cef664e3807",
+  "active": "efcf8898d1d505f7",
   "lastOpenFiles": [
-    "Welcome.md"
+    "Welcome.md",
+    "README.md"
   ]
 }
