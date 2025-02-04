@@ -1,3 +1,24 @@
+## [0.6.1](https://github.com/AurelienStebe/Gladdis/compare/0.6.0...0.6.1) (2025-02-04)
+
+
+### Bug Fixes
+
+* add 8 community plugins with default settings ([66928e0](https://github.com/AurelienStebe/Gladdis/commit/66928e09d48410c84eb14938072a3c1f08ef604c))
+* add a theme and adapt the Startup plugin ([d00940f](https://github.com/AurelienStebe/Gladdis/commit/d00940fb328ac954757f04cad90b25d155973006))
+* add early support for reasoning models like "o1" ([9645ff8](https://github.com/AurelienStebe/Gladdis/commit/9645ff81536c2d09d587ba1ec6753389c657cd3c))
+* add Gladdis default config and setup both configs at startup ([2a3e26c](https://github.com/AurelienStebe/Gladdis/commit/2a3e26c6e2bf4c87ea63ad5493b770c0fa066ba0))
+* add Startup plugin to demo Vault & add "better-word-count" ([3112641](https://github.com/AurelienStebe/Gladdis/commit/3112641b71bd7812ba655dac0964117c01e3f636))
+* add support for OpenAI "o3" in the Catalog ([64d63db](https://github.com/AurelienStebe/Gladdis/commit/64d63dbd844d6f3fefc63905f5945e59775f4864))
+* add Welcome file to the demo Vault and edit it on startup ([cba8c4f](https://github.com/AurelienStebe/Gladdis/commit/cba8c4f3bcf261228d4da74dc9269110685ec597))
+* change "readBinary" signature for a better integration ([41f9af2](https://github.com/AurelienStebe/Gladdis/commit/41f9af23163143d424c5c96ca47f9159db200f2a))
+* correctly URI encode the path and URL of images ([429f326](https://github.com/AurelienStebe/Gladdis/commit/429f326f0b6f6e638527d78965089563071efec3))
+* improve the StartupPlugin onload performance ([97603af](https://github.com/AurelienStebe/Gladdis/commit/97603af096b178f76d8d1ede7cd719281f418f37))
+* move & improve the catalog loader, plus minor bug fix ([0563958](https://github.com/AurelienStebe/Gladdis/commit/05639585f2a28001e25676fa53d3d86e82e7d263))
+* remove the legacy "service" & fix some minor bugs ([b9913df](https://github.com/AurelienStebe/Gladdis/commit/b9913dfa26848cd9db2ef73a9729124f0802cf78))
+* replace "js-tiktoken" with the faster "gpt-tokenizer" ([6e3fb66](https://github.com/AurelienStebe/Gladdis/commit/6e3fb661c1a2896c8259c2fae8424a51af33050a))
+* replace manual PDF text extraction with "pdf2md" lib ([6e62182](https://github.com/AurelienStebe/Gladdis/commit/6e621821d0960fe15338ce26fff9d45b11ba3a06))
+* switch to underscores for sections to avoid conflicts ([d25b0d0](https://github.com/AurelienStebe/Gladdis/commit/d25b0d0901e8523fdb8b4769d1ffed05dc0bc8d7))
+
 # [0.6.0](https://github.com/AurelienStebe/Gladdis/compare/0.5.1...0.6.0) (2024-11-13)
 
 
