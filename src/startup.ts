@@ -90,6 +90,9 @@ export default class GladdisStartupPlugin extends Plugin {
             gladdis.settings.GLADDIS_WHISPER_SERVER = config.default_server[config.default_whisper]
         }
 
+        gladdis.settings.GLADDIS_CONFIG_FILE = 'Gladdis.md'
+        gladdis.settings.GLADDIS_WHISPER_CONFIG = 'Whisper.md'
+
         await gladdis.saveSecrets() // eslint-disable-line
         await gladdis.saveSettings() // eslint-disable-line
 
