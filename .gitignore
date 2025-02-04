@@ -11,5 +11,6 @@
 
 /vault/.obsidian/plugins/*/main.js
 /vault/.obsidian/plugins/*/styles.css
+/vault/.obsidian/vault-stats.json
 /vault/.obsidian/plugins/gladdis/.env
 /vault/.obsidian/plugins/gladdis/data.json

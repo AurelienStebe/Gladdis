@@ -36,7 +36,7 @@
     }
   ],
   "countComments": false,
-  "collectStats": false,
+  "collectStats": true,
   "displaySectionCounts": false,
   "pageWords": 0.75,
   "statsPath": ".obsidian/vault-stats.json"
