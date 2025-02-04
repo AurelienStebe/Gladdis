@@ -1,4 +1,4 @@
-import { App, Modal, Notice, Plugin, Setting } from 'obsidian'
+import { App, Modal, Notice, Plugin, Setting, TFile } from 'obsidian'
 
 interface GladdisConfig {
     name_label: string
@@ -95,6 +95,16 @@ export default class GladdisStartupPlugin extends Plugin {
 
         await gladdis.saveSecrets() // eslint-disable-line
         await gladdis.saveSettings() // eslint-disable-line
+
+        const file = this.app.vault.getAbstractFileByPath('Welcome.md')
+
+        if (file instanceof TFile) {
+            await this.app.vault.process(file, (data) => {
+                return data
+                    .replace('__Gladdis:__', `__${config.name_label}:__`)
+                    .replace('__Hooman:__', `__${config.default_user}:__`)
+            })
+        }
 
         new Notice('Gladdis is configured and ready.').noticeEl.addClass('mod-success')
     }
