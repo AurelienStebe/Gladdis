@@ -12,8 +12,16 @@
 - **Whisper Transcription**: audio files WikiLinks are auto-transcribed, use the Obsidian "audio recorder" core plugin.
 - **Document Loading**: text files WikiLinks are auto-loaded, just drag and drop files into the conversation window.
 - **PDF & Web Support**: load PDF WikiLinks just like text files, load web pages external links as well using `<URL>`.
-- **Image Vision AIs**: send images to vision supporting LLMs using local WikiLinks or Markdown external web links.
+- **Image Vision AIs**: send images to vision-supporting LLMs using local WikiLinks or Markdown external web links.
 - **System Prompts**: name your system prompts, create personalities and use FrontMatter to choose whom to talk to.
+
+## Plugin Demo Vault
+
+Download the [Plugin Demo Vault in ZIP or TGZ](https://github.com/AurelienStebe/Gladdis/releases/latest) to try it out !
+
+<br>
+
+![Gladdis Demo Vault](picdemo.png)
 
 ## Documentation
 
@@ -27,11 +35,15 @@ Gladdis provides 3 commands, map them to hotkeys in the settings or create butto
 
 ### Settings / Options
 
-The settings panel let you specify the plugin data folder, your OpenAI API key and the FrontMatter defaults.
+The settings panel lets you specify the plugin data folder, your OpenAI API key, and the FrontMatter defaults.
 
 - **Data Root Path**: Gladdis will search for config files in the `configs` subfolder, and will write the chat and call logs in the `history` subfolder.
 - **OpenAI Secret Key**: create an OpenAI API account, [generate an API key](https://platform.openai.com/account/api-keys) and paste it in the settings panel.
 - **FrontMatter Defaults**: adjust the various defaults for the Gladdis and Whisper options.
+
+<br>
+
+![The Settings Panel](options.png)
 
 ### FrontMatter Config
 
@@ -93,7 +105,7 @@ The following [OpenAI models](https://platform.openai.com/docs/models) are suppo
 | `gpt-4-turbo`       | 128 k  |   ✅   | The latest GPT-4 Turbo model with vision capabilities (GPT-4o is cheaper and faster).          |
 | `gpt-3.5-turbo`     |  16 k  |        | The latest GPT-3.5 Turbo model with higher accuracy (GPT-4o mini is cheaper and more capable). |
 
-Open Source models can be used locally via [Ollama](https://ollama.com/) or [LocalAI](https://localai.io/):
+Open-Source models can be used locally via [Ollama](https://ollama.com/) or [LocalAI](https://localai.io/):
 
 | Label             | Tokens | Vision | Notes                                                                        |
 | ----------------- | :----: | :----: | ---------------------------------------------------------------------------- |
