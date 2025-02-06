@@ -14,7 +14,7 @@ export interface ModelDetails {
     vision?: boolean
     hearing?: boolean
     speaking?: boolean
-    reasoning?: boolean
+    reasoning?: boolean | 'low' | 'medium' | 'high'
 }
 
 export interface DiskInterface {

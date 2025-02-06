@@ -118,11 +118,14 @@ export function loadContent(context: Context): Context {
     context.user.history.push(...parseHistory(context))
 
     if (typeof context.gladdis.model === 'string') {
-        const label = context.gladdis.model as string
-        const model = modelCatalog.find((model) => new RegExp(`^${model.label}`, 'i').test(label))
-
-        context.gladdis.model = model ? { ...model, label } : { label }
+        context.gladdis.model = { label: context.gladdis.model }
     }
+
+    const model = modelCatalog.find((model) => {
+        return new RegExp(`^${model.label}`, 'i').test(context.gladdis.model.label)
+    })
+
+    context.gladdis.model = deepmerge(model, context.gladdis.model)
 
     for (const message of context.user.history) {
         if (message.role === 'system') message.content = message.content.replace(linkRegex, '!$1')

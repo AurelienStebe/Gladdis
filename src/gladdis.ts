@@ -97,16 +97,22 @@ export async function callGladdis(context: Context): Promise<Context> {
         })
     }
 
+    const options: OpenAI.ChatCompletionCreateParamsStreaming = {
+        stream: true,
+        model: context.gladdis.model.label,
+        messages: context.gladdis.model.vision ? await loadImages(context) : context.user.history,
+        temperature: context.gladdis.temperature / 100,
+        top_p: context.gladdis.top_p_param / 100,
+        frequency_penalty: context.gladdis.freq_penalty / 100,
+        presence_penalty: context.gladdis.pres_penalty / 100,
+    }
+
+    if (typeof context.gladdis.model.reasoning === 'string') {
+        options.reasoning_effort = context.gladdis.model.reasoning
+    }
+
     try {
-        const stream = await openai.chat.completions.create({
-            stream: true,
-            model: context.gladdis.model.label,
-            messages: context.gladdis.model.vision ? await loadImages(context) : context.user.history,
-            temperature: context.gladdis.temperature / 100,
-            top_p: context.gladdis.top_p_param / 100,
-            frequency_penalty: context.gladdis.freq_penalty / 100,
-            presence_penalty: context.gladdis.pres_penalty / 100,
-        })
+        const stream = await openai.chat.completions.create(options)
 
         await disk.appendFile(context.file.path, `\n\n__${context.gladdis.label}:__ `)
 
