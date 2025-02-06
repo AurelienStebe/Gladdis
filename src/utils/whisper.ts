@@ -17,17 +17,21 @@ export async function transcribe(content: string, context: Context): Promise<str
             const fullPath = await resolveFile(filePath, context)
             if (fullPath === undefined) continue
 
+            const audioFile = new File([await disk.readBinary(fullPath)], disk.baseName(fullPath))
+
             try {
-                if (context.whisper.language === undefined && context.whisper.server === undefined) {
-                    transcript = await translation(fullPath, context)
+                if (!context.whisper.language && !context.whisper.server) {
+                    transcript = await translation(audioFile, context)
                 } else {
-                    transcript = await transcription(fullPath, context)
+                    transcript = await transcription(audioFile, context)
                 }
             } catch (error) {
                 await writeErrorModal(error, 'OpenAI Whisper API Error', context)
             }
 
             if (transcript === undefined) continue
+
+            transcript = transcript.replace(/\[BLANK_AUDIO\]$/, '')
 
             if (transcript.trim() === '') {
                 await writeInvalidModal([], `No Transcript from "${filePath}"`, context)
@@ -53,7 +57,7 @@ export async function transcribe(content: string, context: Context): Promise<str
     })
 }
 
-export async function translation(filePath: string, context: Context): Promise<string> {
+export async function translation(audioFile: File, context: Context): Promise<string> {
     const openai = new OpenAI({
         apiKey: context.user.env.OPENAI_API_KEY,
         dangerouslyAllowBrowser: true,
@@ -63,14 +67,14 @@ export async function translation(filePath: string, context: Context): Promise<s
         response_format: 'json',
         model: context.whisper.model,
         prompt: context.whisper.input,
-        file: await toFile(context.file.disk.readBinary(filePath)),
+        file: await toFile(audioFile),
         temperature: context.whisper.temperature / 100,
     })
 
     return translation.text
 }
 
-export async function transcription(filePath: string, context: Context): Promise<string> {
+export async function transcription(audioFile: File, context: Context): Promise<string> {
     const openai = new OpenAI({
         apiKey: context.user.env.OPENAI_API_KEY,
         baseURL: context.whisper.server,
@@ -81,7 +85,7 @@ export async function transcription(filePath: string, context: Context): Promise
         response_format: 'json',
         model: context.whisper.model,
         prompt: context.whisper.input,
-        file: await toFile(context.file.disk.readBinary(filePath)),
+        file: await toFile(audioFile),
         temperature: context.whisper.temperature / 100,
         language: context.whisper.language,
     })
