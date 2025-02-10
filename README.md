@@ -19,9 +19,9 @@
 
 Download the [Plugin Demo Vault in ZIP or TGZ](https://github.com/AurelienStebe/Gladdis/releases/latest) to try it out !
 
-<br>
-
-![Gladdis Demo Vault](picdemo.png)
+<p align="center">
+    <img style="margin-top: 1em;" alt="Gladdis Demo Vault" src="https://raw.githubusercontent.com/AurelienStebe/Gladdis/main/picdemo.png">
+</p>
 
 ## Documentation
 
@@ -41,9 +41,9 @@ The settings panel lets you specify the plugin data folder, your OpenAI API key,
 - **OpenAI Secret Key**: create an OpenAI API account, [generate an API key](https://platform.openai.com/account/api-keys) and paste it in the settings panel.
 - **FrontMatter Defaults**: adjust the various defaults for the Gladdis and Whisper options.
 
-<br>
-
-![The Settings Panel](options.png)
+<p align="center">
+    <img style="margin-top: 2em;" alt="The Settings Panel" src="https://raw.githubusercontent.com/AurelienStebe/Gladdis/main/options.png">
+</p>
 
 ### FrontMatter Config
 
@@ -99,6 +99,8 @@ The following [OpenAI models](https://platform.openai.com/docs/models) are suppo
 
 | Label               | Tokens | Vision | Notes                                                                                          |
 | ------------------- | :----: | :----: | ---------------------------------------------------------------------------------------------- |
+| `o3-mini`           | 200 k  |        | OpenAI's latest reasoning model designed to excel at science, math, and coding tasks.          |
+| `o1-mini`           | 128 k  |        | OpenAI's first reasoning model designed to solve hard problems across domains.                 |
 | `gpt-4o`            | 128 k  |   ✅   | OpenAI's high-intelligence flagship model for complex, multi-step tasks.                       |
 | `gpt-4o-mini`       | 128 k  |   ✅   | OpenAI's affordable and intelligent small model for fast, lightweight tasks.                   |
 | `chatgpt-4o-latest` | 128 k  |   ✅   | Dynamic model continuously updated to the current version of GPT-4o in ChatGPT.                |
@@ -109,12 +111,14 @@ Open-Source models can be used locally via [Ollama](https://ollama.com/) or [Loc
 
 | Label             | Tokens | Vision | Notes                                                                        |
 | ----------------- | :----: | :----: | ---------------------------------------------------------------------------- |
+| `llama3.3`        | 128 k  |        | Meta's new 70B model with similar performance to the Llama 3.1 405B model.   |
 | `llama3.2`        | 128 k  |        | Meta's new 1B and 3B models optimized for multilingual dialogue use cases.   |
 | `llama3.1`        | 128 k  |        | Meta's 8B, 70B and 405B models with overall stronger reasoning capabilities. |
+| `phi4`            |  16 k  |        | Microsoft's new Phi 4 "Medium" (14B) open model with a 16k context window.   |
 | `phi3.5` / `phi3` | 128 k  |        | Microsoft's new Phi 3.5 "Mini" (3.8B) and Phi 3 "Medium" (14B) open models.  |
 | `qwen2.5`         | 128 k  |        | Alibaba Cloud's Qwen multilingual Chinese models ranging from 0.5B to 72B.   |
 | `gemma2`          | 128 k  |        | Google's Gemma 2B, 9B and 27B models featuring a brand new architecture.     |
-| `llava`           |  4 k   |   ✅   | Family of Large Language-and-Vision Assistant models between 7B and 34B.     |
+| `llava`           |   4 k  |   ✅   | Family of Large Language-and-Vision Assistant models between 7B and 34B.     |
 
 ## Future Development
 

@@ -201,6 +201,8 @@ export class GladdisWelcomeModal extends Modal {
             .addDropdown((dropdown) => {
                 dropdown
                     .addOptions({
+                        'o3-mini': 'o3 mini (SOTA model)',
+                        'o1-mini': 'o1 mini (reasoning)',
                         'gpt-4o': 'GPT-4o (smartest)',
                         'gpt-4o-mini': 'GPT-4o mini (fastest)',
                         'chatgpt-4o-latest': 'ChatGPT-4o (latest)',
@@ -255,11 +257,13 @@ export class GladdisWelcomeModal extends Modal {
             .addDropdown((dropdown) => {
                 dropdown
                     .addOptions({
+                        'llama3.3:70b': 'Llama 3.3 70B (43 Go)',
                         'llama3.2:1b': 'Llama 3.2 1B (1 Go)',
                         'llama3.2:3b': 'Llama 3.2 3B (2 Go)',
                         'llama3.1:8b': 'Llama 3.1 8B (5 Go)',
                         'llama3.1:70b': 'Llama 3.1 70B (43 Go)',
-                        'phi3.5': 'Phi 3.5 "Mini" (2 Go)',
+                        'phi4:14b': 'Phi 4 "Medium" (9 Go)',
+                        'phi3.5:3.8b': 'Phi 3.5 "Mini" (2 Go)',
                         'phi3:14b': 'Phi 3 "Medium" (8 Go)',
                         'qwen2.5:0.5b': 'Qwen 2.5 0.5B (0.5 Go)',
                         'qwen2.5:1.5b': 'Qwen 2.5 1.5B (1 Go)',
@@ -269,7 +273,7 @@ export class GladdisWelcomeModal extends Modal {
                         'qwen2.5:32b': 'Qwen 2.5 32B (20 Go)',
                         'qwen2.5:72b': 'Qwen 2.5 72B (47 Go)',
                         'gemma2:2b': 'Gemma 2 2B (1.5 Go)',
-                        'gemma2:9b': 'Gemma 2 9B (5 Go)',
+                        'gemma2:9b': 'Gemma 2 9B (5.5 Go)',
                         'gemma2:27b': 'Gemma 2 27B (16 Go)',
                         'llava:7b': 'Llava 1.6 7B (5 Go)',
                         'llava:13b': 'Llava 1.6 13B (8 Go)',
@@ -324,10 +328,12 @@ export class GladdisWelcomeModal extends Modal {
             .addDropdown((dropdown) => {
                 dropdown
                     .addOptions({
+                        'llama-3.3-70b-instruct': 'Llama 3.3 70B (43 Go)',
                         'llama-3.2-1b-instruct:q8_0': 'Llama 3.2 1B (1 Go)',
                         'llama-3.2-3b-instruct:q8_0': 'Llama 3.2 3B (2 Go)',
                         'meta-llama-3.1-8b-instruct': 'Llama 3.1 8B (5 Go)',
                         'meta-llama-3.1-70b-instruct': 'Llama 3.1 70B (43 Go)',
+                        'phi-4': 'Phi 4 "Medium" (9 Go)',
                         'phi-3.5-mini-instruct': 'Phi 3.5 "Mini" (2 Go)',
                         'phi-3-medium-4k-instruct': 'Phi 3 "Medium" (8 Go)',
                         'qwen2.5-0.5b-instruct': 'Qwen 2.5 0.5B (0.5 Go)',
@@ -336,7 +342,7 @@ export class GladdisWelcomeModal extends Modal {
                         'qwen2.5-32b-instruct': 'Qwen 2.5 32B (20 Go)',
                         'qwen2.5-72b-instruct': 'Qwen 2.5 72B (47 Go)',
                         'gemma-2b': 'Gemma 2 2B (1.5 Go)',
-                        'gemma-2-9b-it': 'Gemma 2 9B (5 Go)',
+                        'gemma-2-9b-it': 'Gemma 2 9B (5.5 Go)',
                         'gemma-2-27b-it': 'Gemma 2 27B (16 Go)',
                         'llava-1.6-vicuna': 'Llava "Vicuna" (5 Go)',
                         'llava-1.6-mistral': 'Llava "Mistral" (5 Go)',

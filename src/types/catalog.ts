@@ -2,6 +2,11 @@ import type { ModelDetails } from './context.js'
 
 export const modelCatalog: ModelDetails[] = [
     {
+        label: 'o3-mini',
+        limit: 200_000,
+        reasoning: true,
+    },
+    {
         label: 'o1-(mini|preview)',
         limit: 128_000,
         reasoning: true,
@@ -44,6 +49,10 @@ export const modelCatalog: ModelDetails[] = [
     {
         label: '(meta-)?llama',
         limit: 4_096,
+    },
+    {
+        label: 'phi-?4',
+        limit: 16_000,
     },
     {
         label: 'phi-?3',
