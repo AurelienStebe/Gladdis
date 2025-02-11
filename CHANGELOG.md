@@ -1,3 +1,13 @@
+## [0.6.2](https://github.com/AurelienStebe/Gladdis/compare/0.6.1...0.6.2) (2025-02-11)
+
+
+### Bug Fixes
+
+* add support for "llama3.2" & "phi3.5" vision models ([d9cd2d5](https://github.com/AurelienStebe/Gladdis/commit/d9cd2d573049876e15eabf1a7423fcf599fa47fe))
+* add support for "o1-mini", "o3-mini", "llama-3.3" & "phi-4" ([15f9736](https://github.com/AurelienStebe/Gladdis/commit/15f9736c245ef4d527880c691051cb3d53f75758))
+* add support for "reasoning_effort" flag for "o3-mini" ([09602ac](https://github.com/AurelienStebe/Gladdis/commit/09602acde835849f757361495e9ecefabb857ce1))
+* OpenAI API Whisper bug and LocalAI transcription ending ([11eaca3](https://github.com/AurelienStebe/Gladdis/commit/11eaca3f070fe4b7ea799eadde9a8259a388d343))
+
 ## [0.6.1](https://github.com/AurelienStebe/Gladdis/compare/0.6.0...0.6.1) (2025-02-04)
 
 
