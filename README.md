@@ -112,12 +112,14 @@ Open-Source models can be used locally via [Ollama](https://ollama.com/) or [Loc
 | Label             | Tokens | Vision | Notes                                                                        |
 | ----------------- | :----: | :----: | ---------------------------------------------------------------------------- |
 | `llama3.3`        | 128 k  |        | Meta's new 70B model with similar performance to the Llama 3.1 405B model.   |
+| `llama3.2-vision` | 128 k  |   ✅   | Meta's image reasoning generative models in both 11B and 90B model sizes.    |
 | `llama3.2`        | 128 k  |        | Meta's new 1B and 3B models optimized for multilingual dialogue use cases.   |
 | `llama3.1`        | 128 k  |        | Meta's 8B, 70B and 405B models with overall stronger reasoning capabilities. |
 | `phi4`            |  16 k  |        | Microsoft's new Phi 4 "Medium" (14B) open model with a 16k context window.   |
+| `phi3.5-vision`   | 128 k  |   ✅   | Microsoft's Phi 3 and 3.5 "Mini" (3.8B) models with vision capabilities.     |
 | `phi3.5` / `phi3` | 128 k  |        | Microsoft's new Phi 3.5 "Mini" (3.8B) and Phi 3 "Medium" (14B) open models.  |
-| `qwen2.5`         | 128 k  |        | Alibaba Cloud's Qwen multilingual Chinese models ranging from 0.5B to 72B.   |
-| `gemma2`          | 128 k  |        | Google's Gemma 2B, 9B and 27B models featuring a brand new architecture.     |
+| `qwen2.5`         |  32 k  |        | Alibaba Cloud's Qwen multilingual Chinese models ranging from 0.5B to 72B.   |
+| `gemma2`          |   8 k  |        | Google's Gemma 2B, 9B and 27B models featuring a brand new architecture.     |
 | `llava`           |   4 k  |   ✅   | Family of Large Language-and-Vision Assistant models between 7B and 34B.     |
 
 ## Future Development

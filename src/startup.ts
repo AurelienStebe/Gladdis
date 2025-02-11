@@ -258,6 +258,8 @@ export class GladdisWelcomeModal extends Modal {
                 dropdown
                     .addOptions({
                         'llama3.3:70b': 'Llama 3.3 70B (43 Go)',
+                        'llama3.2-vision:11b': 'Llama 3 V 11B (8 Go)',
+                        'llama3.2-vision:90b': 'Llama 3 V 90B (55 Go)',
                         'llama3.2:1b': 'Llama 3.2 1B (1 Go)',
                         'llama3.2:3b': 'Llama 3.2 3B (2 Go)',
                         'llama3.1:8b': 'Llama 3.1 8B (5 Go)',
@@ -278,6 +280,8 @@ export class GladdisWelcomeModal extends Modal {
                         'llava:7b': 'Llava 1.6 7B (5 Go)',
                         'llava:13b': 'Llava 1.6 13B (8 Go)',
                         'llava:34b': 'Llava 1.6 34B (20 Go)',
+                        'llava-phi3:3.8b': 'Llava Phi 3.8B (3 Go)',
+                        'llava-llama3:8b': 'Llava Llama 8B (5 Go)',
                     })
                     .setValue(this.config.default_model['Ollama'])
                     .onChange((value) => (this.config.default_model['Ollama'] = value))
@@ -334,7 +338,10 @@ export class GladdisWelcomeModal extends Modal {
                         'meta-llama-3.1-8b-instruct': 'Llama 3.1 8B (5 Go)',
                         'meta-llama-3.1-70b-instruct': 'Llama 3.1 70B (43 Go)',
                         'phi-4': 'Phi 4 "Medium" (9 Go)',
+                        'phi-3.5-vision:vllm': 'Phi 3.5 "Vision" (2 Go)',
                         'phi-3.5-mini-instruct': 'Phi 3.5 "Mini" (2 Go)',
+                        'phi-3.5-moe-instruct': 'Phi 3.5 "MoE" (24 Go)',
+                        'phi-3-vision:vllm': 'Phi 3 "Vision" (2 Go)',
                         'phi-3-medium-4k-instruct': 'Phi 3 "Medium" (8 Go)',
                         'qwen2.5-0.5b-instruct': 'Qwen 2.5 0.5B (0.5 Go)',
                         'qwen2.5-1.5b-instruct': 'Qwen 2.5 1.5B (1 Go)',
@@ -346,6 +353,7 @@ export class GladdisWelcomeModal extends Modal {
                         'gemma-2-27b-it': 'Gemma 2 27B (16 Go)',
                         'llava-1.6-vicuna': 'Llava "Vicuna" (5 Go)',
                         'llava-1.6-mistral': 'Llava "Mistral" (5 Go)',
+                        'llava-llama-3-8b-v1_1': 'Llava "Llama 3" (5 Go)',
                     })
                     .setValue(this.config.default_model['LocalAI'])
                     .onChange((value) => (this.config.default_model['LocalAI'] = value))

@@ -43,6 +43,11 @@ export const modelCatalog: ModelDetails[] = [
         limit: 16_385,
     },
     {
+        label: 'llama-?3.?.?-vision',
+        limit: 128_000,
+        vision: true,
+    },
+    {
         label: '(meta-)?llama-?3',
         limit: 128_000,
     },
@@ -52,7 +57,12 @@ export const modelCatalog: ModelDetails[] = [
     },
     {
         label: 'phi-?4',
-        limit: 16_000,
+        limit: 16_384,
+    },
+    {
+        label: 'phi-?3.?.?-vision',
+        limit: 128_000,
+        vision: true,
     },
     {
         label: 'phi-?3',
@@ -63,16 +73,8 @@ export const modelCatalog: ModelDetails[] = [
         limit: 2_048,
     },
     {
-        label: 'qwen2',
-        limit: 128_000,
-    },
-    {
         label: 'qwen',
-        limit: 8_192,
-    },
-    {
-        label: 'gemma-?2',
-        limit: 128_000,
+        limit: 32_768,
     },
     {
         label: 'gemma',
