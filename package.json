@@ -98,7 +98,7 @@
     },
     "dependencies": {
         "@electron/remote": "^2.1.2",
-        "@mozilla/readability": "^0.5.0",
+        "@mozilla/readability": "^0.6.0",
         "@opendocsg/pdf2md": "^0.2.1",
         "deepmerge-ts": "^7.1.4",
         "fs-extra": "^11.3.0",
